@@ -1,0 +1,128 @@
+import type { PaginatedResponse } from '@/types/pagination'
+
+export type CampaignStatus = 'draft' | 'planned' | 'active' | 'completed' | 'suspended' | 'cancelled'
+
+export type CampaignListFilters = {
+  page: number
+  pageSize: number
+  code?: string
+  name?: string
+  status?: CampaignStatus
+  province?: string
+}
+
+export type CampaignListItem = {
+  id: number
+  name: string
+  code: string | null
+  status: CampaignStatus
+  province: string
+  startDate: string
+  endDate: string
+  totalBeneficiariesCount?: number
+  totalDisbursementAmount?: number
+  successRate?: number | null
+}
+
+export type CampaignListResponse = PaginatedResponse<CampaignListItem>
+
+export type CampaignDetail = {
+  id: number
+  name: string
+  code: string | null
+  description: string | null
+  program: string | null
+  community: string | null
+  province: string
+  status: CampaignStatus
+  startDate: string
+  endDate: string
+  executionDate: string | null
+  isSavingCampaignEnabled: boolean
+  totalBeneficiariesCount: number
+  totalDisbursementAmount: number
+  successRate: number | null
+  createdAt: string
+  updatedAt: string
+  programRelation?: {
+    id: number
+    name: string
+  } | null
+  regionRelation?: {
+    id: number
+    name: string
+  } | null
+  paymentChannel?: {
+    id: number
+    name: string
+  } | null
+  disbursementType?: {
+    id: number
+    name: string
+  } | null
+}
+
+export type CampaignProgress = {
+  campaignId: number
+  progressByStatus: {
+    pending?: number
+    confirmed?: number
+    not_confirmed?: number
+    not_found?: number
+  }
+  total: number
+}
+
+export type CampaignBeneficiaryUploadPreviewRow = {
+  index: number
+  name: string
+  msisdn: string
+  disbursementAmount: number | null
+  testimony?: string | null
+  location?: string | null
+  province?: string | null
+  district?: string | null
+  community?: string | null
+  status: 'valid' | 'invalid' | 'duplicate'
+  errors: string[]
+  duplicateOf?: number
+}
+
+export type CampaignBeneficiaryUploadPreview = {
+  summary: {
+    total: number
+    valid: number
+    invalid: number
+    duplicate: number
+    errors: number
+  }
+  rows: CampaignBeneficiaryUploadPreviewRow[]
+}
+
+export type CampaignBeneficiaryImportResult = {
+  created: number
+  skipped: number
+  errors: Array<{
+    row: number
+    message: string
+    msisdn?: string
+    name?: string
+  }>
+}
+
+export type CampaignMutationPayload = {
+  name: string
+  description?: string
+  program?: string
+  programId?: number | null
+  community?: string
+  province: string
+  regionId?: number | null
+  startDate: string
+  endDate: string
+  executionDate?: string
+  isSavingCampaignEnabled?: boolean
+  paymentChannelId?: number | null
+  disbursementTypeId?: number | null
+  rules?: Record<string, unknown>
+}

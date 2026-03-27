@@ -1,0 +1,810 @@
+import { useState } from "react";
+import {
+  useDisbursementBatchesQuery,
+  useFailedTransactionsQuery,
+  useTransactionAnalyticsSummaryQuery,
+  useTransactionQuery,
+  useTransactionsQuery,
+} from "@/features/transactions/hooks/use-transaction-queries";
+import { adaptAnalytics, adaptBatch, adaptTransaction } from "@/features/transactions/adapters/transactions";
+import type { TransactionListFilters } from "@/features/transactions/types/transaction";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { Search, Package, Download, Eye, RefreshCw, TrendingUp, Activity, CheckCircle, XCircle, Clock, AlertCircle, DollarSign, BarChart3 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+
+export function BackofficeTransactions() {
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [campaignFilter, setCampaignFilter] = useState("all");
+  const [providerFilter, setProviderFilter] = useState("all");
+  const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
+  const [showTransactionDetail, setShowTransactionDetail] = useState(false);
+
+  const filters: TransactionListFilters = {
+    page: 1,
+    pageSize: 100,
+    q: searchQuery.trim() || undefined,
+    status: statusFilter === 'all' ? undefined : statusFilter.toLowerCase(),
+    type: typeFilter === 'all' ? undefined : typeFilter.toLowerCase(),
+  };
+  const transactionsQuery = useTransactionsQuery(filters);
+  const failedTransactionsQuery = useFailedTransactionsQuery({ page: 1, pageSize: 100, q: searchQuery.trim() || undefined });
+  const analyticsQuery = useTransactionAnalyticsSummaryQuery();
+  const batchesQuery = useDisbursementBatchesQuery(1, 100);
+  const selectedTransactionQuery = useTransactionQuery(selectedTransactionId ?? Number.NaN);
+
+  const analytics = adaptAnalytics(analyticsQuery.data);
+  const transactions = (transactionsQuery.data?.data ?? []).map(adaptTransaction).filter((txn) => {
+    const matchesCampaign = campaignFilter === 'all' || txn.campaignId === campaignFilter || txn.campaign === campaignFilter;
+    const matchesProvider = providerFilter === 'all' || txn.mobileMoneyProvider === providerFilter;
+    return matchesCampaign && matchesProvider;
+  });
+  const disbursementBatches = (batchesQuery.data?.data ?? []).map(adaptBatch);
+  const failedTransactionsList = (failedTransactionsQuery.data?.data ?? []).map(adaptTransaction).filter((txn) => {
+    const matchesCampaign = campaignFilter === 'all' || txn.campaignId === campaignFilter || txn.campaign === campaignFilter;
+    return matchesCampaign;
+  });
+  const selectedTransaction = selectedTransactionQuery.data ? adaptTransaction(selectedTransactionQuery.data) : transactions.find((txn) => txn.numericId === selectedTransactionId) ?? null;
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
+      Successful: { variant: "success" },
+      Confirmed: { variant: "success" },
+      Pending: { variant: "warning" },
+      Processing: { variant: "warning" },
+      Failed: { variant: "destructive" },
+      Reversed: { variant: "destructive" },
+      Completed: { variant: "success" },
+      Scheduled: { variant: "outline" }
+    };
+    return <Badge {...(variants[status] || {})}>{status}</Badge>;
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'Successful':
+      case 'Completed':
+        return <CheckCircle className="w-4 h-4" style={{ color: 'var(--success)' }} />;
+      case 'Failed':
+      case 'Reversed':
+        return <XCircle className="w-4 h-4" style={{ color: 'var(--destructive)' }} />;
+      case 'Pending':
+      case 'Processing':
+        return <Clock className="w-4 h-4" style={{ color: 'var(--warning)' }} />;
+      default:
+        return <Activity className="w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />;
+    }
+  };
+
+  const getTypeBadge = (type: string) => {
+    return type === 'Savings' ? (
+      <Badge variant="outline" style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}>
+        {type}
+      </Badge>
+    ) : (
+      <Badge variant="outline">{type}</Badge>
+    );
+  };
+
+  const handleViewTransaction = (txn: { numericId: number }) => {
+    setSelectedTransactionId(txn.numericId);
+    setShowTransactionDetail(true);
+  };
+
+  return (
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>Transactions</h1>
+        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
+          Monitor all financial movements, disbursement batches, and transaction analytics
+        </p>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-6">
+          <TabsTrigger value="all">All Transactions</TabsTrigger>
+          <TabsTrigger value="batches">Disbursement Batches</TabsTrigger>
+          <TabsTrigger value="failed">Failed Transactions</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
+
+        {/* ALL TRANSACTIONS TAB */}
+        <TabsContent value="all">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
+                  <Input
+                    placeholder="Search by transaction ID, beneficiary..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <Select value={campaignFilter} onValueChange={setCampaignFilter}>
+                  <SelectTrigger className="w-52">
+                    <SelectValue placeholder="Campaign" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Campaigns</SelectItem>
+                    {Array.from(new Set(transactions.map((txn) => txn.campaign))).filter((item) => item && item !== '—').map((item) => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="Disbursement">Disbursement</SelectItem>
+                    <SelectItem value="Savings">Savings</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="Successful">Successful</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Processing">Processing</SelectItem>
+                    <SelectItem value="Failed">Failed</SelectItem>
+                    <SelectItem value="Reversed">Reversed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={providerFilter} onValueChange={setProviderFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Provider" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Providers</SelectItem>
+                    {Array.from(new Set(transactions.map((txn) => txn.mobileMoneyProvider))).filter((item) => item && item !== '—').map((item) => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button variant="outline">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+              </div>
+              {transactionsQuery.error ? (
+                <p style={{ fontSize: 'var(--text-13)', color: 'var(--error)' }}>
+                  {transactionsQuery.error instanceof Error ? transactionsQuery.error.message : 'Transactions could not be loaded.'}
+                </p>
+              ) : null}
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Transaction Ref</TableHead>
+                    <TableHead>Beneficiary</TableHead>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>Provider</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Executed</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {transactions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={10} className="py-12 text-center">
+                        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                          {transactionsQuery.isPending ? 'Loading transactions...' : 'No transactions found'}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : transactions.map((txn) => (
+                    <TableRow key={txn.id} className="cursor-pointer hover:bg-muted/50">
+                      <TableCell>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace', fontSize: 'var(--text-12)' }}>
+                          {txn.reference}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>{txn.beneficiary}</p>
+                          <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                            {txn.beneficiaryCode}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p style={{ fontSize: 'var(--text-13)' }}>{txn.campaign}</p>
+                          <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                            {txn.campaignId}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>{getTypeBadge(txn.type)}</TableCell>
+                      <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
+                        MT {txn.amount.toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <span style={{ fontSize: 'var(--text-13)' }}>{txn.mobileMoneyProvider}</span>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(txn.status)}</TableCell>
+                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        {txn.createdAt}
+                      </TableCell>
+                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        {txn.executedAt || '—'}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleViewTransaction(txn)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* DISBURSEMENT BATCHES TAB */}
+        <TabsContent value="batches">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Package className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                  <div>
+                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                      Disbursement Batches
+                    </h3>
+                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      Bulk payment processing and batch management
+                    </p>
+                  </div>
+                </div>
+                <Button variant="outline">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Report
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Batch ID</TableHead>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead className="text-right">Total Amount</TableHead>
+                    <TableHead className="text-right">Transactions</TableHead>
+                    <TableHead>Success Rate</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Execution Date</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {disbursementBatches.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="py-12 text-center">
+                        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                          {batchesQuery.isPending ? 'Loading disbursement batches...' : 'No batches found'}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : disbursementBatches.map((batch) => {
+                    const successRate = batch.transactions > 0 
+                      ? ((batch.successful / batch.transactions) * 100).toFixed(1) 
+                      : '0.0';
+                    
+                    return (
+                      <TableRow key={batch.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell>
+                          <span style={{ fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace', fontSize: 'var(--text-12)' }}>
+                            {batch.id}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                              {batch.campaign}
+                            </p>
+                            <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                              {batch.campaignId}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
+                          MT {batch.totalAmount.toLocaleString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div>
+                            <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                              {batch.transactions.toLocaleString()}
+                            </p>
+                            <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)' }}>
+                              {batch.successful > 0 && `${batch.successful} success`}
+                              {batch.failed > 0 && ` • ${batch.failed} failed`}
+                              {batch.pending > 0 && ` • ${batch.pending} pending`}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="h-1.5 w-16 rounded-full overflow-hidden" 
+                              style={{ backgroundColor: 'var(--muted)' }}
+                            >
+                              <div 
+                                className="h-full" 
+                                style={{ 
+                                  width: `${successRate}%`, 
+                                  backgroundColor: parseFloat(successRate) >= 95 ? 'var(--success)' : parseFloat(successRate) >= 80 ? 'var(--warning)' : 'var(--destructive)'
+                                }}
+                              />
+                            </div>
+                            <span style={{ fontSize: 'var(--text-12)', fontWeight: 'var(--font-weight-medium)' }}>
+                              {successRate}%
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(batch.status)}</TableCell>
+                        <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                          {batch.executedAt || 'Not executed'}
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="icon">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* FAILED TRANSACTIONS TAB */}
+        <TabsContent value="failed">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5" style={{ color: "var(--destructive)" }} />
+                  <div>
+                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                      Failed Transactions
+                    </h3>
+                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      Review and retry failed payment transactions
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                  <Button variant="default">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Retry Selected
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Transaction Ref</TableHead>
+                    <TableHead>Beneficiary</TableHead>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>Error Message</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {failedTransactionsList.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-12 text-center">
+                        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                          {failedTransactionsQuery.isPending ? 'Loading failed transactions...' : 'No failed transactions found'}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : failedTransactionsList.map((txn) => (
+                    <TableRow key={txn.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace', fontSize: 'var(--text-12)' }}>
+                          {txn.reference}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>{txn.beneficiary}</p>
+                          <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                            {txn.beneficiaryCode}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <p style={{ fontSize: 'var(--text-13)' }}>{txn.campaign}</p>
+                      </TableCell>
+                      <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
+                        MT {txn.amount.toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <XCircle className="w-4 h-4" style={{ color: 'var(--destructive)' }} />
+                          <span style={{ fontSize: 'var(--text-13)', color: 'var(--destructive)' }}>
+                            {txn.errorMessage}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        {txn.createdAt}
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="sm">
+                          <RefreshCw className="w-3 h-3 mr-1" />
+                          Retry
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ANALYTICS TAB */}
+        <TabsContent value="analytics">
+          <div className="grid gap-6">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-4 gap-6">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      Total Disbursed
+                    </p>
+                    <DollarSign className="w-4 h-4" style={{ color: 'var(--success)' }} />
+                  </div>
+                  <p style={{ fontSize: 'var(--text-28)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    MT {analytics.totalDisbursed.toLocaleString()}
+                  </p>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--success)', marginTop: '4px' }}>
+                    <TrendingUp className="inline w-3 h-3 mr-1" />
+                    +12% from last month
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      Total Transactions
+                    </p>
+                    <Activity className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                  </div>
+                  <p style={{ fontSize: 'var(--text-28)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    {analytics.totalTransactions}
+                  </p>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
+                    All transaction types
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      Success Rate
+                    </p>
+                    <CheckCircle className="w-4 h-4" style={{ color: 'var(--success)' }} />
+                  </div>
+                  <p style={{ fontSize: 'var(--text-28)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    {analytics.successRate}%
+                  </p>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--success)', marginTop: '4px' }}>
+                    {analytics.successfulTransactions} successful
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      Failed Transactions
+                    </p>
+                    <XCircle className="w-4 h-4" style={{ color: 'var(--destructive)' }} />
+                  </div>
+                  <p style={{ fontSize: 'var(--text-28)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    {analytics.failedTransactions}
+                  </p>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--destructive)', marginTop: '4px' }}>
+                    Requires attention
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts */}
+            <div className="grid grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                      Transactions by Campaign
+                    </h3>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                     {analytics.byCampaign.map((campaign) => (
+                       <div key={campaign.name}>
+                        <div className="flex items-center justify-between mb-2">
+                          <p style={{ fontSize: 'var(--text-13)' }}>{campaign.name}</p>
+                          <span style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                            {campaign.count} txns
+                          </span>
+                        </div>
+                        <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--muted)' }}>
+                          <div 
+                            className="h-full" 
+                            style={{ 
+                               width: `${analytics.totalTransactions > 0 ? (campaign.count / analytics.totalTransactions) * 100 : 0}%`, 
+                               backgroundColor: campaign.color 
+                             }}
+                          />
+                        </div>
+                        <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
+                          MT {campaign.amount.toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                      Transaction Status Breakdown
+                    </h3>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                     {analytics.byStatus.map((stat) => (
+                       <div key={stat.status}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {getStatusIcon(stat.status)}
+                            <p style={{ fontSize: 'var(--text-13)' }}>{stat.status}</p>
+                          </div>
+                          <span style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                            {stat.count}
+                          </span>
+                        </div>
+                        <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--muted)' }}>
+                          <div 
+                            className="h-full" 
+                            style={{ 
+                               width: `${analytics.totalTransactions > 0 ? (stat.count / analytics.totalTransactions) * 100 : 0}%`, 
+                               backgroundColor: stat.color 
+                             }}
+                          />
+                        </div>
+                        <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
+                           {analytics.totalTransactions > 0 ? ((stat.count / analytics.totalTransactions) * 100).toFixed(1) : '0.0'}% of total
+                         </p>
+                       </div>
+                     ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Transaction Detail Dialog */}
+      <Dialog open={showTransactionDetail} onOpenChange={setShowTransactionDetail}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+              Transaction Details
+            </DialogTitle>
+            <DialogDescription style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+              Complete transaction information and lifecycle
+            </DialogDescription>
+          </DialogHeader>
+          {selectedTransaction && (
+            <div className="space-y-6">
+              {/* Transaction Header */}
+              <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)' }}>
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '4px' }}>
+                    Transaction Reference
+                  </p>
+                  <p style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)', fontFamily: 'monospace' }}>
+                    {selectedTransaction.reference}
+                  </p>
+                </div>
+                {getStatusBadge(selectedTransaction.status)}
+              </div>
+
+              {/* Transaction Details Grid */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Beneficiary
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.beneficiary}
+                  </p>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                    {selectedTransaction.beneficiaryCode}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Campaign
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.campaign}
+                  </p>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                    {selectedTransaction.campaignId}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Transaction Type
+                  </p>
+                  <div className="mt-1">
+                    {getTypeBadge(selectedTransaction.type)}
+                  </div>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Amount
+                  </p>
+                  <p style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    MT {selectedTransaction.amount.toLocaleString()}
+                  </p>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                    {selectedTransaction.currency}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Mobile Money Provider
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.mobileMoneyProvider}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    External Transaction ID
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace' }}>
+                    {selectedTransaction.externalTxnId || '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Created Date
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.createdAt}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Execution Date
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.executedAt || '—'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {selectedTransaction.errorMessage && (
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--destructive)', color: 'var(--destructive-foreground)' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <XCircle className="w-4 h-4" />
+                    <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                      Error Message
+                    </p>
+                  </div>
+                  <p style={{ fontSize: 'var(--text-13)' }}>
+                    {selectedTransaction.errorMessage}
+                  </p>
+                </div>
+              )}
+
+              {/* Transaction Timeline */}
+              <div>
+                <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-semi-bold)', marginBottom: '12px' }}>
+                  Transaction Lifecycle
+                </p>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: 'var(--success)' }}>
+                      <CheckCircle className="w-4 h-4" style={{ color: 'var(--success-foreground)' }} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>Created</p>
+                      <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        {selectedTransaction.createdAt}
+                      </p>
+                    </div>
+                  </div>
+                  {selectedTransaction.executedAt && (
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: selectedTransaction.status === 'Successful' ? 'var(--success)' : 'var(--destructive)' }}>
+                        {selectedTransaction.status === 'Successful' ? (
+                          <CheckCircle className="w-4 h-4" style={{ color: 'var(--success-foreground)' }} />
+                        ) : (
+                          <XCircle className="w-4 h-4" style={{ color: 'var(--destructive-foreground)' }} />
+                        )}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                          {selectedTransaction.status}
+                        </p>
+                        <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                          {selectedTransaction.executedAt}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
