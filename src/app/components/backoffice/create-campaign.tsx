@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
 import { useCampaignCatalogs } from "@/features/catalogs/hooks/use-catalog-queries";
-import { useCampaignBeneficiariesQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
+import { useAllCampaignBeneficiariesQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
 import {
   useCreateCampaignMutation,
   useUpdateCampaignMutation,
@@ -77,7 +77,7 @@ export function CreateCampaign() {
   const isEditMode = Number.isFinite(campaignId);
   const catalogs = useCampaignCatalogs();
   const campaignQuery = useCampaignQuery(campaignId);
-  const existingCampaignBeneficiariesQuery = useCampaignBeneficiariesQuery(campaignId, { page: 1, pageSize: 200 });
+  const existingCampaignBeneficiariesQuery = useAllCampaignBeneficiariesQuery(campaignId);
   const createCampaignMutation = useCreateCampaignMutation();
   const updateCampaignMutation = useUpdateCampaignMutation(campaignId);
   const validateUploadMutation = useValidateCampaignBeneficiariesUploadMutation();

@@ -43,7 +43,6 @@ export function adaptCampaignDetail(detail: CampaignDetail, progress?: CampaignP
   const successRate = detail.successRate ?? 0
   const totalDisbursementAmount = Number(detail.totalDisbursementAmount ?? 0)
   const totalBeneficiariesCount = Number(detail.totalBeneficiariesCount ?? 0)
-  const amountDisbursed = Math.round(totalDisbursementAmount * (successRate / 100))
   const totalBeneficiaries = Math.max(totalBeneficiariesCount, progress?.total ?? pending + confirmed + failed)
 
   return {
@@ -57,7 +56,7 @@ export function adaptCampaignDetail(detail: CampaignDetail, progress?: CampaignP
     status: adaptCampaignStatus(detail.status),
     enabledSavings: detail.isSavingCampaignEnabled,
     totalBeneficiaries,
-    amountDisbursed,
+    amountDisbursed: totalDisbursementAmount,
     totalBudget: totalDisbursementAmount,
     successRate,
     pendingPayments: pending,
