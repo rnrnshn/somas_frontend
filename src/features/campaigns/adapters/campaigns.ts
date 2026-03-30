@@ -20,6 +20,10 @@ export function adaptCampaignStatus(status: CampaignStatus) {
 }
 
 export function adaptCampaignListItem(item: CampaignListItem, detail?: CampaignDetail) {
+  const detailTotalBeneficiaries = detail ? Number(detail.totalBeneficiariesCount ?? 0) : null
+  const detailTotalDisbursement = detail ? Number(detail.totalDisbursementAmount ?? 0) : null
+  const detailSuccessRate = detail?.successRate ?? null
+
   return {
     id: String(item.id),
     numericId: item.id,
@@ -29,9 +33,9 @@ export function adaptCampaignListItem(item: CampaignListItem, detail?: CampaignD
     region: item.province,
     startDate: item.startDate,
     endDate: item.endDate,
-    beneficiaries: item.totalBeneficiariesCount ?? detail?.totalBeneficiariesCount ?? 0,
-    disbursementAmount: item.totalDisbursementAmount ?? detail?.totalDisbursementAmount ?? 0,
-    successRate: item.successRate ?? detail?.successRate ?? 0,
+    beneficiaries: detailTotalBeneficiaries ?? Number(item.totalBeneficiariesCount ?? 0),
+    disbursementAmount: detailTotalDisbursement ?? Number(item.totalDisbursementAmount ?? 0),
+    successRate: detailSuccessRate ?? Number(item.successRate ?? 0),
     status: adaptCampaignStatus(item.status),
   }
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
-import { useCampaignDetailsQueries, useCampaignsQuery } from "@/features/campaigns/hooks/use-campaign-queries";
+import { useCampaignDetailsQueries, useCampaignsQuery, useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
 import { adaptCampaignListItem } from "@/features/campaigns/adapters/campaigns";
 import type { CampaignListFilters, CampaignStatus } from "@/features/campaigns/types/campaign";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
@@ -50,13 +50,32 @@ export function BackofficeCampaigns() {
   const campaignsQuery = useCampaignsQuery(filters);
   const campaignIds = (campaignsQuery.data?.data ?? []).map((campaign) => campaign.id);
   const campaignDetailsQueries = useCampaignDetailsQueries(campaignIds);
+  const campaignSummaryQueries = useCampaignTableSummaryQueries(campaignIds);
   const detailMap = new Map(
     campaignDetailsQueries
       .map((query) => query.data)
       .filter((detail): detail is NonNullable<typeof detail> => Boolean(detail))
       .map((detail) => [detail.id, detail])
   );
-  const campaigns = (campaignsQuery.data?.data ?? []).map((item) => adaptCampaignListItem(item, detailMap.get(item.id)));
+  const summaryMap = new Map(
+    campaignSummaryQueries
+      .map((query) => query.data)
+      .filter((summary): summary is NonNullable<typeof summary> => Boolean(summary))
+      .map((summary) => [summary.campaignId, summary])
+  );
+  const campaigns = (campaignsQuery.data?.data ?? []).map((item) => {
+    const campaign = adaptCampaignListItem(item, detailMap.get(item.id));
+    const summary = summaryMap.get(item.id);
+
+    if (!summary) return campaign;
+
+    return {
+      ...campaign,
+      beneficiaries: summary.totalBeneficiaries,
+      disbursementAmount: summary.amountDisbursed,
+      successRate: summary.successRate,
+    };
+  });
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
