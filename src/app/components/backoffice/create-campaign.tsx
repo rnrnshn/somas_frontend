@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
 import { useCampaignCatalogs } from "@/features/catalogs/hooks/use-catalog-queries";
-import { useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
+import { useCampaignBeneficiariesQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
 import {
   useCreateCampaignMutation,
   useUpdateCampaignMutation,
@@ -77,8 +77,7 @@ export function CreateCampaign() {
   const isEditMode = Number.isFinite(campaignId);
   const catalogs = useCampaignCatalogs();
   const campaignQuery = useCampaignQuery(campaignId);
-  const existingBeneficiariesQuery = useBeneficiariesQuery({ page: 1, pageSize: 200 });
-  const existingRowQueries = useBeneficiaryRowQueries((existingBeneficiariesQuery.data?.data ?? []).map((item) => item.id));
+  const existingCampaignBeneficiariesQuery = useCampaignBeneficiariesQuery(campaignId, { page: 1, pageSize: 200 });
   const createCampaignMutation = useCreateCampaignMutation();
   const updateCampaignMutation = useUpdateCampaignMutation(campaignId);
   const validateUploadMutation = useValidateCampaignBeneficiariesUploadMutation();
@@ -101,22 +100,6 @@ export function CreateCampaign() {
   });
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const metricsMap = new Map<number, any>();
-  const campaignsMap = new Map<number, any[]>();
-
-  existingRowQueries.forEach((query, index) => {
-    const beneficiaryIndex = Math.floor(index / 2);
-    const beneficiaryId = existingBeneficiariesQuery.data?.data?.[beneficiaryIndex]?.id;
-    if (!beneficiaryId) return;
-
-    if (index % 2 === 0 && query.data) {
-      metricsMap.set(beneficiaryId, query.data);
-    }
-
-    if (index % 2 === 1 && query.data?.data) {
-      campaignsMap.set(beneficiaryId, query.data.data);
-    }
-  });
 
   useEffect(() => {
     if (!campaignQuery.data) return;
@@ -138,27 +121,16 @@ export function CreateCampaign() {
 
   useEffect(() => {
     if (!isEditMode || uploadedFile || !campaignQuery.data) return;
-    if (!existingBeneficiariesQuery.data?.data) return;
+    if (!existingCampaignBeneficiariesQuery.data?.data) return;
 
-    const existingCampaignBeneficiaries = existingBeneficiariesQuery.data.data
-      .map((item) => ({
-        item,
-        campaigns: campaignsMap.get(item.id) ?? [],
-      }))
-      .filter(({ campaigns }) => campaigns.some((entry) => entry.campaignId === campaignId))
-      .map(({ item, campaigns }) => {
-        const primaryCampaign = campaigns.find((entry) => entry.campaignId === campaignId) ?? campaigns[0];
-        const beneficiary = adaptBeneficiaryListItem(item, metricsMap.get(item.id), primaryCampaign);
-
-        return {
-          id: String(item.id),
-          name: beneficiary.fullName,
-          msisdn: beneficiary.msisdn,
-          location: [beneficiary.district, beneficiary.province].filter((value) => value && value !== '—').join(', ') || '—',
-          amount: null,
-          status: 'valid' as const,
-        };
-      });
+    const existingCampaignBeneficiaries = existingCampaignBeneficiariesQuery.data.data.map((item) => ({
+      id: String(item.id),
+      name: item.beneficiary?.name ?? 'Beneficiary',
+      msisdn: item.beneficiary?.msisdn ?? '—',
+      location: '—',
+      amount: item.disbursementAmount,
+      status: 'valid' as const,
+    }));
 
     if (existingCampaignBeneficiaries.length === 0) return;
 
@@ -169,7 +141,7 @@ export function CreateCampaign() {
         beneficiaries: existingCampaignBeneficiaries,
       };
     });
-  }, [campaignId, campaignQuery.data, existingBeneficiariesQuery.data, isEditMode, metricsMap, campaignsMap, uploadedFile]);
+  }, [campaignQuery.data, existingCampaignBeneficiariesQuery.data, isEditMode, uploadedFile]);
 
   const totalSteps = 4;
   const progressPercentage = (currentStep / totalSteps) * 100;
@@ -238,16 +210,16 @@ export function CreateCampaign() {
       const payload = {
         name: formData.name,
         description: formData.description || undefined,
-        programId: formData.program ? Number(formData.program) : null,
-        regionId: formData.region ? Number(formData.region) : null,
+        programId: formData.program ? Number(formData.program) : undefined,
+        regionId: formData.region ? Number(formData.region) : undefined,
         province: getCatalogLabel(catalogs.regions.data ?? [], formData.region) || 'Unknown',
         community: undefined,
         startDate: formData.startDate,
         endDate: formData.endDate,
         executionDate: formData.executionDate || undefined,
         isSavingCampaignEnabled: formData.enableSavings,
-        paymentChannelId: formData.paymentChannel ? Number(formData.paymentChannel) : null,
-        disbursementTypeId: formData.disbursementType ? Number(formData.disbursementType) : null,
+        paymentChannelId: formData.paymentChannel ? Number(formData.paymentChannel) : undefined,
+        disbursementTypeId: formData.disbursementType ? Number(formData.disbursementType) : undefined,
       };
       const savedCampaign = isEditMode
         ? await updateCampaignMutation.mutateAsync(payload)
@@ -497,7 +469,7 @@ export function CreateCampaign() {
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription style={{ fontSize: "var(--text-13)" }}>
-                  Existing campaign beneficiaries are shown below. Uploaded disbursement amounts are not returned by the current campaign list APIs, so amount cells stay blank until a new file is uploaded or the backend exposes campaign beneficiary listing with amounts.
+                  Existing campaign beneficiaries are loaded from the campaign beneficiary API, including their current disbursement amounts.
                   </AlertDescription>
                 </Alert>
               ) : null}
