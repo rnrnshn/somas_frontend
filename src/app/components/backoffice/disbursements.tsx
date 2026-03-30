@@ -2,10 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { useDisbursementBatchesQuery } from '@/features/transactions/hooks/use-transaction-queries'
 import { adaptBatch } from '@/features/transactions/adapters/transactions'
+import { DataTablePagination, useTablePagination } from '../ui/table-pagination'
 
 export function Disbursements() {
   const batchesQuery = useDisbursementBatchesQuery(1, 100)
   const batches = (batchesQuery.data?.data ?? []).map(adaptBatch)
+  const batchesPagination = useTablePagination(batches)
   const totalAmount = batches.reduce((sum, batch) => sum + batch.totalAmount, 0)
   const totalTransactions = batches.reduce((sum, batch) => sum + batch.transactions, 0)
 
@@ -52,7 +54,7 @@ export function Disbursements() {
                     </p>
                   </TableCell>
                 </TableRow>
-              ) : batches.map((batch) => (
+              ) : batchesPagination.paginatedItems.map((batch) => (
                 <TableRow key={batch.id}>
                   <TableCell>{batch.id}</TableCell>
                   <TableCell>{batch.campaign}</TableCell>
@@ -65,6 +67,13 @@ export function Disbursements() {
               ))}
             </TableBody>
           </Table>
+          <DataTablePagination
+            page={batchesPagination.page}
+            pageSize={batchesPagination.pageSize}
+            totalItems={batchesPagination.totalItems}
+            totalPages={batchesPagination.totalPages}
+            onPageChange={batchesPagination.setPage}
+          />
         </CardContent>
       </Card>
     </div>

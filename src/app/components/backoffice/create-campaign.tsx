@@ -47,6 +47,7 @@ import {
   LoaderCircle
 } from "lucide-react";
 import { toast } from "sonner";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 type CampaignFormData = {
   name: string;
@@ -100,6 +101,7 @@ export function CreateCampaign() {
     executionDate: "",
     stagedDisbursement: false,
   });
+  const beneficiariesPreviewPagination = useTablePagination(formData.beneficiaries, undefined, [currentStep, uploadedFile, formData.beneficiaries.length]);
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -542,7 +544,7 @@ export function CreateCampaign() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {formData.beneficiaries.map((beneficiary) => (
+                        {beneficiariesPreviewPagination.paginatedItems.map((beneficiary) => (
                           <TableRow key={beneficiary.id}>
                             <TableCell style={{ fontSize: "var(--text-13)" }}>
                               {beneficiary.name}
@@ -566,6 +568,13 @@ export function CreateCampaign() {
                         ))}
                       </TableBody>
                     </Table>
+                    <DataTablePagination
+                      page={beneficiariesPreviewPagination.page}
+                      pageSize={beneficiariesPreviewPagination.pageSize}
+                      totalItems={beneficiariesPreviewPagination.totalItems}
+                      totalPages={beneficiariesPreviewPagination.totalPages}
+                      onPageChange={beneficiariesPreviewPagination.setPage}
+                    />
                   </div>
                 </div>
               </>

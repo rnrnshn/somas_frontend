@@ -23,6 +23,7 @@ import { useCampaignsQuery } from '@/features/campaigns/hooks/use-campaign-queri
 import { adaptBeneficiaries, adaptFinancial, adaptOverview } from '@/features/dashboard/adapters/insights'
 import { useInsightsBeneficiariesQuery, useInsightsFinancialQuery, useInsightsSummaryQuery } from '@/features/dashboard/hooks/use-insights-queries'
 import type { DashboardFilters } from '@/features/dashboard/types/dashboard'
+import { DataTablePagination, useTablePagination } from '../ui/table-pagination'
 
 export function Insights() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -42,6 +43,7 @@ export function Insights() {
   const beneficiaries = adaptBeneficiaries(beneficiariesQuery.data)
   const error = summaryQuery.error ?? financialQuery.error ?? beneficiariesQuery.error
   const totalDisbursed = overview.totalPaid || 1
+  const topCampaignsPagination = useTablePagination(financial.topCampaignsByDisbursement, undefined, [activeTab, campaignFilter, provinceFilter])
 
   return (
     <div className="p-8">
@@ -111,7 +113,7 @@ export function Insights() {
             </ChartCard>
           </div>
           <Card><CardHeader><CardTitle style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>Transacoes por Operador</CardTitle></CardHeader><CardContent className="space-y-4">{financial.transactionsByProvider.map((provider) => <div key={provider.provider}><div className="flex items-center justify-between mb-2"><div><p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>{provider.provider}</p><p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>{provider.count} transacoes</p></div><p style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>{formatCurrency(provider.amount)}</p></div><div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--muted)' }}><div className="h-full" style={{ width: `${(provider.amount / totalDisbursed) * 100}%`, backgroundColor: provider.color }} /></div></div>)}</CardContent></Card>
-          <Card><CardHeader><CardTitle style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>Principais Programas por Valor de Pagamento</CardTitle></CardHeader><CardContent className="p-0"><Table><TableHeader><TableRow><TableHead>Posicao</TableHead><TableHead>Programa</TableHead><TableHead className="text-right">Total Pago</TableHead><TableHead className="text-right">Beneficiarios</TableHead><TableHead className="text-right">Pagamento Medio</TableHead></TableRow></TableHeader><TableBody>{financial.topCampaignsByDisbursement.map((campaign) => <TableRow key={campaign.rank}><TableCell>{campaign.rank}</TableCell><TableCell>{campaign.campaign}</TableCell><TableCell className="text-right">{formatCurrency(campaign.totalDisbursed)}</TableCell><TableCell className="text-right">{campaign.beneficiaries}</TableCell><TableCell className="text-right">{formatCurrency(campaign.avgPayment)}</TableCell></TableRow>)}</TableBody></Table></CardContent></Card>
+          <Card><CardHeader><CardTitle style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>Principais Programas por Valor de Pagamento</CardTitle></CardHeader><CardContent className="p-0"><Table><TableHeader><TableRow><TableHead>Posicao</TableHead><TableHead>Programa</TableHead><TableHead className="text-right">Total Pago</TableHead><TableHead className="text-right">Beneficiarios</TableHead><TableHead className="text-right">Pagamento Medio</TableHead></TableRow></TableHeader><TableBody>{topCampaignsPagination.paginatedItems.map((campaign) => <TableRow key={campaign.rank}><TableCell>{campaign.rank}</TableCell><TableCell>{campaign.campaign}</TableCell><TableCell className="text-right">{formatCurrency(campaign.totalDisbursed)}</TableCell><TableCell className="text-right">{campaign.beneficiaries}</TableCell><TableCell className="text-right">{formatCurrency(campaign.avgPayment)}</TableCell></TableRow>)}</TableBody></Table><DataTablePagination page={topCampaignsPagination.page} pageSize={topCampaignsPagination.pageSize} totalItems={topCampaignsPagination.totalItems} totalPages={topCampaignsPagination.totalPages} onPageChange={topCampaignsPagination.setPage} /></CardContent></Card>
         </TabsContent>
 
         <TabsContent value="beneficiary" className="space-y-6">

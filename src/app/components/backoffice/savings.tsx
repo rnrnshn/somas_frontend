@@ -37,6 +37,7 @@ import {
   XCircle,
   Download
 } from "lucide-react";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BackofficeSavings() {
   const navigate = useNavigate();
@@ -107,6 +108,7 @@ export function BackofficeSavings() {
     
     return matchesSearch && matchesStatus && matchesCampaign;
   });
+  const savingsPagination = useTablePagination(filteredCampaigns, undefined, [searchQuery, statusFilter, campaignFilter]);
 
   return (
     <div className="p-8">
@@ -257,7 +259,7 @@ export function BackofficeSavings() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredCampaigns.map((campaign) => (
+                savingsPagination.paginatedItems.map((campaign) => (
                   <TableRow
                     key={campaign.id}
                     className="cursor-pointer hover:bg-muted/50"
@@ -346,6 +348,13 @@ export function BackofficeSavings() {
               )}
             </TableBody>
           </Table>
+          <DataTablePagination
+            page={savingsPagination.page}
+            pageSize={savingsPagination.pageSize}
+            totalItems={savingsPagination.totalItems}
+            totalPages={savingsPagination.totalPages}
+            onPageChange={savingsPagination.setPage}
+          />
         </CardContent>
       </Card>
     </div>

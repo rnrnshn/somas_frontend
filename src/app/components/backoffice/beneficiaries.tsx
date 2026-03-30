@@ -13,6 +13,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from ".
 import { Plus, Search, Download, MapPin, CheckCircle, XCircle, Clock, Upload } from "lucide-react";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BackofficeBeneficiaries() {
   const navigate = useNavigate();
@@ -101,6 +102,8 @@ export function BackofficeBeneficiaries() {
       .toLowerCase()
       .includes(query);
   });
+  const beneficiariesPagination = useTablePagination(beneficiaries, undefined, [searchQuery, campaignFilter, provinceFilter, statusFilter, activeTab]);
+  const verificationPagination = useTablePagination(filteredFieldVerifications, undefined, [searchQuery, activeTab]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -263,7 +266,7 @@ export function BackofficeBeneficiaries() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : beneficiaries.map((beneficiary) => (
+                  ) : beneficiariesPagination.paginatedItems.map((beneficiary) => (
                     <TableRow key={beneficiary.id} className="cursor-pointer">
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
@@ -286,6 +289,13 @@ export function BackofficeBeneficiaries() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={beneficiariesPagination.page}
+                pageSize={beneficiariesPagination.pageSize}
+                totalItems={beneficiariesPagination.totalItems}
+                totalPages={beneficiariesPagination.totalPages}
+                onPageChange={beneficiariesPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -345,7 +355,7 @@ export function BackofficeBeneficiaries() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : filteredFieldVerifications.map((verification) => (
+                  ) : verificationPagination.paginatedItems.map((verification) => (
                     <TableRow key={verification.id} className="cursor-pointer">
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -384,6 +394,13 @@ export function BackofficeBeneficiaries() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={verificationPagination.page}
+                pageSize={verificationPagination.pageSize}
+                totalItems={verificationPagination.totalItems}
+                totalPages={verificationPagination.totalPages}
+                onPageChange={verificationPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>

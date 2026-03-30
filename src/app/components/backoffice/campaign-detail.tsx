@@ -38,6 +38,7 @@ import {
   PiggyBank
 } from "lucide-react";
 import { toast } from "sonner";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 import {
   LineChart,
   Line,
@@ -147,6 +148,9 @@ export function CampaignDetail() {
 
   // Savings data
   const savingsData: Array<{ id: string; beneficiary: string; savedAmount: number; lastDeposit: string }> = [];
+  const beneficiariesPagination = useTablePagination(beneficiaries, undefined, [activeTab, searchQuery]);
+  const transactionsPagination = useTablePagination(transactions, undefined, [activeTab]);
+  const savingsPagination = useTablePagination(savingsData, undefined, [activeTab]);
 
   const savingsParticipation = campaign ? [
     { category: 'Participating', count: Math.round(campaign.totalBeneficiaries * (successRate / 100)) },
@@ -446,7 +450,7 @@ export function CampaignDetail() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : beneficiaries.map((beneficiary) => (
+                  ) : beneficiariesPagination.paginatedItems.map((beneficiary) => (
                     <TableRow key={beneficiary.id}>
                       <TableCell>
                         <div>
@@ -487,6 +491,13 @@ export function CampaignDetail() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={beneficiariesPagination.page}
+                pageSize={beneficiariesPagination.pageSize}
+                totalItems={beneficiariesPagination.totalItems}
+                totalPages={beneficiariesPagination.totalPages}
+                onPageChange={beneficiariesPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -535,7 +546,7 @@ export function CampaignDetail() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : transactions.map((txn) => (
+                  ) : transactionsPagination.paginatedItems.map((txn) => (
                     <TableRow key={txn.id}>
                       <TableCell style={{ fontSize: "var(--text-12)", fontFamily: "var(--font-mono)" }}>
                         {txn.id}
@@ -572,6 +583,13 @@ export function CampaignDetail() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={transactionsPagination.page}
+                pageSize={transactionsPagination.pageSize}
+                totalItems={transactionsPagination.totalItems}
+                totalPages={transactionsPagination.totalPages}
+                onPageChange={transactionsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -653,7 +671,7 @@ export function CampaignDetail() {
                           </p>
                         </TableCell>
                       </TableRow>
-                    ) : savingsData.map((saving) => (
+                    ) : savingsPagination.paginatedItems.map((saving) => (
                       <TableRow key={saving.id}>
                         <TableCell style={{ fontSize: "var(--text-13)" }}>
                           {saving.beneficiary}
@@ -668,6 +686,13 @@ export function CampaignDetail() {
                     ))}
                   </TableBody>
                 </Table>
+                <DataTablePagination
+                  page={savingsPagination.page}
+                  pageSize={savingsPagination.pageSize}
+                  totalItems={savingsPagination.totalItems}
+                  totalPages={savingsPagination.totalPages}
+                  onPageChange={savingsPagination.setPage}
+                />
               </CardContent>
             </Card>
           </TabsContent>

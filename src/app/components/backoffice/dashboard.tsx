@@ -53,6 +53,7 @@ import {
   Legend,
   ResponsiveContainer
 } from "recharts";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BackofficeDashboard() {
   const navigate = useNavigate();
@@ -115,6 +116,8 @@ export function BackofficeDashboard() {
   const availableCampaigns = campaignPerformance;
   const availableRegions = Array.from(new Set((dashboard.beneficiaries.data?.byProvince ?? []).map((item) => item.province)));
   const dashboardError = dashboard.error instanceof Error ? dashboard.error.message : null;
+  const campaignPerformancePagination = useTablePagination(campaignPerformance, undefined, [activeTab, dateRange, region, campaign]);
+  const recentTransactionsPagination = useTablePagination(recentTransactions, undefined, [activeTab, dateRange, region, campaign]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -519,7 +522,7 @@ export function BackofficeDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {campaignPerformance.map((campaign) => (
+                  {campaignPerformancePagination.paginatedItems.map((campaign) => (
                     <TableRow
                       key={campaign.id}
                       className="cursor-pointer hover:bg-muted/50"
@@ -556,6 +559,13 @@ export function BackofficeDashboard() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={campaignPerformancePagination.page}
+                pageSize={campaignPerformancePagination.pageSize}
+                totalItems={campaignPerformancePagination.totalItems}
+                totalPages={campaignPerformancePagination.totalPages}
+                onPageChange={campaignPerformancePagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -610,7 +620,7 @@ export function BackofficeDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentTransactions.map((txn) => (
+                  {recentTransactionsPagination.paginatedItems.map((txn) => (
                     <TableRow key={txn.id}>
                       <TableCell style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)" }}>
                         {txn.id}
@@ -630,6 +640,13 @@ export function BackofficeDashboard() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={recentTransactionsPagination.page}
+                pageSize={recentTransactionsPagination.pageSize}
+                totalItems={recentTransactionsPagination.totalItems}
+                totalPages={recentTransactionsPagination.totalPages}
+                onPageChange={recentTransactionsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>

@@ -13,6 +13,7 @@ import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
 import { ArrowLeft, Phone, MapPin, CheckCircle } from "lucide-react";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BeneficiaryProfile() {
   const { id } = useParams();
@@ -25,6 +26,10 @@ export function BeneficiaryProfile() {
   const savings = adaptBeneficiarySavings(queries.savings.data?.data ?? []);
   const campaigns = adaptBeneficiaryCampaigns(queries.campaigns.data?.data ?? []);
   const verifications: Array<{ id: string; enumerator: string; date: string; status: string; notes: string }> = [];
+  const transactionsPagination = useTablePagination(transactions, undefined, [activeTab]);
+  const savingsPagination = useTablePagination(savings, undefined, [activeTab]);
+  const campaignsPagination = useTablePagination(campaigns, undefined, [activeTab]);
+  const verificationsPagination = useTablePagination(verifications, undefined, [activeTab]);
   const errorMessage = queries.profile.error instanceof Error
     ? queries.profile.error.message
     : queries.withMetrics.error instanceof Error
@@ -419,7 +424,7 @@ export function BeneficiaryProfile() {
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>No transactions found.</p>
                       </TableCell>
                     </TableRow>
-                  ) : transactions.map((transaction) => (
+                  ) : transactionsPagination.paginatedItems.map((transaction) => (
                     <TableRow key={transaction.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)', fontFamily: 'var(--font-mono)' }}>
@@ -442,6 +447,13 @@ export function BeneficiaryProfile() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={transactionsPagination.page}
+                pageSize={transactionsPagination.pageSize}
+                totalItems={transactionsPagination.totalItems}
+                totalPages={transactionsPagination.totalPages}
+                onPageChange={transactionsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -475,7 +487,7 @@ export function BeneficiaryProfile() {
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>No savings records found.</p>
                       </TableCell>
                     </TableRow>
-                  ) : savings.map((saving) => (
+                  ) : savingsPagination.paginatedItems.map((saving) => (
                     <TableRow key={saving.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)', fontFamily: 'var(--font-mono)' }}>
@@ -498,6 +510,13 @@ export function BeneficiaryProfile() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={savingsPagination.page}
+                pageSize={savingsPagination.pageSize}
+                totalItems={savingsPagination.totalItems}
+                totalPages={savingsPagination.totalPages}
+                onPageChange={savingsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -528,7 +547,7 @@ export function BeneficiaryProfile() {
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>No campaign participation found.</p>
                       </TableCell>
                     </TableRow>
-                  ) : campaigns.map((campaign) => (
+                  ) : campaignsPagination.paginatedItems.map((campaign) => (
                     <TableRow key={campaign.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)', fontFamily: 'var(--font-mono)' }}>
@@ -551,6 +570,13 @@ export function BeneficiaryProfile() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={campaignsPagination.page}
+                pageSize={campaignsPagination.pageSize}
+                totalItems={campaignsPagination.totalItems}
+                totalPages={campaignsPagination.totalPages}
+                onPageChange={campaignsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -583,7 +609,7 @@ export function BeneficiaryProfile() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : verifications.map((verification) => (
+                  ) : verificationsPagination.paginatedItems.map((verification) => (
                     <TableRow key={verification.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)', fontFamily: 'var(--font-mono)' }}>
@@ -606,6 +632,13 @@ export function BeneficiaryProfile() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={verificationsPagination.page}
+                pageSize={verificationsPagination.pageSize}
+                totalItems={verificationsPagination.totalItems}
+                totalPages={verificationsPagination.totalPages}
+                onPageChange={verificationsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>

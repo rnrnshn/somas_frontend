@@ -76,7 +76,7 @@ export function BackofficeLayout() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex h-screen flex-col overflow-hidden">
       {/* Top Navigation Bar */}
       <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-6">
@@ -90,9 +90,9 @@ export function BackofficeLayout() {
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex min-h-0 flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
+        <aside className="flex h-full w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {/* Dashboard - no section */}
             {navItems.map((item) => {
@@ -131,7 +131,7 @@ export function BackofficeLayout() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
+        <main className="min-h-0 flex-1 overflow-auto">
           <Suspense fallback={<BackofficeRouteSkeleton />}>
             <Outlet />
           </Suspense>

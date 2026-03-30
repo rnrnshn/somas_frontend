@@ -35,6 +35,7 @@ import {
   LoaderCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BackofficeCampaigns() {
   const navigate = useNavigate();
@@ -131,6 +132,7 @@ export function BackofficeCampaigns() {
     
     return matchesSearch && matchesStatus && matchesRegion && matchesProgram;
   });
+  const campaignsPagination = useTablePagination(filteredCampaigns, undefined, [searchQuery, statusFilter, regionFilter, programFilter]);
 
   return (
     <div className="p-8">
@@ -248,7 +250,7 @@ export function BackofficeCampaigns() {
                     </TableCell>
                   </TableRow>
               ) : (
-                filteredCampaigns.map((campaign) => (
+                campaignsPagination.paginatedItems.map((campaign) => (
                   <TableRow
                     key={campaign.id}
                     className="cursor-pointer hover:bg-muted/50"
@@ -320,6 +322,13 @@ export function BackofficeCampaigns() {
               )}
             </TableBody>
           </Table>
+          <DataTablePagination
+            page={campaignsPagination.page}
+            pageSize={campaignsPagination.pageSize}
+            totalItems={campaignsPagination.totalItems}
+            totalPages={campaignsPagination.totalPages}
+            onPageChange={campaignsPagination.setPage}
+          />
         </CardContent>
       </Card>
     </div>

@@ -17,6 +17,7 @@ import { Button } from "../ui/button";
 import { Search, Package, Download, Eye, RefreshCw, TrendingUp, Activity, CheckCircle, XCircle, Clock, AlertCircle, DollarSign, BarChart3 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BackofficeTransactions() {
   const [activeTab, setActiveTab] = useState("all");
@@ -53,6 +54,9 @@ export function BackofficeTransactions() {
     return matchesCampaign;
   });
   const selectedTransaction = selectedTransactionQuery.data ? adaptTransaction(selectedTransactionQuery.data) : transactions.find((txn) => txn.numericId === selectedTransactionId) ?? null;
+  const transactionsPagination = useTablePagination(transactions, undefined, [activeTab, searchQuery, statusFilter, typeFilter, campaignFilter, providerFilter]);
+  const batchesPagination = useTablePagination(disbursementBatches, undefined, [activeTab]);
+  const failedTransactionsPagination = useTablePagination(failedTransactionsList, undefined, [activeTab, searchQuery, campaignFilter]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -211,7 +215,7 @@ export function BackofficeTransactions() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : transactions.map((txn) => (
+                  ) : transactionsPagination.paginatedItems.map((txn) => (
                     <TableRow key={txn.id} className="cursor-pointer hover:bg-muted/50">
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace', fontSize: 'var(--text-12)' }}>
@@ -261,6 +265,13 @@ export function BackofficeTransactions() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={transactionsPagination.page}
+                pageSize={transactionsPagination.pageSize}
+                totalItems={transactionsPagination.totalItems}
+                totalPages={transactionsPagination.totalPages}
+                onPageChange={transactionsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -310,7 +321,7 @@ export function BackofficeTransactions() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : disbursementBatches.map((batch) => {
+                  ) : batchesPagination.paginatedItems.map((batch) => {
                     const successRate = batch.transactions > 0 
                       ? ((batch.successful / batch.transactions) * 100).toFixed(1) 
                       : '0.0';
@@ -380,6 +391,13 @@ export function BackofficeTransactions() {
                   })}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={batchesPagination.page}
+                pageSize={batchesPagination.pageSize}
+                totalItems={batchesPagination.totalItems}
+                totalPages={batchesPagination.totalPages}
+                onPageChange={batchesPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -434,7 +452,7 @@ export function BackofficeTransactions() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : failedTransactionsList.map((txn) => (
+                  ) : failedTransactionsPagination.paginatedItems.map((txn) => (
                     <TableRow key={txn.id} className="hover:bg-muted/50">
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace', fontSize: 'var(--text-12)' }}>
@@ -476,6 +494,13 @@ export function BackofficeTransactions() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={failedTransactionsPagination.page}
+                pageSize={failedTransactionsPagination.pageSize}
+                totalItems={failedTransactionsPagination.totalItems}
+                totalPages={failedTransactionsPagination.totalPages}
+                onPageChange={failedTransactionsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>

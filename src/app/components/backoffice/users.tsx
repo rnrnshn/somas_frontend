@@ -4,6 +4,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from ".
 import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
 import { Plus, Shield } from "lucide-react";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BackofficeUsers() {
   const users = [
@@ -65,6 +66,7 @@ export function BackofficeUsers() {
     const props = config[role] || {};
     return <Badge {...props}>{role}</Badge>;
   };
+  const usersPagination = useTablePagination(users);
 
   return (
     <div className="p-8">
@@ -104,7 +106,7 @@ export function BackofficeUsers() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {usersPagination.paginatedItems.map((user) => (
                 <TableRow key={user.id} className="cursor-pointer">
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -148,6 +150,13 @@ export function BackofficeUsers() {
               ))}
             </TableBody>
           </Table>
+          <DataTablePagination
+            page={usersPagination.page}
+            pageSize={usersPagination.pageSize}
+            totalItems={usersPagination.totalItems}
+            totalPages={usersPagination.totalPages}
+            onPageChange={usersPagination.setPage}
+          />
         </CardContent>
       </Card>
     </div>

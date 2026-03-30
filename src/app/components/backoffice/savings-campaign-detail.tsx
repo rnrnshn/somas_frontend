@@ -50,6 +50,7 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function SavingsCampaignDetail() {
   const navigate = useNavigate();
@@ -67,6 +68,8 @@ export function SavingsCampaignDetail() {
   const participationData = buildParticipationData(campaign?.participants ?? 0, campaign?.totalBeneficiaries ?? 0);
   const participants: Array<{ id: string; name: string; totalSaved: number; lastContribution: string; contributionAmount: number; goalProgress: number; personalGoal: number; status: string }> = [];
   const transactions: Array<{ id: string; beneficiary: string; amount: number; date: string; status: string; type: string }> = [];
+  const participantsPagination = useTablePagination(participants, undefined, [activeTab, searchQuery]);
+  const transactionsPagination = useTablePagination(transactions, undefined, [activeTab]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -330,7 +333,7 @@ export function SavingsCampaignDetail() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : participants.map((participant) => (
+                  ) : participantsPagination.paginatedItems.map((participant) => (
                     <TableRow key={participant.id}>
                       <TableCell>
                         <div>
@@ -375,6 +378,13 @@ export function SavingsCampaignDetail() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={participantsPagination.page}
+                pageSize={participantsPagination.pageSize}
+                totalItems={participantsPagination.totalItems}
+                totalPages={participantsPagination.totalPages}
+                onPageChange={participantsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -405,7 +415,7 @@ export function SavingsCampaignDetail() {
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : transactions.map((txn) => (
+                  ) : transactionsPagination.paginatedItems.map((txn) => (
                     <TableRow key={txn.id}>
                       <TableCell style={{ fontSize: "var(--text-12)", fontFamily: "var(--font-mono)" }}>
                         {txn.id}
@@ -426,6 +436,13 @@ export function SavingsCampaignDetail() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={transactionsPagination.page}
+                pageSize={transactionsPagination.pageSize}
+                totalItems={transactionsPagination.totalItems}
+                totalPages={transactionsPagination.totalPages}
+                onPageChange={transactionsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>

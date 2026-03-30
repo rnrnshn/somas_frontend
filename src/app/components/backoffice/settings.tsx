@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { BackendSettingsPanel } from "@/features/settings/components/backend-settings-panel";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState("users");
@@ -224,6 +225,13 @@ export function Settings() {
     };
     return <Badge {...(variants[status] || {})}>{status}</Badge>;
   };
+  const usersPagination = useTablePagination(users, undefined, [activeTab, searchQuery]);
+  const rolesPagination = useTablePagination(roles, undefined, [activeTab]);
+  const permissionsPagination = useTablePagination(permissions, undefined, [activeTab]);
+  const auditLogsPagination = useTablePagination(auditLogs, undefined, [activeTab]);
+  const sessionsPagination = useTablePagination(sessions, undefined, [activeTab]);
+  const systemEventsPagination = useTablePagination(systemEvents, undefined, [activeTab]);
+  const smsTemplatesPagination = useTablePagination(smsTemplates, undefined, [activeTab]);
 
   return (
     <div className="p-8">
@@ -297,7 +305,7 @@ export function Settings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user) => (
+                  {usersPagination.paginatedItems.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -336,6 +344,13 @@ export function Settings() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={usersPagination.page}
+                pageSize={usersPagination.pageSize}
+                totalItems={usersPagination.totalItems}
+                totalPages={usersPagination.totalPages}
+                onPageChange={usersPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -375,7 +390,7 @@ export function Settings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {roles.map((role) => (
+                  {rolesPagination.paginatedItems.map((role) => (
                     <TableRow key={role.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -408,6 +423,13 @@ export function Settings() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={rolesPagination.page}
+                pageSize={rolesPagination.pageSize}
+                totalItems={rolesPagination.totalItems}
+                totalPages={rolesPagination.totalPages}
+                onPageChange={rolesPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -453,7 +475,7 @@ export function Settings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {permissions.map((perm, index) => (
+                  {permissionsPagination.paginatedItems.map((perm, index) => (
                     <TableRow key={index}>
                       <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
                         {perm.module}
@@ -498,6 +520,13 @@ export function Settings() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={permissionsPagination.page}
+                pageSize={permissionsPagination.pageSize}
+                totalItems={permissionsPagination.totalItems}
+                totalPages={permissionsPagination.totalPages}
+                onPageChange={permissionsPagination.setPage}
+              />
               <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
                 <Button>
                   Save Permissions
@@ -554,7 +583,7 @@ export function Settings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {auditLogs.map((log) => (
+                  {auditLogsPagination.paginatedItems.map((log) => (
                     <TableRow key={log.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -582,6 +611,13 @@ export function Settings() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={auditLogsPagination.page}
+                pageSize={auditLogsPagination.pageSize}
+                totalItems={auditLogsPagination.totalItems}
+                totalPages={auditLogsPagination.totalPages}
+                onPageChange={auditLogsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -616,7 +652,7 @@ export function Settings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sessions.map((session) => (
+                  {sessionsPagination.paginatedItems.map((session) => (
                     <TableRow key={session.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -652,6 +688,13 @@ export function Settings() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={sessionsPagination.page}
+                pageSize={sessionsPagination.pageSize}
+                totalItems={sessionsPagination.totalItems}
+                totalPages={sessionsPagination.totalPages}
+                onPageChange={sessionsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -689,7 +732,7 @@ export function Settings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {systemEvents.map((event) => (
+                  {systemEventsPagination.paginatedItems.map((event) => (
                     <TableRow key={event.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -713,6 +756,13 @@ export function Settings() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={systemEventsPagination.page}
+                pageSize={systemEventsPagination.pageSize}
+                totalItems={systemEventsPagination.totalItems}
+                totalPages={systemEventsPagination.totalPages}
+                onPageChange={systemEventsPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -752,7 +802,7 @@ export function Settings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {smsTemplates.map((template) => (
+                  {smsTemplatesPagination.paginatedItems.map((template) => (
                     <TableRow key={template.id}>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -787,6 +837,13 @@ export function Settings() {
                   ))}
                 </TableBody>
               </Table>
+              <DataTablePagination
+                page={smsTemplatesPagination.page}
+                pageSize={smsTemplatesPagination.pageSize}
+                totalItems={smsTemplatesPagination.totalItems}
+                totalPages={smsTemplatesPagination.totalPages}
+                onPageChange={smsTemplatesPagination.setPage}
+              />
             </CardContent>
           </Card>
         </TabsContent>

@@ -5,6 +5,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from ".
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 export function BackofficeAudit() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,6 +72,7 @@ export function BackofficeAudit() {
     };
     return <Badge style={styles[action as keyof typeof styles]}>{action}</Badge>;
   };
+  const auditPagination = useTablePagination(auditLogs, undefined, [searchQuery, entityFilter]);
 
   return (
     <div className="p-8">
@@ -120,7 +122,7 @@ export function BackofficeAudit() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {auditLogs.map((log) => (
+              {auditPagination.paginatedItems.map((log) => (
                 <TableRow key={log.id} className="cursor-pointer hover:bg-muted/50">
                   <TableCell style={{ fontSize: 'var(--text-12)', fontFamily: 'monospace' }}>
                     {log.timestamp}
@@ -168,6 +170,13 @@ export function BackofficeAudit() {
               ))}
             </TableBody>
           </Table>
+          <DataTablePagination
+            page={auditPagination.page}
+            pageSize={auditPagination.pageSize}
+            totalItems={auditPagination.totalItems}
+            totalPages={auditPagination.totalPages}
+            onPageChange={auditPagination.setPage}
+          />
         </CardContent>
       </Card>
     </div>

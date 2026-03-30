@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { Monitor, Smartphone, Tablet, AlertCircle } from "lucide-react";
+import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
 interface Session {
   id: string;
@@ -95,6 +96,7 @@ const DeviceIcon = ({ type }: { type: 'desktop' | 'mobile' | 'tablet' }) => {
 export function SessionManagement() {
   const [sessions, setSessions] = useState<Session[]>(MOCK_SESSIONS);
   const [sessionToRevoke, setSessionToRevoke] = useState<Session | null>(null);
+  const sessionsPagination = useTablePagination(sessions);
 
   const handleRevokeSession = () => {
     if (sessionToRevoke) {
@@ -135,7 +137,7 @@ export function SessionManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sessions.map((session) => (
+                {sessionsPagination.paginatedItems.map((session) => (
                   <TableRow key={session.id}>
                     <TableCell style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
                       {session.user}
@@ -179,6 +181,13 @@ export function SessionManagement() {
                 ))}
               </TableBody>
             </Table>
+            <DataTablePagination
+              page={sessionsPagination.page}
+              pageSize={sessionsPagination.pageSize}
+              totalItems={sessionsPagination.totalItems}
+              totalPages={sessionsPagination.totalPages}
+              onPageChange={sessionsPagination.setPage}
+            />
           </div>
         </CardContent>
       </Card>
