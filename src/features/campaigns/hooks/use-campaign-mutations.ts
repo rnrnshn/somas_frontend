@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   createCampaign,
+  executeCampaignDisbursement,
   importCampaignBeneficiaries,
   updateCampaign,
   validateCampaignBeneficiariesUpload,
@@ -25,6 +26,22 @@ export function useUpdateCampaignMutation(campaignId: number) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['campaigns'] })
       void queryClient.invalidateQueries({ queryKey: ['campaign', campaignId] })
+    },
+  })
+}
+
+export function useExecuteCampaignDisbursementMutation(campaignId: number) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => executeCampaignDisbursement(campaignId),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['campaigns'] }),
+        queryClient.invalidateQueries({ queryKey: ['campaign', campaignId] }),
+        queryClient.invalidateQueries({ queryKey: ['transactions'] }),
+        queryClient.invalidateQueries({ queryKey: ['field', 'search'] }),
+      ])
     },
   })
 }

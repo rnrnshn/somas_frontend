@@ -74,7 +74,7 @@ export function useBeneficiaryRowQueries(beneficiaryIds: number[]) {
       },
       {
         queryKey: ['beneficiary', beneficiaryId, 'campaigns', 'row'],
-        queryFn: () => getBeneficiaryCampaigns(beneficiaryId, 1, 1),
+        queryFn: () => getBeneficiaryCampaigns(beneficiaryId, 1, 100),
         enabled: Number.isFinite(beneficiaryId),
         staleTime: QUERY_STALE_TIME.list,
       },

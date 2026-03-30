@@ -30,6 +30,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { ArrowLeft, Check, Info } from "lucide-react";
+import { toast } from "sonner";
 
 type SavingsCampaignFormData = {
   name: string;
@@ -81,13 +82,54 @@ export function CreateSavingsCampaign() {
     });
   }, [savingsProgramQuery.data]);
 
+  const validateForm = () => {
+    if (!formData.name.trim()) return 'Enter a savings campaign name.';
+    if (!formData.linkedCampaign) return 'Select a linked campaign.';
+    if (!Number.isFinite(Number(formData.linkedCampaign)) || Number(formData.linkedCampaign) <= 0) {
+      return 'Select a valid linked campaign.';
+    }
+    if (!formData.startDate) return 'Select a start date.';
+    if (!formData.endDate) return 'Select an end date.';
+    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+      return 'End date must be after the start date.';
+    }
+
+    const savingsGoal = Number(formData.savingsGoal);
+    if (!Number.isFinite(savingsGoal) || savingsGoal <= 0) {
+      return 'Enter a savings goal greater than zero.';
+    }
+
+    const minimumContribution = Number(formData.minimumContribution);
+    if (!Number.isFinite(minimumContribution) || minimumContribution < 0) {
+      return 'Enter a valid minimum contribution.';
+    }
+
+    if (formData.enableMatchingBonus) {
+      const matchingBonus = Number(formData.matchingBonus);
+      if (!Number.isFinite(matchingBonus) || matchingBonus < 0 || matchingBonus > 100) {
+        return 'Enter a matching bonus percentage between 0 and 100.';
+      }
+    }
+
+    return null;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitError(null);
+    const validationError = validateForm();
+    setSubmitError(validationError);
+    if (validationError) return;
     setShowConfirmDialog(true);
   };
 
   const handleCreateCampaign = async () => {
+    const validationError = validateForm();
+    if (validationError) {
+      setSubmitError(validationError);
+      setShowConfirmDialog(false);
+      return;
+    }
+
     try {
       const payload = {
         name: formData.name,
@@ -103,9 +145,11 @@ export function CreateSavingsCampaign() {
       const result = isEditMode
         ? await updateMutation.mutateAsync(payload)
         : await createMutation.mutateAsync(payload);
+      toast.success(isEditMode ? 'Savings campaign updated successfully.' : 'Savings campaign created successfully.');
       setShowConfirmDialog(false);
       navigate(`/backoffice/savings/${result.id}`);
     } catch (error) {
+      toast.error(error instanceof HttpError ? error.message : `Savings campaign could not be ${isEditMode ? 'updated' : 'created'}.`);
       setSubmitError(error instanceof HttpError ? error.message : `Savings campaign could not be ${isEditMode ? 'updated' : 'created'}.`);
     }
   };
@@ -123,10 +167,10 @@ export function CreateSavingsCampaign() {
           Back to Savings Campaigns
         </Button>
         <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
-          Create Savings Campaign
+          {isEditMode ? 'Edit Savings Campaign' : 'Create Savings Campaign'}
         </h1>
         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-          Set up a new savings program linked to a social transfer campaign
+          {isEditMode ? 'Update the savings program linked to a social transfer campaign' : 'Set up a new savings program linked to a social transfer campaign'}
         </p>
       </div>
 
@@ -330,7 +374,7 @@ export function CreateSavingsCampaign() {
 
           <Button disabled={createMutation.isPending || updateMutation.isPending} type="submit">
             <Check className="w-4 h-4 mr-2" />
-            Create Savings Campaign
+            {isEditMode ? 'Update Savings Campaign' : 'Create Savings Campaign'}
           </Button>
         </div>
       </form>
@@ -340,10 +384,10 @@ export function CreateSavingsCampaign() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle style={{ fontSize: "var(--text-20)" }}>
-              Confirm Savings Campaign Creation
+              {isEditMode ? 'Confirm Savings Campaign Update' : 'Confirm Savings Campaign Creation'}
             </DialogTitle>
             <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-              Are you sure you want to create this savings campaign?
+              {isEditMode ? 'Are you sure you want to update this savings campaign?' : 'Are you sure you want to create this savings campaign?'}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -378,8 +422,8 @@ export function CreateSavingsCampaign() {
             <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
               Cancel
             </Button>
-            <Button disabled={createMutation.isPending} onClick={() => void handleCreateCampaign()}>
-              Confirm & Create
+            <Button disabled={createMutation.isPending || updateMutation.isPending} onClick={() => void handleCreateCampaign()}>
+              {isEditMode ? 'Confirm & Update' : 'Confirm & Create'}
             </Button>
           </DialogFooter>
         </DialogContent>

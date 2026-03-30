@@ -9,6 +9,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Building2, Loader2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 type AccountStatus = 'active' | 'locked' | 'disabled' | null;
 
@@ -44,6 +45,7 @@ export function BackofficeLogin() {
         password,
       });
       signIn(response.token, response.user);
+      toast.success('Signed in successfully.');
       navigate('/backoffice/dashboard');
     } catch (requestError) {
       if (email.includes('locked')) {
@@ -55,6 +57,7 @@ export function BackofficeLogin() {
       } else {
         setError(requestError instanceof HttpError ? requestError.message : 'Invalid email or password. Please try again.');
       }
+      toast.error(requestError instanceof HttpError ? requestError.message : 'Invalid email or password. Please try again.');
     }
   };
 

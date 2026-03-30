@@ -9,6 +9,7 @@ import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Building2, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import { toast } from "sonner";
 
 type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
 
@@ -76,8 +77,10 @@ export function ResetPassword() {
         token: resetToken,
         password: newPassword,
       });
+      toast.success('Password reset successfully.');
       setIsSuccess(true);
     } catch (requestError) {
+      toast.error(requestError instanceof HttpError ? requestError.message : 'Password could not be reset.');
       setError(requestError instanceof HttpError ? requestError.message : 'Password could not be reset.');
     }
   };

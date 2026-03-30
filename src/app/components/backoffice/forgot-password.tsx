@@ -8,6 +8,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Building2, Loader2, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function ForgotPassword() {
   const navigate = useNavigate();
@@ -23,8 +24,10 @@ export function ForgotPassword() {
 
     try {
       await forgotPasswordMutation.mutateAsync({ email });
+      toast.success('Reset instructions sent if the account exists.');
       setIsSubmitted(true);
     } catch (requestError) {
+      toast.error(requestError instanceof HttpError ? requestError.message : 'Reset instructions could not be sent.');
       setError(requestError instanceof HttpError ? requestError.message : 'Reset instructions could not be sent.');
     }
   };

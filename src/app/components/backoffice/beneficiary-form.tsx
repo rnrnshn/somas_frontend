@@ -10,6 +10,7 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 export function BeneficiaryForm() {
   const { id } = useParams();
@@ -49,6 +50,7 @@ export function BeneficiaryForm() {
     setSubmitError(null);
 
     if (!isEdit) {
+      toast.error('Create beneficiary is not wired yet with the current backend surface.');
       setSubmitError('Create beneficiary is not wired yet with the current backend surface.');
       return;
     }
@@ -64,9 +66,11 @@ export function BeneficiaryForm() {
         notes: formData.notes || null,
       })
       .then(() => {
+        toast.success('Beneficiary updated successfully.');
         navigate(`/backoffice/beneficiaries/profile/${beneficiaryId}`);
       })
       .catch((error) => {
+        toast.error(error instanceof HttpError ? error.message : 'Beneficiary could not be updated.');
         setSubmitError(error instanceof HttpError ? error.message : 'Beneficiary could not be updated.');
       });
   };
