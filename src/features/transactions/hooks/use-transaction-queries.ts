@@ -1,5 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  getAllCampaignTransactions,
   getDisbursementBatches,
   getFailedTransactions,
   getTransaction,
@@ -15,6 +16,15 @@ export function useTransactionsQuery(filters: TransactionListFilters) {
     queryKey: ['transactions', filters],
     queryFn: () => getTransactions(filters),
     placeholderData: keepPreviousData,
+    staleTime: QUERY_STALE_TIME.list,
+  })
+}
+
+export function useCampaignTransactionsQuery(campaignId: number) {
+  return useQuery({
+    queryKey: ['transactions', 'campaign', campaignId],
+    queryFn: () => getAllCampaignTransactions(campaignId),
+    enabled: Number.isFinite(campaignId),
     staleTime: QUERY_STALE_TIME.list,
   })
 }

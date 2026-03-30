@@ -41,8 +41,10 @@ export function adaptCampaignDetail(detail: CampaignDetail, progress?: CampaignP
   const confirmed = progress?.progressByStatus.confirmed ?? 0
   const failed = (progress?.progressByStatus.not_confirmed ?? 0) + (progress?.progressByStatus.not_found ?? 0)
   const successRate = detail.successRate ?? 0
-  const amountDisbursed = Math.round(detail.totalDisbursementAmount * (successRate / 100))
-  const totalBeneficiaries = Math.max(detail.totalBeneficiariesCount, progress?.total ?? pending + confirmed + failed)
+  const totalDisbursementAmount = Number(detail.totalDisbursementAmount ?? 0)
+  const totalBeneficiariesCount = Number(detail.totalBeneficiariesCount ?? 0)
+  const amountDisbursed = Math.round(totalDisbursementAmount * (successRate / 100))
+  const totalBeneficiaries = Math.max(totalBeneficiariesCount, progress?.total ?? pending + confirmed + failed)
 
   return {
     id: detail.code ?? `CMP-${detail.id}`,
@@ -56,7 +58,7 @@ export function adaptCampaignDetail(detail: CampaignDetail, progress?: CampaignP
     enabledSavings: detail.isSavingCampaignEnabled,
     totalBeneficiaries,
     amountDisbursed,
-    totalBudget: detail.totalDisbursementAmount,
+    totalBudget: totalDisbursementAmount,
     successRate,
     pendingPayments: pending,
     failedPayments: failed,

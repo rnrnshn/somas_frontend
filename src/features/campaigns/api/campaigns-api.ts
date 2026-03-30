@@ -66,6 +66,30 @@ export function getCampaignBeneficiaries(
   )
 }
 
+export async function getAllCampaignBeneficiaries(campaignId: number) {
+  const pageSize = 100
+  const firstPage = await getCampaignBeneficiaries(campaignId, { page: 1, pageSize })
+  const allRows = [...firstPage.data]
+
+  for (let page = 2; page <= firstPage.meta.lastPage; page += 1) {
+    const nextPage = await getCampaignBeneficiaries(campaignId, { page, pageSize })
+    allRows.push(...nextPage.data)
+  }
+
+  return {
+    ...firstPage,
+    data: allRows,
+    meta: {
+      ...firstPage.meta,
+      total: allRows.length,
+      perPage: allRows.length,
+      currentPage: 1,
+      lastPage: 1,
+      firstPage: 1,
+    },
+  }
+}
+
 export function createCampaign(payload: CampaignMutationPayload) {
   return apiRequest<CampaignDetail>('/campaigns', {
     method: 'POST',

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
-import { useCampaignBeneficiariesQuery, useCampaignProgressQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
+import { useAllCampaignBeneficiariesQuery, useCampaignBeneficiariesQuery, useCampaignProgressQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
 import { useExecuteCampaignDisbursementMutation } from "@/features/campaigns/hooks/use-campaign-mutations";
 import { adaptCampaignDetail, adaptCampaignProgressSeries } from "@/features/campaigns/adapters/campaigns";
 import { useFieldSearchQuery } from "@/features/field/hooks/use-field-queries";
 import { adaptTransaction } from "@/features/transactions/adapters/transactions";
-import { useTransactionsQuery } from "@/features/transactions/hooks/use-transaction-queries";
+import { useCampaignTransactionsQuery } from "@/features/transactions/hooks/use-transaction-queries";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -63,7 +63,7 @@ export function CampaignDetail() {
 
   const campaignQuery = useCampaignQuery(campaignId);
   const progressQuery = useCampaignProgressQuery(campaignId);
-  const campaignBeneficiariesListQuery = useCampaignBeneficiariesQuery(campaignId, { page: 1, pageSize: 100 });
+  const campaignBeneficiariesListQuery = useAllCampaignBeneficiariesQuery(campaignId);
   const campaignBeneficiariesQuery = useFieldSearchQuery(
     {
       campaignId,
@@ -72,11 +72,9 @@ export function CampaignDetail() {
     },
     Number.isFinite(campaignId) && beneficiarySearch.length > 0
   );
-  const campaignTransactionsQuery = useTransactionsQuery({ page: 1, pageSize: 500 });
+  const campaignTransactionsQuery = useCampaignTransactionsQuery(campaignId);
   const executeDisbursementMutation = useExecuteCampaignDisbursementMutation(campaignId);
   const campaign = campaignQuery.data ? adaptCampaignDetail(campaignQuery.data, progressQuery.data) : null;
-
-  const disbursementProgress = campaignQuery.data ? adaptCampaignProgressSeries(campaignQuery.data) : [];
 
   const searchedBeneficiaries = (campaignBeneficiariesQuery.data ?? []).map((item) => ({
     id: `CB-${item.id}`,
@@ -85,7 +83,7 @@ export function CampaignDetail() {
     name: item.beneficiary?.name ?? 'Beneficiary',
     msisdn: item.beneficiary?.msisdn ?? '—',
     location: 'Not available',
-    amount: item.disbursementAmount,
+    amount: Number(item.disbursementAmount ?? 0),
     status: formatDisbursementStatus(item.disbursementStatus),
     lastActivity: '—',
   }));
@@ -96,19 +94,20 @@ export function CampaignDetail() {
     name: item.beneficiary?.name ?? 'Beneficiary',
     msisdn: item.beneficiary?.msisdn ?? '—',
     location: '—',
-    amount: item.disbursementAmount,
+    amount: Number(item.disbursementAmount ?? 0),
     status: formatDisbursementStatus(item.disbursementStatus),
     lastActivity: '—',
   }));
   const beneficiaries = beneficiarySearch.length > 0 ? searchedBeneficiaries : listedBeneficiaries;
-  const fallbackBudget = searchedBeneficiaries.reduce((sum, beneficiary) => sum + beneficiary.amount, 0);
+  const beneficiaryBudget = listedBeneficiaries.reduce((sum, beneficiary) => sum + beneficiary.amount, 0);
+  const fallbackBudget = Math.max(
+    beneficiaryBudget,
+    searchedBeneficiaries.reduce((sum, beneficiary) => sum + beneficiary.amount, 0)
+  );
   const totalBudget = campaign ? Math.max(campaign.totalBudget, fallbackBudget) : fallbackBudget;
   const totalBeneficiaries = campaign ? campaign.totalBeneficiaries : beneficiaries.length;
-  const completionPercentage = campaign && totalBudget > 0 ? (campaign.amountDisbursed / totalBudget) * 100 : 0;
 
-  const transactions = (campaignTransactionsQuery.data?.data ?? [])
-    .filter((item) => item.campaign?.id === campaignId)
-    .map((item) => {
+  const transactions = (campaignTransactionsQuery.data?.data ?? []).map((item) => {
       const transaction = adaptTransaction(item);
 
       return {
@@ -117,16 +116,41 @@ export function CampaignDetail() {
         amount: transaction.amount,
         status: transaction.status,
         errorMessage: transaction.errorMessage,
+        executedAtRaw: item.executedAt ?? item.createdAt,
         executionDate: transaction.executedAt ?? transaction.createdAt ?? '—',
       };
     });
+
+  const successfulTransactions = transactions.filter((item) => item.status === 'Successful');
+  const failedTransactions = transactions.filter((item) => ['Failed', 'Reversed'].includes(item.status));
+  const processingTransactions = transactions.filter((item) => ['Pending', 'Processing'].includes(item.status));
+  const amountDisbursed =
+    successfulTransactions.length > 0
+      ? successfulTransactions.reduce((sum, item) => sum + item.amount, 0)
+      : campaign?.amountDisbursed ?? 0;
+  const pendingPayments =
+    transactions.length > 0
+      ? Math.max(totalBeneficiaries - successfulTransactions.length - failedTransactions.length, processingTransactions.length)
+      : campaign?.pendingPayments ?? 0;
+  const failedPayments = transactions.length > 0 ? failedTransactions.length : campaign?.failedPayments ?? 0;
+  const successRate =
+    transactions.length > 0 && totalBeneficiaries > 0
+      ? Math.round((successfulTransactions.length / totalBeneficiaries) * 100)
+      : campaign?.successRate ?? 0;
+  const effectiveTotalBudget = Math.max(totalBudget, amountDisbursed);
+  const completionPercentage = effectiveTotalBudget > 0 ? Math.min((amountDisbursed / effectiveTotalBudget) * 100, 100) : 0;
+  const disbursementProgress = transactions.length > 0
+    ? buildDisbursementProgressFromTransactions(successfulTransactions)
+    : campaignQuery.data
+      ? adaptCampaignProgressSeries(campaignQuery.data)
+      : [];
 
   // Savings data
   const savingsData: Array<{ id: string; beneficiary: string; savedAmount: number; lastDeposit: string }> = [];
 
   const savingsParticipation = campaign ? [
-    { category: 'Participating', count: Math.round(campaign.totalBeneficiaries * (campaign.successRate / 100)) },
-    { category: 'Not Participating', count: Math.max(campaign.totalBeneficiaries - Math.round(campaign.totalBeneficiaries * (campaign.successRate / 100)), 0) },
+    { category: 'Participating', count: Math.round(campaign.totalBeneficiaries * (successRate / 100)) },
+    { category: 'Not Participating', count: Math.max(campaign.totalBeneficiaries - Math.round(campaign.totalBeneficiaries * (successRate / 100)), 0) },
   ] : [];
   const errorMessage = campaignQuery.error instanceof Error ? campaignQuery.error.message : progressQuery.error instanceof Error ? progressQuery.error.message : null;
   const hasPaymentChannel = Boolean(campaignQuery.data?.paymentChannel?.id);
@@ -267,7 +291,7 @@ export function CampaignDetail() {
                   Amount Disbursed
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
-                  {formatCurrency(campaign.amountDisbursed)}
+                  {formatCurrency(amountDisbursed)}
                 </p>
               </CardContent>
             </Card>
@@ -278,7 +302,7 @@ export function CampaignDetail() {
                   Success Rate
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
-                  {campaign.successRate}%
+                  {successRate}%
                 </p>
               </CardContent>
             </Card>
@@ -289,7 +313,7 @@ export function CampaignDetail() {
                   Pending Payments
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--warning)" }}>
-                  {campaign.pendingPayments}
+                  {pendingPayments}
                 </p>
               </CardContent>
             </Card>
@@ -300,7 +324,7 @@ export function CampaignDetail() {
                   Failed Payments
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--error)" }}>
-                  {campaign.failedPayments}
+                  {failedPayments}
                 </p>
               </CardContent>
             </Card>
@@ -315,7 +339,7 @@ export function CampaignDetail() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
-                    {formatCurrency(campaign.amountDisbursed)} of {formatCurrency(totalBudget)}
+                    {formatCurrency(amountDisbursed)} of {formatCurrency(effectiveTotalBudget)}
                   </span>
                   <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
                     {completionPercentage.toFixed(1)}%
@@ -559,13 +583,13 @@ export function CampaignDetail() {
               <Card>
                 <CardContent className="p-6">
                   <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Total Savings Amount
-                  </p>
-                  <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
-                    {formatCurrency(campaign.amountDisbursed)}
-                  </p>
-                </CardContent>
-              </Card>
+                      Total Savings Amount
+                    </p>
+                    <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                     {formatCurrency(amountDisbursed)}
+                    </p>
+                  </CardContent>
+                </Card>
 
               <Card>
                 <CardContent className="p-6">
@@ -584,7 +608,7 @@ export function CampaignDetail() {
                     Avg Savings per Beneficiary
                   </p>
                   <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
-                    {formatCurrency(savingsParticipation[0]?.count ? campaign.amountDisbursed / savingsParticipation[0].count : 0)}
+                    {formatCurrency(savingsParticipation[0]?.count ? amountDisbursed / savingsParticipation[0].count : 0)}
                   </p>
                 </CardContent>
               </Card>
@@ -850,4 +874,32 @@ function formatDisbursementStatus(status: string) {
     default:
       return status;
   }
+}
+
+function buildDisbursementProgressFromTransactions(
+  transactions: Array<{ amount: number; executedAtRaw: string | null }>
+) {
+  const totals = new Map<string, { label: string; amount: number }>()
+
+  transactions.forEach((transaction) => {
+    if (!transaction.executedAtRaw) return
+    const date = new Date(transaction.executedAtRaw)
+    if (Number.isNaN(date.getTime())) return
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    const label = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date)
+    const current = totals.get(key)
+    totals.set(key, {
+      label,
+      amount: (current?.amount ?? 0) + transaction.amount,
+    })
+  })
+
+  let runningTotal = 0
+
+  return Array.from(totals.entries())
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([, value]) => {
+      runningTotal += value.amount
+      return { month: value.label, amount: runningTotal }
+    })
 }

@@ -6,6 +6,7 @@ export type TransactionListFilters = {
   q?: string
   status?: string
   type?: string
+  campaignId?: number
 }
 
 export type TransactionListItem = {

@@ -15,7 +15,7 @@ export function adaptTransaction(item: TransactionListItem | TransactionDetail) 
     campaign: item.campaign?.name ?? '—',
     campaignId: item.campaign?.code ?? (item.campaign ? `CMP-${item.campaign.id}` : '—'),
     type: normalizeType(item.type),
-    amount: item.amount,
+    amount: Number(item.amount ?? 0),
     mobileMoneyProvider: item.paymentChannel?.name ?? '—',
     externalTxnId: 'externalId' in item ? (item.externalId ?? null) : null,
     status: normalizeStatus(item.status),

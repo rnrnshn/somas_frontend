@@ -1,5 +1,6 @@
 import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query'
 import {
+  getAllCampaignBeneficiaries,
   getCampaign,
   getCampaignBeneficiaries,
   getCampaignProgress,
@@ -44,6 +45,15 @@ export function useCampaignBeneficiariesQuery(
     queryFn: () => getCampaignBeneficiaries(campaignId, filters),
     enabled: Number.isFinite(campaignId),
     placeholderData: keepPreviousData,
+    staleTime: QUERY_STALE_TIME.list,
+  })
+}
+
+export function useAllCampaignBeneficiariesQuery(campaignId: number) {
+  return useQuery({
+    queryKey: ['campaign', campaignId, 'beneficiaries', 'all'],
+    queryFn: () => getAllCampaignBeneficiaries(campaignId),
+    enabled: Number.isFinite(campaignId),
     staleTime: QUERY_STALE_TIME.list,
   })
 }

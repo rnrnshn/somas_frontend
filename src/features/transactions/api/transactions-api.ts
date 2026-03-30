@@ -17,6 +17,7 @@ function buildTransactionListQuery(filters: TransactionListFilters) {
   if (filters.q?.trim()) params.set('q', filters.q.trim())
   if (filters.status?.trim()) params.set('status', filters.status.trim())
   if (filters.type?.trim()) params.set('type', filters.type.trim())
+  if (Number.isFinite(filters.campaignId)) params.set('campaignId', String(filters.campaignId))
 
   return `?${params.toString()}`
 }
@@ -26,6 +27,30 @@ export function getTransactions(filters: TransactionListFilters) {
     method: 'GET',
     auth: true,
   })
+}
+
+export async function getAllCampaignTransactions(campaignId: number) {
+  const pageSize = 100
+  const firstPage = await getTransactions({ page: 1, pageSize, campaignId })
+  const allRows = [...firstPage.data]
+
+  for (let page = 2; page <= firstPage.meta.lastPage; page += 1) {
+    const nextPage = await getTransactions({ page, pageSize, campaignId })
+    allRows.push(...nextPage.data)
+  }
+
+  return {
+    ...firstPage,
+    data: allRows,
+    meta: {
+      ...firstPage.meta,
+      total: allRows.length,
+      perPage: allRows.length,
+      currentPage: 1,
+      lastPage: 1,
+      firstPage: 1,
+    },
+  }
 }
 
 export function getFailedTransactions(filters: TransactionListFilters) {
