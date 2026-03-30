@@ -44,6 +44,7 @@ import {
   FileText,
   Check
 } from "lucide-react";
+import { toast } from "sonner";
 
 type CampaignFormData = {
   name: string;
@@ -65,7 +66,7 @@ type BeneficiaryRow = {
   name: string;
   msisdn: string;
   location: string;
-  amount: number;
+  amount: number | null;
   status: "valid" | "duplicate" | "invalid";
 };
 
@@ -76,6 +77,8 @@ export function CreateCampaign() {
   const isEditMode = Number.isFinite(campaignId);
   const catalogs = useCampaignCatalogs();
   const campaignQuery = useCampaignQuery(campaignId);
+  const existingBeneficiariesQuery = useBeneficiariesQuery({ page: 1, pageSize: 200 });
+  const existingRowQueries = useBeneficiaryRowQueries((existingBeneficiariesQuery.data?.data ?? []).map((item) => item.id));
   const createCampaignMutation = useCreateCampaignMutation();
   const updateCampaignMutation = useUpdateCampaignMutation(campaignId);
   const validateUploadMutation = useValidateCampaignBeneficiariesUploadMutation();
@@ -98,6 +101,22 @@ export function CreateCampaign() {
   });
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const metricsMap = new Map<number, any>();
+  const campaignsMap = new Map<number, any[]>();
+
+  existingRowQueries.forEach((query, index) => {
+    const beneficiaryIndex = Math.floor(index / 2);
+    const beneficiaryId = existingBeneficiariesQuery.data?.data?.[beneficiaryIndex]?.id;
+    if (!beneficiaryId) return;
+
+    if (index % 2 === 0 && query.data) {
+      metricsMap.set(beneficiaryId, query.data);
+    }
+
+    if (index % 2 === 1 && query.data?.data) {
+      campaignsMap.set(beneficiaryId, query.data.data);
+    }
+  });
 
   useEffect(() => {
     if (!campaignQuery.data) return;
@@ -116,6 +135,41 @@ export function CreateCampaign() {
       executionDate: campaignQuery.data.executionDate ?? '',
     }));
   }, [campaignQuery.data]);
+
+  useEffect(() => {
+    if (!isEditMode || uploadedFile || !campaignQuery.data) return;
+    if (!existingBeneficiariesQuery.data?.data) return;
+
+    const existingCampaignBeneficiaries = existingBeneficiariesQuery.data.data
+      .map((item) => ({
+        item,
+        campaigns: campaignsMap.get(item.id) ?? [],
+      }))
+      .filter(({ campaigns }) => campaigns.some((entry) => entry.campaignId === campaignId))
+      .map(({ item, campaigns }) => {
+        const primaryCampaign = campaigns.find((entry) => entry.campaignId === campaignId) ?? campaigns[0];
+        const beneficiary = adaptBeneficiaryListItem(item, metricsMap.get(item.id), primaryCampaign);
+
+        return {
+          id: String(item.id),
+          name: beneficiary.fullName,
+          msisdn: beneficiary.msisdn,
+          location: [beneficiary.district, beneficiary.province].filter((value) => value && value !== '—').join(', ') || '—',
+          amount: null,
+          status: 'valid' as const,
+        };
+      });
+
+    if (existingCampaignBeneficiaries.length === 0) return;
+
+    setFormData((current) => {
+      if (current.beneficiaries.length > 0) return current;
+      return {
+        ...current,
+        beneficiaries: existingCampaignBeneficiaries,
+      };
+    });
+  }, [campaignId, campaignQuery.data, existingBeneficiariesQuery.data, isEditMode, metricsMap, campaignsMap, uploadedFile]);
 
   const totalSteps = 4;
   const progressPercentage = (currentStep / totalSteps) * 100;
@@ -154,8 +208,10 @@ export function CreateCampaign() {
   const getTotalDisbursement = () => {
     return formData.beneficiaries
       .filter(b => b.status === "valid")
-      .reduce((sum, b) => sum + b.amount, 0);
+      .reduce((sum, b) => sum + (b.amount ?? 0), 0);
   };
+
+  const hasKnownDisbursementAmounts = formData.beneficiaries.some((beneficiary) => typeof beneficiary.amount === 'number');
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
@@ -172,6 +228,12 @@ export function CreateCampaign() {
   };
 
   const handleCreateCampaign = async () => {
+    if (!formData.paymentChannel) {
+      setSubmitError('Select a payment channel before saving the campaign.');
+      setShowConfirmDialog(false);
+      return;
+    }
+
     try {
       const payload = {
         name: formData.name,
@@ -190,23 +252,25 @@ export function CreateCampaign() {
       const savedCampaign = isEditMode
         ? await updateCampaignMutation.mutateAsync(payload)
         : await createCampaignMutation.mutateAsync(payload);
-      const validRows = formData.beneficiaries.filter((row) => row.status === 'valid').map((row, index) => ({
+      const validRows = formData.beneficiaries.filter((row) => row.status === 'valid' && typeof row.amount === 'number').map((row, index) => ({
         index,
         name: row.name,
         msisdn: row.msisdn,
-        disbursementAmount: row.amount,
+        disbursementAmount: row.amount as number,
         location: row.location,
         status: 'valid' as const,
         errors: [],
       }));
 
-      if (validRows.length > 0) {
+      if (uploadedFile && validRows.length > 0) {
         await importCampaignBeneficiaries(savedCampaign.id, validRows);
       }
 
+      toast.success(isEditMode ? 'Campaign updated successfully.' : 'Campaign created successfully.');
       setShowConfirmDialog(false);
       navigate(`/backoffice/campaigns/${savedCampaign.id}`);
     } catch (error) {
+      toast.error(error instanceof HttpError ? error.message : `Campaign could not be ${isEditMode ? 'updated' : 'created'}.`);
       setSubmitError(error instanceof HttpError ? error.message : `Campaign could not be ${isEditMode ? 'updated' : 'created'}.`);
       setShowConfirmDialog(false);
     }
@@ -247,7 +311,7 @@ export function CreateCampaign() {
           Back to Campaigns
         </Button>
         <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
-          Create Campaign
+          {isEditMode ? 'Edit Campaign' : 'Create Campaign'}
         </h1>
         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
           Step {currentStep} of {totalSteps}
@@ -429,6 +493,15 @@ export function CreateCampaign() {
               />
             </div>
 
+            {isEditMode && !uploadedFile && formData.beneficiaries.length > 0 ? (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription style={{ fontSize: "var(--text-13)" }}>
+                  Existing campaign beneficiaries are shown below. Uploaded disbursement amounts are not returned by the current campaign list APIs, so amount cells stay blank until a new file is uploaded or the backend exposes campaign beneficiary listing with amounts.
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+
             {formData.beneficiaries.length > 0 && (
               <>
                 {/* Validation Summary */}
@@ -503,7 +576,7 @@ export function CreateCampaign() {
                               {beneficiary.location}
                             </TableCell>
                             <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                              ${beneficiary.amount.toLocaleString()}
+                              {typeof beneficiary.amount === 'number' ? `$${beneficiary.amount.toLocaleString()}` : '—'}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
@@ -644,7 +717,7 @@ export function CreateCampaign() {
                   Total Disbursement Amount
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                  ${getTotalDisbursement().toLocaleString()}
+                  {hasKnownDisbursementAmounts ? `$${getTotalDisbursement().toLocaleString()}` : '—'}
                 </p>
               </div>
 
@@ -685,7 +758,7 @@ export function CreateCampaign() {
           {currentStep === totalSteps ? (
             <>
               <Check className="w-4 h-4 mr-2" />
-              Create Campaign
+              {isEditMode ? 'Update Campaign' : 'Create Campaign'}
             </>
           ) : (
             <>
@@ -701,10 +774,12 @@ export function CreateCampaign() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle style={{ fontSize: "var(--text-20)" }}>
-              Confirm Campaign Creation
+              {isEditMode ? 'Confirm Campaign Update' : 'Confirm Campaign Creation'}
             </DialogTitle>
             <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-              Are you sure you want to create this campaign? This action will initialize the disbursement process.
+              {isEditMode
+                ? 'Are you sure you want to update this campaign?'
+                : 'Are you sure you want to create this campaign? This action will initialize the disbursement process.'}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -712,10 +787,12 @@ export function CreateCampaign() {
               <FileText className="h-4 w-4" />
               <AlertDescription style={{ fontSize: "var(--text-13)" }}>
                 <p style={{ fontWeight: "var(--font-weight-medium)" }}>
-                  {getValidationSummary().valid} beneficiaries • ${getTotalDisbursement().toLocaleString()} total
+                  {hasKnownDisbursementAmounts
+                    ? `${getValidationSummary().valid} beneficiaries • $${getTotalDisbursement().toLocaleString()} total`
+                    : `${getValidationSummary().valid} beneficiaries`}
                 </p>
                 <p style={{ color: "var(--muted-foreground)", marginTop: "4px" }}>
-                  Campaign will be activated on {formData.executionDate}
+                  {isEditMode ? 'Campaign settings will be updated.' : `Campaign will be activated on ${formData.executionDate}`}
                 </p>
               </AlertDescription>
             </Alert>
@@ -725,7 +802,7 @@ export function CreateCampaign() {
               Cancel
             </Button>
             <Button disabled={createCampaignMutation.isPending || updateCampaignMutation.isPending} onClick={() => void handleCreateCampaign()}>
-              Confirm & Create
+              {isEditMode ? 'Confirm & Update' : 'Confirm & Create'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { CurrentUserCard } from '@/features/settings/components/current-user-card'
 import { EmailActionForm } from '@/features/settings/components/email-action-form'
 import { AddMsisdnCard, ConfirmMsisdnCard } from '@/features/settings/components/msisdn-verification-card'
@@ -92,16 +93,31 @@ export function BackendSettingsPanel() {
             onUpdate={async (id, payload) => run(() => mutations.updateRegion.mutateAsync({ id, payload: { name: payload.name } }), 'Region updated successfully.', 'Region could not be updated.')}
             title="Regions"
           />
-          <CatalogAdminCard
-            feedback={feedback}
-            includeDescription
-            isPending={mutations.createPaymentChannel.isPending || mutations.updatePaymentChannel.isPending || mutations.deletePaymentChannel.isPending}
-            items={paymentChannels.data ?? []}
-            onCreate={async (payload) => run(() => mutations.createPaymentChannel.mutateAsync(payload), 'Payment channel created successfully.', 'Payment channel could not be created.')}
-            onDelete={async (id) => run(() => mutations.deletePaymentChannel.mutateAsync(id), 'Payment channel deleted successfully.', 'Payment channel could not be deleted.')}
-            onUpdate={async (id, payload) => run(() => mutations.updatePaymentChannel.mutateAsync({ id, payload }), 'Payment channel updated successfully.', 'Payment channel could not be updated.')}
-            title="Payment channels"
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment channels</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Payment channels are now backend-managed and exposed here as an active read-only list.
+              </p>
+              <div className="space-y-2 rounded-[--radius] border border-border p-4">
+                <p className="text-sm font-medium text-foreground">Current active entries</p>
+                <div className="space-y-2">
+                  {(paymentChannels.data ?? []).map((item) => (
+                    <div className="rounded-[--radius] border border-border px-3 py-2" key={item.id}>
+                      <p className="font-medium text-foreground">{item.name}</p>
+                      {item.code ? <p className="text-xs text-muted-foreground">Code: {item.code}</p> : null}
+                      {item.description ? <p className="text-xs text-muted-foreground">{item.description}</p> : null}
+                    </div>
+                  ))}
+                  {(paymentChannels.data ?? []).length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No active payment channels are currently available.</p>
+                  ) : null}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           <CatalogAdminCard
             feedback={feedback}
             includeDescription

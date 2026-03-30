@@ -41,18 +41,6 @@ export function deleteRegion(id: number) {
   return apiRequest<void>(`/regions/${id}`, { method: 'DELETE', auth: true })
 }
 
-export function createPaymentChannel(payload: { name: string; description?: string }) {
-  return apiRequest<CatalogOption>('/payment-channels', { method: 'POST', auth: true, body: payload })
-}
-
-export function updatePaymentChannel(id: number, payload: { name?: string; description?: string }) {
-  return apiRequest<CatalogOption>(`/payment-channels/${id}`, { method: 'PATCH', auth: true, body: payload })
-}
-
-export function deletePaymentChannel(id: number) {
-  return apiRequest<void>(`/payment-channels/${id}`, { method: 'DELETE', auth: true })
-}
-
 export function createDisbursementType(payload: { name: string; description?: string }) {
   return apiRequest<CatalogOption>('/disbursement-types', { method: 'POST', auth: true, body: payload })
 }

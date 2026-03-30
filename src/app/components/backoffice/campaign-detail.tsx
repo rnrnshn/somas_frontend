@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
-import { useCampaignProgressQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
+import { useCampaignBeneficiariesQuery, useCampaignProgressQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
+import { useExecuteCampaignDisbursementMutation } from "@/features/campaigns/hooks/use-campaign-mutations";
 import { adaptCampaignDetail, adaptCampaignProgressSeries } from "@/features/campaigns/adapters/campaigns";
+import { useFieldSearchQuery } from "@/features/field/hooks/use-field-queries";
+import { adaptTransaction } from "@/features/transactions/adapters/transactions";
+import { useTransactionsQuery } from "@/features/transactions/hooks/use-transaction-queries";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -24,6 +28,8 @@ import {
   Pause,
   XCircle,
   AlertTriangle,
+  Play,
+  SquarePen,
   Search,
   Eye,
   Flag,
@@ -31,6 +37,7 @@ import {
   FileText,
   PiggyBank
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   LineChart,
   Line,
@@ -51,35 +58,68 @@ export function CampaignDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [showCloseDialog, setShowCloseDialog] = useState(false);
+  const [showExecuteDialog, setShowExecuteDialog] = useState(false);
+  const beneficiarySearch = searchQuery.trim();
 
   const campaignQuery = useCampaignQuery(campaignId);
   const progressQuery = useCampaignProgressQuery(campaignId);
+  const campaignBeneficiariesListQuery = useCampaignBeneficiariesQuery(campaignId, { page: 1, pageSize: 100 });
+  const campaignBeneficiariesQuery = useFieldSearchQuery(
+    {
+      campaignId,
+      name: beneficiarySearch || undefined,
+      msisdn: beneficiarySearch || undefined,
+    },
+    Number.isFinite(campaignId) && beneficiarySearch.length > 0
+  );
+  const campaignTransactionsQuery = useTransactionsQuery({ page: 1, pageSize: 500 });
+  const executeDisbursementMutation = useExecuteCampaignDisbursementMutation(campaignId);
   const campaign = campaignQuery.data ? adaptCampaignDetail(campaignQuery.data, progressQuery.data) : null;
-
-  const completionPercentage = campaign && campaign.totalBudget > 0 ? (campaign.amountDisbursed / campaign.totalBudget) * 100 : 0;
 
   const disbursementProgress = campaignQuery.data ? adaptCampaignProgressSeries(campaignQuery.data) : [];
 
-  // Beneficiaries data
-  const beneficiaries: Array<{
-    id: string;
-    name: string;
-    msisdn: string;
-    location: string;
-    amount: number;
-    status: string;
-    lastActivity: string;
-  }> = [];
+  const searchedBeneficiaries = (campaignBeneficiariesQuery.data ?? []).map((item) => ({
+    id: `CB-${item.id}`,
+    campaignBeneficiaryId: item.id,
+    beneficiaryId: item.beneficiaryId,
+    name: item.beneficiary?.name ?? 'Beneficiary',
+    msisdn: item.beneficiary?.msisdn ?? '—',
+    location: 'Not available',
+    amount: item.disbursementAmount,
+    status: formatDisbursementStatus(item.disbursementStatus),
+    lastActivity: '—',
+  }));
+  const listedBeneficiaries = (campaignBeneficiariesListQuery.data?.data ?? []).map((item) => ({
+    id: `CB-${item.id}`,
+    campaignBeneficiaryId: item.id,
+    beneficiaryId: item.beneficiaryId,
+    name: item.beneficiary?.name ?? 'Beneficiary',
+    msisdn: item.beneficiary?.msisdn ?? '—',
+    location: '—',
+    amount: item.disbursementAmount,
+    status: formatDisbursementStatus(item.disbursementStatus),
+    lastActivity: '—',
+  }));
+  const beneficiaries = beneficiarySearch.length > 0 ? searchedBeneficiaries : listedBeneficiaries;
+  const fallbackBudget = searchedBeneficiaries.reduce((sum, beneficiary) => sum + beneficiary.amount, 0);
+  const totalBudget = campaign ? Math.max(campaign.totalBudget, fallbackBudget) : fallbackBudget;
+  const totalBeneficiaries = campaign ? campaign.totalBeneficiaries : beneficiaries.length;
+  const completionPercentage = campaign && totalBudget > 0 ? (campaign.amountDisbursed / totalBudget) * 100 : 0;
 
-  // Transactions data
-  const transactions: Array<{
-    id: string;
-    beneficiary: string;
-    amount: number;
-    status: string;
-    errorMessage: string | null;
-    executionDate: string;
-  }> = [];
+  const transactions = (campaignTransactionsQuery.data?.data ?? [])
+    .filter((item) => item.campaign?.id === campaignId)
+    .map((item) => {
+      const transaction = adaptTransaction(item);
+
+      return {
+        id: transaction.id,
+        beneficiary: transaction.beneficiary,
+        amount: transaction.amount,
+        status: transaction.status,
+        errorMessage: transaction.errorMessage,
+        executionDate: transaction.executedAt ?? transaction.createdAt ?? '—',
+      };
+    });
 
   // Savings data
   const savingsData: Array<{ id: string; beneficiary: string; savedAmount: number; lastDeposit: string }> = [];
@@ -89,6 +129,8 @@ export function CampaignDetail() {
     { category: 'Not Participating', count: Math.max(campaign.totalBeneficiaries - Math.round(campaign.totalBeneficiaries * (campaign.successRate / 100)), 0) },
   ] : [];
   const errorMessage = campaignQuery.error instanceof Error ? campaignQuery.error.message : progressQuery.error instanceof Error ? progressQuery.error.message : null;
+  const hasPaymentChannel = Boolean(campaignQuery.data?.paymentChannel?.id);
+  const canExecuteDisbursement = campaign ? !['Closed', 'Suspended'].includes(campaign.status) && hasPaymentChannel : false;
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -119,6 +161,22 @@ export function CampaignDetail() {
     });
   };
 
+  const handleExecuteDisbursement = async () => {
+    try {
+      const result = await executeDisbursementMutation.mutateAsync();
+      const transactionsCount = typeof result?.transactionsCount === 'number' ? result.transactionsCount : null;
+
+      toast.success(
+        transactionsCount !== null
+          ? `Disbursement batch ${result.code ?? result.batchId ?? ''} started for ${transactionsCount} transaction${transactionsCount === 1 ? '' : 's'}.`.trim()
+          : 'Disbursement execution started successfully.'
+      );
+      setShowExecuteDialog(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Disbursement execution could not be started.');
+    }
+  };
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -144,6 +202,14 @@ export function CampaignDetail() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate(`/backoffice/campaigns/${campaignId}/edit`)}>
+              <SquarePen className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+            <Button onClick={() => setShowExecuteDialog(true)} disabled={!canExecuteDisbursement || executeDisbursementMutation.isPending}>
+              <Play className="w-4 h-4 mr-2" />
+              {executeDisbursementMutation.isPending ? 'Executing...' : 'Execute Disbursement'}
+            </Button>
             <Button variant="outline" onClick={() => setShowSuspendDialog(true)}>
               <Pause className="w-4 h-4 mr-2" />
               Suspend
@@ -159,6 +225,14 @@ export function CampaignDetail() {
       {errorMessage ? (
         <Alert className="mb-6" variant="destructive">
           <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      {campaign && !hasPaymentChannel ? (
+        <Alert className="mb-6" variant="destructive">
+          <AlertDescription>
+            This campaign cannot be executed until a payment channel is configured. Edit the campaign and select a payment channel first.
+          </AlertDescription>
         </Alert>
       ) : null}
 
@@ -182,7 +256,7 @@ export function CampaignDetail() {
                   Total Beneficiaries
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
-                  {campaign.totalBeneficiaries.toLocaleString()}
+                  {totalBeneficiaries.toLocaleString()}
                 </p>
               </CardContent>
             </Card>
@@ -241,7 +315,7 @@ export function CampaignDetail() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
-                    {formatCurrency(campaign.amountDisbursed)} of {formatCurrency(campaign.totalBudget)}
+                    {formatCurrency(campaign.amountDisbursed)} of {formatCurrency(totalBudget)}
                   </span>
                   <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
                     {completionPercentage.toFixed(1)}%
@@ -308,11 +382,43 @@ export function CampaignDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {beneficiaries.length === 0 ? (
+                  {beneficiarySearch.length > 0 && campaignBeneficiariesQuery.isPending ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                          Beneficiary detail records are not wired yet for this screen.
+                          Loading beneficiaries...
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : beneficiarySearch.length > 0 && campaignBeneficiariesQuery.error ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <p style={{ fontSize: "var(--text-14)", color: "var(--error)" }}>
+                          {campaignBeneficiariesQuery.error instanceof Error ? campaignBeneficiariesQuery.error.message : 'Campaign beneficiaries could not be loaded.'}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : beneficiarySearch.length === 0 && campaignBeneficiariesListQuery.isPending ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                          Loading beneficiaries...
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : beneficiarySearch.length === 0 && campaignBeneficiariesListQuery.error ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <p style={{ fontSize: "var(--text-14)", color: "var(--error)" }}>
+                          {campaignBeneficiariesListQuery.error instanceof Error ? campaignBeneficiariesListQuery.error.message : 'Campaign beneficiaries could not be loaded.'}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : beneficiaries.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                          {beneficiarySearch.length > 0 ? 'No beneficiaries match your search.' : 'No beneficiaries were found for this campaign.'}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -335,7 +441,7 @@ export function CampaignDetail() {
                         {beneficiary.location}
                       </TableCell>
                       <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                        ${beneficiary.amount.toLocaleString()}
+                        {typeof beneficiary.amount === 'number' ? `$${beneficiary.amount.toLocaleString()}` : '—'}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(beneficiary.status)}
@@ -345,7 +451,7 @@ export function CampaignDetail() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" onClick={() => navigate(`/backoffice/beneficiaries/profile/${beneficiary.beneficiaryId}`)}>
                             <Eye className="w-4 h-4" />
                           </Button>
                           <Button variant="ghost" size="sm">
@@ -381,11 +487,27 @@ export function CampaignDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactions.length === 0 ? (
+                  {campaignTransactionsQuery.isPending ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                          Campaign transaction rows are not wired yet for this screen.
+                          Loading transactions...
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : campaignTransactionsQuery.error ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <p style={{ fontSize: "var(--text-14)", color: "var(--error)" }}>
+                          {campaignTransactionsQuery.error instanceof Error ? campaignTransactionsQuery.error.message : 'Campaign transactions could not be loaded.'}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : transactions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                          No transactions have been created for this campaign yet.
                         </p>
                       </TableCell>
                     </TableRow>
@@ -629,6 +751,34 @@ export function CampaignDetail() {
       </Tabs> : null}
 
       {/* Suspend Campaign Dialog */}
+      <Dialog open={showExecuteDialog} onOpenChange={setShowExecuteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle style={{ fontSize: "var(--text-20)" }}>
+              Execute Disbursement
+            </DialogTitle>
+            <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+              This will create and process campaign transactions for the current beneficiaries.
+            </DialogDescription>
+          </DialogHeader>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription style={{ fontSize: "var(--text-13)" }}>
+              {campaign ? `${campaign.pendingPayments} pending payment${campaign.pendingPayments === 1 ? '' : 's'} will be considered for execution.` : 'Pending campaign payments will be considered for execution.'}
+            </AlertDescription>
+          </Alert>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExecuteDialog(false)} disabled={executeDisbursementMutation.isPending}>
+              Cancel
+            </Button>
+            <Button onClick={handleExecuteDisbursement} disabled={!canExecuteDisbursement || executeDisbursementMutation.isPending}>
+              {executeDisbursementMutation.isPending ? 'Executing...' : 'Execute Disbursement'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Suspend Campaign Dialog */}
       <Dialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
         <DialogContent>
           <DialogHeader>
@@ -685,4 +835,19 @@ export function CampaignDetail() {
       </Dialog>
     </div>
   );
+}
+
+function formatDisbursementStatus(status: string) {
+  switch (status) {
+    case 'confirmed':
+      return 'Confirmed';
+    case 'not_confirmed':
+      return 'Failed';
+    case 'not_found':
+      return 'Failed';
+    case 'pending':
+      return 'Pending';
+    default:
+      return status;
+  }
 }

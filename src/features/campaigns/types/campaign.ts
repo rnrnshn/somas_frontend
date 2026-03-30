@@ -73,6 +73,27 @@ export type CampaignProgress = {
   total: number
 }
 
+export type CampaignBeneficiaryListItem = {
+  id: number
+  campaignId: number
+  beneficiaryId: number
+  disbursementAmount: number
+  disbursementStatus: string
+  createdAt: string
+  beneficiary?: {
+    id: number
+    name: string
+    msisdn: string
+  } | null
+}
+
+export type CampaignBeneficiariesResponse = PaginatedResponse<CampaignBeneficiaryListItem>
+
+export type CampaignBeneficiariesFilters = {
+  page?: number
+  pageSize?: number
+}
+
 export type CampaignBeneficiaryUploadPreviewRow = {
   index: number
   name: string
@@ -125,4 +146,28 @@ export type CampaignMutationPayload = {
   paymentChannelId?: number | null
   disbursementTypeId?: number | null
   rules?: Record<string, unknown>
+}
+
+export type CampaignDisbursementExecutionResult = {
+  batchId?: number | string
+  code?: string
+  transactionsCount?: number
+  totalAmount?: number
+}
+
+export type CampaignBeneficiaryDisbursement = {
+  id: number
+  campaignId: number
+  beneficiaryId: number
+  disbursementAmount: number
+  disbursementStatus: string
+}
+
+export type ConfirmCampaignBeneficiaryPayload = {
+  status: 'confirmed' | 'not_confirmed' | 'not_found'
+  latitude?: number
+  longitude?: number
+  verifiedAt?: string
+  signatureUrl?: string
+  photoUrl?: string
 }

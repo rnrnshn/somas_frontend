@@ -1,6 +1,11 @@
 import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query'
-import { getCampaign, getCampaignProgress, getCampaigns } from '@/features/campaigns/api/campaigns-api'
-import type { CampaignListFilters } from '@/features/campaigns/types/campaign'
+import {
+  getCampaign,
+  getCampaignBeneficiaries,
+  getCampaignProgress,
+  getCampaigns,
+} from '@/features/campaigns/api/campaigns-api'
+import type { CampaignBeneficiariesFilters, CampaignListFilters } from '@/features/campaigns/types/campaign'
 import { QUERY_STALE_TIME } from '@/lib/constants/query'
 
 export function useCampaignsQuery(filters: CampaignListFilters) {
@@ -27,6 +32,19 @@ export function useCampaignProgressQuery(campaignId: number) {
     queryFn: () => getCampaignProgress(campaignId),
     enabled: Number.isFinite(campaignId),
     staleTime: QUERY_STALE_TIME.dashboard,
+  })
+}
+
+export function useCampaignBeneficiariesQuery(
+  campaignId: number,
+  filters: CampaignBeneficiariesFilters = {}
+) {
+  return useQuery({
+    queryKey: ['campaign', campaignId, 'beneficiaries', filters],
+    queryFn: () => getCampaignBeneficiaries(campaignId, filters),
+    enabled: Number.isFinite(campaignId),
+    placeholderData: keepPreviousData,
+    staleTime: QUERY_STALE_TIME.list,
   })
 }
 

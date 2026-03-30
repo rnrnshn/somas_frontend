@@ -1,5 +1,8 @@
 import { apiRequest } from '@/lib/api/client'
 import type {
+  CampaignBeneficiariesFilters,
+  CampaignBeneficiariesResponse,
+  CampaignDisbursementExecutionResult,
   CampaignBeneficiaryImportResult,
   CampaignBeneficiaryUploadPreview,
   CampaignBeneficiaryUploadPreviewRow,
@@ -45,6 +48,24 @@ export function getCampaignProgress(campaignId: number) {
   })
 }
 
+export function getCampaignBeneficiaries(
+  campaignId: number,
+  filters: CampaignBeneficiariesFilters = {}
+) {
+  const params = new URLSearchParams({
+    page: String(filters.page ?? 1),
+    pageSize: String(filters.pageSize ?? 100),
+  })
+
+  return apiRequest<CampaignBeneficiariesResponse>(
+    `/campaigns/${campaignId}/beneficiaries?${params.toString()}`,
+    {
+      method: 'GET',
+      auth: true,
+    }
+  )
+}
+
 export function createCampaign(payload: CampaignMutationPayload) {
   return apiRequest<CampaignDetail>('/campaigns', {
     method: 'POST',
@@ -58,6 +79,13 @@ export function updateCampaign(campaignId: number, payload: CampaignMutationPayl
     method: 'PATCH',
     auth: true,
     body: payload,
+  })
+}
+
+export function executeCampaignDisbursement(campaignId: number) {
+  return apiRequest<CampaignDisbursementExecutionResult>(`/campaigns/${campaignId}/disbursements/execute`, {
+    method: 'POST',
+    auth: true,
   })
 }
 
