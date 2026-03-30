@@ -2,7 +2,8 @@ import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { LayoutDashboard, Search, WifiOff, ChevronLeft, Menu } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
 
 export function FieldLayout() {
   const navigate = useNavigate();
@@ -85,7 +86,9 @@ export function FieldLayout() {
 
       {/* Main Content */}
       <main className="flex-1">
-        <Outlet />
+        <Suspense fallback={<FieldRouteSkeleton />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       {/* Bottom Navigation */}
@@ -113,4 +116,15 @@ export function FieldLayout() {
       </nav>
     </div>
   );
+}
+
+function FieldRouteSkeleton() {
+  return (
+    <div className="space-y-4 p-4">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-24 w-full" />
+      <Skeleton className="h-24 w-full" />
+      <Skeleton className="h-40 w-full" />
+    </div>
+  )
 }

@@ -4,8 +4,10 @@ import {
   executeCampaignDisbursement,
   importCampaignBeneficiaries,
   updateCampaign,
+  updateCampaignStatus,
   validateCampaignBeneficiariesUpload,
 } from '@/features/campaigns/api/campaigns-api'
+import type { CampaignStatus } from '@/features/campaigns/types/campaign'
 
 export function useCreateCampaignMutation() {
   const queryClient = useQueryClient()
@@ -41,6 +43,21 @@ export function useExecuteCampaignDisbursementMutation(campaignId: number) {
         queryClient.invalidateQueries({ queryKey: ['campaign', campaignId] }),
         queryClient.invalidateQueries({ queryKey: ['transactions'] }),
         queryClient.invalidateQueries({ queryKey: ['field', 'search'] }),
+      ])
+    },
+  })
+}
+
+export function useUpdateCampaignStatusMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ campaignId, status }: { campaignId: number; status: CampaignStatus }) =>
+      updateCampaignStatus(campaignId, { status }),
+    onSuccess: async (_data, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['campaigns'] }),
+        queryClient.invalidateQueries({ queryKey: ['campaign', variables.campaignId] }),
       ])
     },
   })

@@ -27,6 +27,7 @@ export function adaptCampaignListItem(item: CampaignListItem, detail?: CampaignD
   return {
     id: String(item.id),
     numericId: item.id,
+    statusCode: item.status,
     name: item.name,
     code: item.code,
     program: detail?.programRelation?.name ?? detail?.program ?? '—',
@@ -52,6 +53,7 @@ export function adaptCampaignDetail(detail: CampaignDetail, progress?: CampaignP
   return {
     id: detail.code ?? `CMP-${detail.id}`,
     numericId: detail.id,
+    statusCode: detail.status,
     name: detail.name,
     program: detail.programRelation?.name ?? detail.program ?? '—',
     region: detail.province,

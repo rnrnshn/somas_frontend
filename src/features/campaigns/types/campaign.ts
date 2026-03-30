@@ -148,6 +148,10 @@ export type CampaignMutationPayload = {
   rules?: Record<string, unknown>
 }
 
+export type CampaignStatusUpdatePayload = {
+  status: CampaignStatus
+}
+
 export type CampaignDisbursementExecutionResult = {
   batchId?: number | string
   code?: string
@@ -161,6 +165,22 @@ export type CampaignBeneficiaryDisbursement = {
   beneficiaryId: number
   disbursementAmount: number
   disbursementStatus: string
+  testimony?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  verifiedAt?: string | null
+  signatureUrl?: string | null
+  photoUrl?: string | null
+  beneficiary?: {
+    id: number
+    name: string
+    msisdn: string
+  } | null
+  campaign?: {
+    id: number
+    name: string
+    code?: string | null
+  } | null
 }
 
 export type ConfirmCampaignBeneficiaryPayload = {

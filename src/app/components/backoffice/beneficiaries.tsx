@@ -1,14 +1,16 @@
 import { useState } from "react";
+import { useQueries } from "@tanstack/react-query";
 import { useNavigate } from "@/lib/router";
 import { useBeneficiariesQuery, useBeneficiaryRowQueries } from "@/features/beneficiaries/hooks/use-beneficiary-queries";
 import { adaptBeneficiaryListItem } from "@/features/beneficiaries/adapters/beneficiaries";
 import type { BeneficiaryListFilters } from "@/features/beneficiaries/types/beneficiary";
+import { getFieldDisbursement } from "@/features/field/api/field-api";
 import { Card, CardHeader, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
-import { Plus, Search, Download, MapPin, CheckCircle, XCircle, Clock, Upload, Eye, Edit } from "lucide-react";
+import { Plus, Search, Download, MapPin, CheckCircle, XCircle, Clock, Upload } from "lucide-react";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
@@ -45,6 +47,19 @@ export function BackofficeBeneficiaries() {
     }
   });
 
+  const verificationSourceRows = rowQueries
+    .filter((_, index) => index % 2 === 1)
+    .flatMap((query) => query.data?.data ?? []);
+
+  const verificationQueries = useQueries({
+    queries: verificationSourceRows.map((row) => ({
+      queryKey: ['field', 'verification-record', row.campaignId, row.id],
+      queryFn: () => getFieldDisbursement(row.campaignId, row.id),
+      enabled: activeTab === 'field-verification',
+      staleTime: 30_000,
+    })),
+  });
+
   const beneficiaries = (beneficiariesQuery.data?.data ?? []).map((item) =>
     adaptBeneficiaryListItem(item, metricsMap.get(item.id), campaignsMap.get(item.id))
   ).filter((beneficiary) => {
@@ -54,7 +69,38 @@ export function BackofficeBeneficiaries() {
     return matchesCampaign && matchesProvince && matchesStatus;
   });
 
-  const fieldVerifications: Array<{ id: string; beneficiary: string; beneficiaryCode: string; enumerator: string; location: string; date: string; status: string; notes: string }> = [];
+  const fieldVerifications = verificationSourceRows
+    .map((row, index) => {
+      const detail = verificationQueries[index]?.data;
+      if (!detail) return null;
+
+      const hasVerification = Boolean(detail.verifiedAt) || String(detail.disbursementStatus).toLowerCase() !== 'pending';
+      if (!hasVerification) return null;
+
+      return {
+        id: `VER-${detail.id}`,
+        beneficiary: detail.beneficiary?.name ?? row.campaign?.name ?? 'Beneficiary',
+        beneficiaryCode: `BEN-${String(detail.beneficiaryId).padStart(6, '0')}`,
+        enumerator: 'Field App',
+        location:
+          typeof detail.latitude === 'number' && typeof detail.longitude === 'number'
+            ? `${detail.latitude.toFixed(4)}, ${detail.longitude.toFixed(4)}`
+            : 'Not captured',
+        date: formatDisplayDate(detail.verifiedAt ?? row.createdAt),
+        status: mapVerificationStatus(detail.disbursementStatus),
+        notes: detail.testimony ?? buildEvidenceSummary(detail.signatureUrl, detail.photoUrl),
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  const filteredFieldVerifications = fieldVerifications.filter((verification) => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+    return [verification.id, verification.beneficiary, verification.beneficiaryCode, verification.notes]
+      .join(' ')
+      .toLowerCase()
+      .includes(query);
+  });
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -206,16 +252,12 @@ export function BackofficeBeneficiaries() {
                     <TableHead>District</TableHead>
                     <TableHead>Campaign</TableHead>
                     <TableHead>Last Transaction</TableHead>
-                    <TableHead className="text-right">Total Received</TableHead>
-                    <TableHead className="text-right">Total Saved</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {beneficiaries.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={11} className="py-12 text-center">
+                      <TableCell colSpan={7} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
                           {beneficiariesQuery.isPending ? 'Loading beneficiaries...' : 'No beneficiaries found'}
                         </p>
@@ -240,33 +282,6 @@ export function BackofficeBeneficiaries() {
                       </TableCell>
                       <TableCell style={{ fontSize: 'var(--text-13)' }}>{beneficiary.campaign}</TableCell>
                       <TableCell style={{ fontSize: 'var(--text-13)' }}>{beneficiary.lastTransaction}</TableCell>
-                      <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
-                        {beneficiary.totalReceived.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
-                        {beneficiary.totalSaved.toLocaleString()}
-                      </TableCell>
-                      <TableCell>
-                        {getStatusBadge(beneficiary.status)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => navigate(`/backoffice/beneficiaries/profile/${beneficiary.id}`)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => navigate(`/backoffice/beneficiaries/form/${beneficiary.id}`)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -314,15 +329,23 @@ export function BackofficeBeneficiaries() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {fieldVerifications.length === 0 ? (
+                  {activeTab === 'field-verification' && verificationQueries.some((query) => query.isPending) && filteredFieldVerifications.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                          Field verification records are not wired yet for this screen.
+                          Loading field verification records...
                         </p>
                       </TableCell>
                     </TableRow>
-                  ) : fieldVerifications.map((verification) => (
+                  ) : filteredFieldVerifications.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-12 text-center">
+                        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                          No field verification records found.
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredFieldVerifications.map((verification) => (
                     <TableRow key={verification.id} className="cursor-pointer">
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
@@ -367,4 +390,24 @@ export function BackofficeBeneficiaries() {
       </Tabs>
     </div>
   );
+}
+
+function mapVerificationStatus(status: string) {
+  const value = status.toLowerCase();
+  if (value === 'confirmed') return 'Verified';
+  if (value === 'not_confirmed' || value === 'not_found') return 'Rejected';
+  return 'Pending';
+}
+
+function buildEvidenceSummary(signatureUrl?: string | null, photoUrl?: string | null) {
+  const parts = [];
+  if (signatureUrl) parts.push('Signature attached');
+  if (photoUrl) parts.push('Photo attached');
+  return parts.join(' • ') || 'No notes';
+}
+
+function formatDisplayDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('en-CA').format(date);
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
 import { useBackofficeDashboardQueries } from "@/features/dashboard/hooks/use-dashboard-queries";
+import { useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
 import {
   adaptBeneficiaryGrowth,
   adaptCampaignPerformance,
@@ -80,6 +81,25 @@ export function BackofficeDashboard() {
   const dailyMetrics = adaptDailyMetrics(dashboard.overview.data);
   const transactionStatus = adaptTransactionStatus(dashboard.overview.data);
   const campaigns = adaptCampaignPerformance(dashboard.overview.data);
+  const campaignSummaryQueries = useCampaignTableSummaryQueries(campaigns.map((item) => Number(item.id)));
+  const campaignSummaryMap = new Map(
+    campaignSummaryQueries
+      .map((query) => query.data)
+      .filter((summary): summary is NonNullable<typeof summary> => Boolean(summary))
+      .map((summary) => [summary.campaignId, summary])
+  );
+  const campaignPerformance = campaigns.map((campaign) => {
+    const summary = campaignSummaryMap.get(Number(campaign.id));
+    if (!summary) return campaign;
+
+    return {
+      ...campaign,
+      beneficiaries: summary.totalBeneficiaries,
+      amount: summary.amountDisbursed,
+      successRate: summary.successRate,
+      progress: summary.successRate,
+    };
+  });
   const transactionTrend = adaptTransactionTrend(dashboard.transactions.data);
   const recentTransactions = adaptRecentTransactions(dashboard.transactions.data);
   const savingsGrowth = adaptSavingsGrowth(dashboard.overview.data);
@@ -92,7 +112,7 @@ export function BackofficeDashboard() {
     inactive: 0,
     withSavings: 0,
   };
-  const availableCampaigns = campaigns;
+  const availableCampaigns = campaignPerformance;
   const availableRegions = Array.from(new Set((dashboard.beneficiaries.data?.byProvince ?? []).map((item) => item.province)));
   const dashboardError = dashboard.error instanceof Error ? dashboard.error.message : null;
 
@@ -499,7 +519,7 @@ export function BackofficeDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {campaigns.map((campaign) => (
+                  {campaignPerformance.map((campaign) => (
                     <TableRow
                       key={campaign.id}
                       className="cursor-pointer hover:bg-muted/50"

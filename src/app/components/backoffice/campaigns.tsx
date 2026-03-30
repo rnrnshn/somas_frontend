@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "@/lib/router";
 import { useCampaignDetailsQueries, useCampaignsQuery, useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
 import { adaptCampaignListItem } from "@/features/campaigns/adapters/campaigns";
+import { useUpdateCampaignStatusMutation } from "@/features/campaigns/hooks/use-campaign-mutations";
 import type { CampaignListFilters, CampaignStatus } from "@/features/campaigns/types/campaign";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
+import { Skeleton } from "../ui/skeleton";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
 import { 
   Select, 
@@ -29,8 +31,10 @@ import {
   Edit, 
   Pause, 
   XCircle,
-  Download 
+  Download,
+  LoaderCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export function BackofficeCampaigns() {
   const navigate = useNavigate();
@@ -48,6 +52,7 @@ export function BackofficeCampaigns() {
     province: regionFilter === 'all' ? undefined : regionFilter,
   };
   const campaignsQuery = useCampaignsQuery(filters);
+  const updateCampaignStatusMutation = useUpdateCampaignStatusMutation();
   const campaignIds = (campaignsQuery.data?.data ?? []).map((campaign) => campaign.id);
   const campaignDetailsQueries = useCampaignDetailsQueries(campaignIds);
   const campaignSummaryQueries = useCampaignTableSummaryQueries(campaignIds);
@@ -76,6 +81,9 @@ export function BackofficeCampaigns() {
       successRate: summary.successRate,
     };
   });
+  const summaryLoadingIds = new Set(
+    campaignSummaryQueries.filter((query) => query.isPending).map((query, index) => campaignIds[index]).filter(Boolean)
+  );
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -104,6 +112,15 @@ export function BackofficeCampaigns() {
       day: 'numeric' 
     });
   };
+
+  const handleStatusChange = async (campaignId: number, status: CampaignStatus) => {
+    try {
+      await updateCampaignStatusMutation.mutateAsync({ campaignId, status })
+      toast.success(`Campaign status updated to ${formatStatusLabel(status)}.`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Campaign status could not be updated.')
+    }
+  }
 
   const filteredCampaigns = campaigns.filter(campaign => {
     const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -202,23 +219,34 @@ export function BackofficeCampaigns() {
                 <TableHead>Program</TableHead>
                 <TableHead>Region</TableHead>
                 <TableHead>Start Date</TableHead>
-                <TableHead>End Date</TableHead>
                 <TableHead>Beneficiaries</TableHead>
                 <TableHead>Disbursement</TableHead>
-                <TableHead>Success Rate</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-               {filteredCampaigns.length === 0 ? (
-                 <TableRow>
-                   <TableCell colSpan={10} className="text-center py-12">
-                     <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                       {campaignsQuery.isPending ? 'Loading campaigns...' : 'No campaigns found'}
-                     </p>
-                   </TableCell>
-                 </TableRow>
+               {campaignsQuery.isPending && campaigns.length === 0 ? (
+                 Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={`campaign-skeleton-${index}`}>
+                    <TableCell><Skeleton className="h-10 w-48" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-28" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-12" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                  </TableRow>
+                 ))
+               ) : filteredCampaigns.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-12">
+                      <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                        No campaigns found
+                      </p>
+                    </TableCell>
+                  </TableRow>
               ) : (
                 filteredCampaigns.map((campaign) => (
                   <TableRow
@@ -245,23 +273,11 @@ export function BackofficeCampaigns() {
                     <TableCell style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
                       {formatDate(campaign.startDate)}
                     </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
-                      {formatDate(campaign.endDate)}
+                    <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                      {summaryLoadingIds.has(campaign.numericId) ? <Skeleton className="h-5 w-12" /> : campaign.beneficiaries > 0 ? campaign.beneficiaries.toLocaleString() : '—'}
                     </TableCell>
                     <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                      {campaign.beneficiaries > 0 ? campaign.beneficiaries.toLocaleString() : '—'}
-                    </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                      {formatCurrency(campaign.disbursementAmount)}
-                    </TableCell>
-                    <TableCell>
-                      {campaign.successRate > 0 ? (
-                        <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)", color: "var(--success)" }}>
-                          {campaign.successRate}%
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>—</span>
-                      )}
+                      {summaryLoadingIds.has(campaign.numericId) ? <Skeleton className="h-5 w-20" /> : formatCurrency(campaign.disbursementAmount)}
                     </TableCell>
                     <TableCell>
                       {getStatusBadge(campaign.status)}
@@ -282,14 +298,16 @@ export function BackofficeCampaigns() {
                             <Edit className="w-4 h-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Pause className="w-4 h-4 mr-2" />
-                            Suspend
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Close
-                          </DropdownMenuItem>
+                          {getCampaignStatusActions(campaign.statusCode).map((action) => (
+                            <DropdownMenuItem
+                              key={action.status}
+                              onClick={() => handleStatusChange(campaign.numericId, action.status)}
+                              disabled={updateCampaignStatusMutation.isPending}
+                            >
+                              {updateCampaignStatusMutation.isPending ? <LoaderCircle className="w-4 h-4 mr-2 animate-spin" /> : <action.icon className="w-4 h-4 mr-2" />}
+                              {action.label}
+                            </DropdownMenuItem>
+                          ))}
                           <DropdownMenuItem>
                             <Download className="w-4 h-4 mr-2" />
                             Export Data
@@ -306,6 +324,51 @@ export function BackofficeCampaigns() {
       </Card>
     </div>
   );
+}
+
+function getCampaignStatusActions(status: CampaignStatus) {
+  switch (status) {
+    case 'draft':
+      return [
+        { status: 'planned' as const, label: 'Mark Planned', icon: Edit },
+        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+      ]
+    case 'planned':
+      return [
+        { status: 'active' as const, label: 'Activate', icon: Eye },
+        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+      ]
+    case 'active':
+      return [
+        { status: 'suspended' as const, label: 'Suspend', icon: Pause },
+        { status: 'completed' as const, label: 'Complete', icon: Eye },
+        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+      ]
+    case 'suspended':
+      return [
+        { status: 'active' as const, label: 'Activate', icon: Eye },
+        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+      ]
+    default:
+      return []
+  }
+}
+
+function formatStatusLabel(status: CampaignStatus) {
+  switch (status) {
+    case 'draft':
+      return 'Draft'
+    case 'planned':
+      return 'Planned'
+    case 'active':
+      return 'Active'
+    case 'completed':
+      return 'Completed'
+    case 'suspended':
+      return 'Suspended'
+    case 'cancelled':
+      return 'Cancelled'
+  }
 }
 
 function mapStatusFilter(status: string): CampaignStatus | undefined {

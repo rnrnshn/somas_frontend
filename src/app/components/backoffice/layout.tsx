@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { useAuth } from "@/lib/auth/auth-context";
 import { 
@@ -11,6 +11,7 @@ import {
   Settings
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 import { TenantSwitcher } from "./tenant-switcher";
 
 type NavItem = {
@@ -131,9 +132,28 @@ export function BackofficeLayout() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          <Suspense fallback={<BackofficeRouteSkeleton />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
   );
+}
+
+function BackofficeRouteSkeleton() {
+  return (
+    <div className="space-y-6 p-8">
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-72" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <Skeleton className="h-28" />
+        <Skeleton className="h-28" />
+        <Skeleton className="h-28" />
+      </div>
+      <Skeleton className="h-80" />
+    </div>
+  )
 }

@@ -11,6 +11,7 @@ import type {
   CampaignListResponse,
   CampaignMutationPayload,
   CampaignProgress,
+  CampaignStatusUpdatePayload,
 } from '@/features/campaigns/types/campaign'
 
 function buildCampaignListQuery(filters: CampaignListFilters) {
@@ -100,6 +101,14 @@ export function createCampaign(payload: CampaignMutationPayload) {
 
 export function updateCampaign(campaignId: number, payload: CampaignMutationPayload) {
   return apiRequest<CampaignDetail>(`/campaigns/${campaignId}`, {
+    method: 'PATCH',
+    auth: true,
+    body: payload,
+  })
+}
+
+export function updateCampaignStatus(campaignId: number, payload: CampaignStatusUpdatePayload) {
+  return apiRequest<CampaignDetail>(`/campaigns/${campaignId}/status`, {
     method: 'PATCH',
     auth: true,
     body: payload,

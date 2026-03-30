@@ -1,15 +1,10 @@
-import { Suspense } from 'react'
 import { Outlet, createRootRoute, createRouter } from '@tanstack/react-router'
 import { buildBackofficeRoutes } from '@/app/router/backoffice-routes'
 import { buildFieldRoutes } from '@/app/router/field-routes'
 import { buildPublicRoutes } from '@/app/router/public-routes'
 
 function RootComponent() {
-  return (
-    <Suspense fallback={null}>
-      <Outlet />
-    </Suspense>
-  )
+  return <Outlet />
 }
 
 const rootRoute = createRootRoute({

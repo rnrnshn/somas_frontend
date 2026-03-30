@@ -16,6 +16,7 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
 import { Progress } from "../ui/progress";
+import { Skeleton } from "../ui/skeleton";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Badge } from "../ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
@@ -42,7 +43,8 @@ import {
   AlertTriangle,
   XCircle,
   FileText,
-  Check
+  Check,
+  LoaderCircle
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -247,6 +249,10 @@ export function CreateCampaign() {
       setShowConfirmDialog(false);
     }
   };
+
+  if (isEditMode && (campaignQuery.isPending || catalogs.isPending) && !campaignQuery.data) {
+    return <CreateCampaignSkeleton />;
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -773,9 +779,10 @@ export function CreateCampaign() {
             <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
               Cancel
             </Button>
-            <Button disabled={createCampaignMutation.isPending || updateCampaignMutation.isPending} onClick={() => void handleCreateCampaign()}>
-              {isEditMode ? 'Confirm & Update' : 'Confirm & Create'}
-            </Button>
+             <Button disabled={createCampaignMutation.isPending || updateCampaignMutation.isPending} onClick={() => void handleCreateCampaign()}>
+               {createCampaignMutation.isPending || updateCampaignMutation.isPending ? <LoaderCircle className="w-4 h-4 mr-2 animate-spin" /> : null}
+               {isEditMode ? 'Confirm & Update' : 'Confirm & Create'}
+             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -786,4 +793,28 @@ export function CreateCampaign() {
 function getCatalogLabel(options: Array<{ id: number; name: string }>, value: string) {
   if (!value) return '';
   return options.find((option) => String(option.id) === value)?.name ?? '';
+}
+
+function CreateCampaignSkeleton() {
+  return (
+    <div className="mx-auto max-w-5xl space-y-8 p-8">
+      <div className="space-y-3">
+        <Skeleton className="h-9 w-44" />
+        <Skeleton className="h-12 w-64" />
+        <Skeleton className="h-4 w-32" />
+      </div>
+      <div className="space-y-4">
+        <Skeleton className="h-2 w-full" />
+        <div className="grid grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div className="space-y-2 text-center" key={index}>
+              <Skeleton className="mx-auto h-8 w-8 rounded-full" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <Skeleton className="h-[28rem] w-full" />
+    </div>
+  )
 }
