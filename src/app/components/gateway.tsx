@@ -89,7 +89,7 @@ export function Gateway() {
                   Backoffice Platform
                 </h3>
                 <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '12px' }}>
-                  Senha para todos: <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>demo</span>
+                  Senha para todos: <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>1234567890</span>
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div style={{ 
@@ -99,10 +99,10 @@ export function Gateway() {
                     backgroundColor: 'var(--muted)'
                   }}>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Admin
+                      Administrador
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      admin@somas.gov
+                      admin@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                       Acesso completo ao sistema
@@ -115,10 +115,10 @@ export function Gateway() {
                     backgroundColor: 'var(--muted)'
                   }}>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Analyst
+                      Analytics
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      miguel@somas.gov
+                      analytic@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                       Leitura de dashboards e relatórios
@@ -134,7 +134,7 @@ export function Gateway() {
                       Content Manager
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      lucia@somas.gov
+                      content@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                       Gestão de conteúdo
@@ -149,9 +149,9 @@ export function Gateway() {
                   Field Operations App
                 </h3>
                 <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '12px' }}>
-                  PIN para todos: <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>1234</span>
+                  Senha para todos: <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>1234567890</span>
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div style={{ 
                     padding: '12px', 
                     borderRadius: 'var(--radius)', 
@@ -159,45 +159,13 @@ export function Gateway() {
                     backgroundColor: 'var(--muted)'
                   }}>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Enumerator
+                      Inquiridor
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      enumerator.001
+                      inquirer@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      Verificação no campo
-                    </p>
-                  </div>
-                  <div style={{ 
-                    padding: '12px', 
-                    borderRadius: 'var(--radius)', 
-                    border: '1px solid var(--border)',
-                    backgroundColor: 'var(--muted)'
-                  }}>
-                    <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Enumerator
-                    </p>
-                    <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      enumerator.002
-                    </p>
-                    <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      Verificação no campo
-                    </p>
-                  </div>
-                  <div style={{ 
-                    padding: '12px', 
-                    borderRadius: 'var(--radius)', 
-                    border: '1px solid var(--border)',
-                    backgroundColor: 'var(--muted)'
-                  }}>
-                    <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Regional
-                    </p>
-                    <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      regional.001
-                    </p>
-                    <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      Supervisão regional
+                      Verificação e confirmação no local
                     </p>
                   </div>
                 </div>

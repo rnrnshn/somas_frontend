@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { getCurrentUser, logout } from '@/features/auth/api/auth-api'
 import type { AuthUser } from '@/features/auth/types/auth'
 import { HttpError } from '@/lib/api/http-error'
+import { normalizeAuthUser } from '@/lib/auth/roles'
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/lib/auth/token-storage'
 
 type AuthContextValue = {
@@ -21,7 +22,7 @@ function getStoredUser(): AuthUser | null {
   if (!raw) return null
 
   try {
-    return JSON.parse(raw) as AuthUser
+    return normalizeAuthUser(JSON.parse(raw) as AuthUser)
   } catch {
     window.localStorage.removeItem(AUTH_USER_KEY)
     return null
@@ -34,7 +35,7 @@ function setStoredUser(user: AuthUser | null) {
     return
   }
 
-  window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user))
+  window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizeAuthUser(user)))
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -56,8 +57,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void getCurrentUser()
       .then((nextUser) => {
         if (cancelled) return
-        setUser(nextUser)
-        setStoredUser(nextUser)
+        const normalizedUser = normalizeAuthUser(nextUser)
+        setUser(normalizedUser)
+        setStoredUser(normalizedUser)
       })
       .catch((error: unknown) => {
         if (cancelled) return
@@ -90,10 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(token && user),
       isBootstrapping,
       signIn: (nextToken, nextUser) => {
+        const normalizedUser = normalizeAuthUser(nextUser)
         setAccessToken(nextToken)
-        setStoredUser(nextUser ?? null)
+        setStoredUser(normalizedUser)
         setToken(nextToken)
-        setUser(nextUser ?? null)
+        setUser(normalizedUser)
         setIsBootstrapping(false)
       },
       signOut: async () => {

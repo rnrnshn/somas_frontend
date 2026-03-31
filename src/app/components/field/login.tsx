@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "@/lib/router";
 import { HttpError } from "@/lib/api/http-error";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useFieldLoginMutation } from "@/features/auth/hooks/use-login-mutation";
+import { getDefaultRouteForRole, isFieldRole, normalizeRole } from "@/lib/auth/roles";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -12,7 +13,7 @@ import { Smartphone, Loader2, AlertCircle } from "lucide-react";
 
 export function FieldLogin() {
   const navigate = useNavigate();
-  const { isAuthenticated, signIn } = useAuth();
+  const { isAuthenticated, signIn, user } = useAuth();
   const loginMutation = useFieldLoginMutation();
   const [username, setUsername] = useState("");
   const [pin, setPin] = useState("");
@@ -28,15 +29,27 @@ export function FieldLogin() {
         email: username,
         password: pin,
       });
+      const normalizedRole = normalizeRole(response.user.role);
+
+      if (!isFieldRole(normalizedRole)) {
+        throw new Error('Esta conta nao tem acesso ao app de Inquiridor.');
+      }
+
       signIn(response.token, response.user);
-      navigate('/field/dashboard');
+      navigate(getDefaultRouteForRole(normalizedRole));
     } catch (requestError) {
-      setError(requestError instanceof HttpError ? requestError.message : 'Invalid credentials. Please try again.');
+      setError(
+        requestError instanceof HttpError
+          ? requestError.message
+          : requestError instanceof Error
+            ? requestError.message
+            : 'Invalid credentials. Please try again.'
+      );
     }
   };
 
   if (isAuthenticated) {
-    return <Navigate to="/field/dashboard" />;
+    return <Navigate to={getDefaultRouteForRole(user?.role)} />;
   }
 
   return (
@@ -69,11 +82,11 @@ export function FieldLogin() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">Email</Label>
                 <Input
                   id="username"
-                  type="text"
-                  placeholder="enumerator.id"
+                  type="email"
+                  placeholder="inquirer@somas.app"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
@@ -81,12 +94,11 @@ export function FieldLogin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="pin">PIN</Label>
+                <Label htmlFor="pin">Password</Label>
                 <Input
                   id="pin"
                   type="password"
-                  placeholder="••••"
-                  maxLength={4}
+                  placeholder="••••••••••"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   disabled={isLoading}

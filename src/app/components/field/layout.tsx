@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { LayoutDashboard, Search, WifiOff, ChevronLeft, Menu } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
+import { getDefaultRouteForRole, getRoleLabel, isFieldRole } from "@/lib/auth/roles";
 import { Button } from "../ui/button";
 import { Suspense, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
@@ -8,7 +9,7 @@ import { Skeleton } from "../ui/skeleton";
 export function FieldLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isBootstrapping, signOut } = useAuth();
+  const { isAuthenticated, isBootstrapping, signOut, user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
@@ -25,6 +26,10 @@ export function FieldLayout() {
     return <Navigate to="/field/login" />;
   }
 
+  if (!isFieldRole(user?.role)) {
+    return <Navigate to={getDefaultRouteForRole(user?.role)} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col max-w-md mx-auto bg-background">
       {/* Mobile Header */}
@@ -33,7 +38,7 @@ export function FieldLayout() {
           <div>
             <h2 style={{ fontSize: 'var(--text-18)' }}>SOMAS Field</h2>
             <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-              Field Operations
+              {getRoleLabel(user?.role)}
             </p>
           </div>
           <button

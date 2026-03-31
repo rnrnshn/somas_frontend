@@ -39,33 +39,33 @@ export function Settings() {
     {
       id: 'USR-001',
       name: 'Maria Santos',
-      email: 'maria.santos@somas.gov',
-      role: 'Administrator',
+      email: 'admin@somas.app',
+      role: 'admin',
       status: 'Active',
       lastLogin: '2026-03-05 09:30:00'
     },
     {
       id: 'USR-002',
-      name: 'John Smith',
-      email: 'john.smith@somas.gov',
-      role: 'Field Manager',
+      name: 'Content Manager',
+      email: 'content@somas.app',
+      role: 'content_manager',
       status: 'Active',
       lastLogin: '2026-03-05 08:15:00'
     },
     {
       id: 'USR-003',
-      name: 'Jane Doe',
-      email: 'jane.doe@somas.gov',
-      role: 'Enumerator',
+      name: 'Analytics',
+      email: 'analytic@somas.app',
+      role: 'analytics',
       status: 'Active',
       lastLogin: '2026-03-04 16:45:00'
     },
     {
       id: 'USR-004',
-      name: 'Carlos Garcia',
-      email: 'carlos.garcia@somas.gov',
-      role: 'Finance Officer',
-      status: 'Inactive',
+      name: 'Inquiridor',
+      email: 'inquirer@somas.app',
+      role: 'inquirer',
+      status: 'Active',
       lastLogin: '2026-02-28 11:20:00'
     },
   ];
@@ -73,30 +73,30 @@ export function Settings() {
   const roles = [
     {
       id: 'ROL-001',
-      name: 'Administrator',
+      name: 'admin',
       description: 'Full system access and control',
-      usersCount: 3,
+      usersCount: 1,
       permissionsCount: 48
     },
     {
       id: 'ROL-002',
-      name: 'Field Manager',
-      description: 'Manage field operations and enumerators',
-      usersCount: 8,
+      name: 'content_manager',
+      description: 'Manage campaigns, beneficiaries, and inquirers',
+      usersCount: 1,
       permissionsCount: 24
     },
     {
       id: 'ROL-003',
-      name: 'Finance Officer',
-      description: 'Manage disbursements and financial operations',
-      usersCount: 5,
+      name: 'analytics',
+      description: 'View dashboards, reports, and analytics',
+      usersCount: 1,
       permissionsCount: 18
     },
     {
       id: 'ROL-004',
-      name: 'Enumerator',
-      description: 'Field data collection and beneficiary verification',
-      usersCount: 45,
+      name: 'inquirer',
+      description: 'Verify and confirm beneficiaries in the field',
+      usersCount: 1,
       permissionsCount: 12
     },
   ];
@@ -319,7 +319,7 @@ export function Settings() {
                         {user.email}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{user.role}</Badge>
+                        <Badge variant="outline">{user.role.replace(/_/g, ' ')}</Badge>
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(user.status)}

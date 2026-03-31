@@ -10,61 +10,51 @@ export function BackofficeUsers() {
   const users = [
     {
       id: 'USR-001',
-      email: 'admin@somas.gov',
+      email: 'admin@somas.app',
       name: 'Domingas',
-      role: 'Admin',
+      role: 'admin',
       enabled: true,
       lastLogin: '2026-03-02 09:45:00',
       failedLogins: 0
     },
     {
       id: 'USR-002',
-      email: 'lucia@somas.gov',
-      name: 'Lucia',
-      role: 'Content Manager',
+      email: 'content@somas.app',
+      name: 'Content Manager',
+      role: 'content_manager',
       enabled: true,
       lastLogin: '2026-03-02 08:30:00',
       failedLogins: 0
     },
     {
       id: 'USR-003',
-      email: 'miguel@somas.gov',
-      name: 'Miguel',
-      role: 'Analyst',
+      email: 'analytic@somas.app',
+      name: 'Analytics',
+      role: 'analytics',
       enabled: true,
       lastLogin: '2026-03-01 16:20:00',
       failedLogins: 0
     },
     {
       id: 'USR-004',
-      email: 'ana@somas.gov',
-      name: 'Ana Pires',
-      role: 'Enumerator',
-      enabled: false,
-      lastLogin: '2026-02-28 14:15:00',
-      failedLogins: 3
-    },
-    {
-      id: 'USR-005',
-      email: 'jose@somas.gov',
-      name: 'José',
-      role: 'Regional',
+      email: 'inquirer@somas.app',
+      name: 'Inquiridor',
+      role: 'inquirer',
       enabled: true,
-      lastLogin: '2026-03-02 07:00:00',
+      lastLogin: '2026-02-28 14:15:00',
       failedLogins: 0
     },
   ];
 
   const getRoleBadge = (role: string) => {
     const config: Record<string, { style?: React.CSSProperties; variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
-      Admin: { style: { backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' } },
-      'Content Manager': { style: { backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' } },
-      Analyst: { style: { backgroundColor: 'var(--chart-3)', color: 'var(--warning-foreground)' } },
-      Enumerator: { variant: 'outline' as const },
-      Regional: { style: { backgroundColor: 'var(--success)', color: 'var(--success-foreground)' } }
+      admin: { style: { backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' } },
+      content_manager: { style: { backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' } },
+      analytics: { style: { backgroundColor: 'var(--chart-3)', color: 'var(--warning-foreground)' } },
+      inquirer: { variant: 'outline' as const },
     };
     const props = config[role] || {};
-    return <Badge {...props}>{role}</Badge>;
+    return <Badge {...props}>{role.replace(/_/g, ' ')}</Badge>;
   };
   const usersPagination = useTablePagination(users);
 

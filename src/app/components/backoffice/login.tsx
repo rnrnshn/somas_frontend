@@ -3,6 +3,7 @@ import { Navigate, useNavigate, Link } from "@/lib/router";
 import { HttpError } from "@/lib/api/http-error";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useBackofficeLoginMutation } from "@/features/auth/hooks/use-login-mutation";
+import { getDefaultRouteForRole, isBackofficeRole, isFieldRole, normalizeRole } from "@/lib/auth/roles";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -15,7 +16,7 @@ type AccountStatus = 'active' | 'locked' | 'disabled' | null;
 
 export function BackofficeLogin() {
   const navigate = useNavigate();
-  const { isAuthenticated, signIn } = useAuth();
+  const { isAuthenticated, signIn, user } = useAuth();
   const loginMutation = useBackofficeLoginMutation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,9 +45,17 @@ export function BackofficeLogin() {
         email,
         password,
       });
+      const normalizedRole = normalizeRole(response.user.role);
+
+      if (!isBackofficeRole(normalizedRole)) {
+        throw new Error(normalizedRole && isFieldRole(normalizedRole)
+          ? 'Use o acesso de Inquiridor para esta conta.'
+          : 'Esta conta nao tem acesso ao backoffice.');
+      }
+
       signIn(response.token, response.user);
       toast.success('Signed in successfully.');
-      navigate('/backoffice/dashboard');
+      navigate(getDefaultRouteForRole(normalizedRole));
     } catch (requestError) {
       if (email.includes('locked')) {
         setAccountStatus('locked');
@@ -55,14 +64,26 @@ export function BackofficeLogin() {
         setAccountStatus('disabled');
         setError('This account has been disabled. Contact your administrator.');
       } else {
-        setError(requestError instanceof HttpError ? requestError.message : 'Invalid email or password. Please try again.');
+        setError(
+          requestError instanceof HttpError
+            ? requestError.message
+            : requestError instanceof Error
+              ? requestError.message
+              : 'Invalid email or password. Please try again.'
+        );
       }
-      toast.error(requestError instanceof HttpError ? requestError.message : 'Invalid email or password. Please try again.');
+      toast.error(
+        requestError instanceof HttpError
+          ? requestError.message
+          : requestError instanceof Error
+            ? requestError.message
+            : 'Invalid email or password. Please try again.'
+      );
     }
   };
 
   if (isAuthenticated) {
-    return <Navigate to="/backoffice/dashboard" />;
+    return <Navigate to={getDefaultRouteForRole(user?.role)} />;
   }
 
   return (

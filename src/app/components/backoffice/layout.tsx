@@ -1,6 +1,7 @@
 import { Suspense, useState } from "react";
 import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { useAuth } from "@/lib/auth/auth-context";
+import { canAccessBackofficePath, getDefaultRouteForRole, getRoleLabel, isBackofficeRole } from "@/lib/auth/roles";
 import { 
   LayoutDashboard, 
   Megaphone, 
@@ -23,17 +24,18 @@ type NavItem = {
 export function BackofficeLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isBootstrapping, signOut } = useAuth();
+  const { isAuthenticated, isBootstrapping, signOut, user } = useAuth();
 
   const navItems: NavItem[] = [
     { path: '/backoffice/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/backoffice/campaigns', label: 'Campaigns', icon: Megaphone },
     { path: '/backoffice/savings', label: 'Savings Programs', icon: PiggyBank },
     { path: '/backoffice/beneficiaries', label: 'Beneficiaries', icon: Users },
+    { path: '/backoffice/users', label: 'Inquiridores', icon: Users },
     { path: '/backoffice/transactions', label: 'Transactions', icon: Receipt },
     { path: '/backoffice/metrics', label: 'Insights', icon: BarChart3 },
     { path: '/backoffice/settings', label: 'Settings', icon: Settings }
-  ];
+  ].filter((item) => canAccessBackofficePath(user?.role, item.path));
 
   const isPathActive = (path: string) => {
     // Special handling for certain paths
@@ -51,6 +53,9 @@ export function BackofficeLayout() {
       return location.pathname === path || 
              location.pathname.startsWith('/backoffice/beneficiaries') ||
              location.pathname.startsWith('/backoffice/field-verification');
+    }
+    if (path === '/backoffice/users') {
+      return location.pathname === path;
     }
     if (path === '/backoffice/settings') {
       return location.pathname === path || 
@@ -75,6 +80,14 @@ export function BackofficeLayout() {
     return <Navigate to="/backoffice/login" />;
   }
 
+  if (!isBackofficeRole(user?.role)) {
+    return <Navigate to={getDefaultRouteForRole(user?.role)} />;
+  }
+
+  if (!canAccessBackofficePath(user?.role, location.pathname)) {
+    return <Navigate to={getDefaultRouteForRole(user?.role)} />;
+  }
+
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Top Navigation Bar */}
@@ -86,7 +99,12 @@ export function BackofficeLayout() {
           <TenantSwitcher />
         </div>
         <div className="flex items-center gap-3">
-          
+          {user?.email ? (
+            <div className="text-right">
+              <p className="text-sm font-medium">{user.email}</p>
+              <p className="text-xs text-muted-foreground">{getRoleLabel(user.role)}</p>
+            </div>
+          ) : null}
         </div>
       </header>
 
