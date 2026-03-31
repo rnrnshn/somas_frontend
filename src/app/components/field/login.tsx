@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from "@/lib/router";
 import { HttpError } from "@/lib/api/http-error";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useFieldLoginMutation } from "@/features/auth/hooks/use-login-mutation";
-import { getDefaultRouteForRole, isFieldRole, normalizeRole } from "@/lib/auth/roles";
+import { getDefaultRouteForRole, isFieldRole, normalizeAuthUser } from "@/lib/auth/roles";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -29,13 +29,14 @@ export function FieldLogin() {
         email: username,
         password: pin,
       });
-      const normalizedRole = normalizeRole(response.user.role);
+      const normalizedUser = normalizeAuthUser(response.user);
+      const normalizedRole = normalizedUser?.role;
 
       if (!isFieldRole(normalizedRole)) {
         throw new Error('Esta conta nao tem acesso ao app de Inquiridor.');
       }
 
-      signIn(response.token, response.user);
+      signIn(response.token, normalizedUser);
       navigate(getDefaultRouteForRole(normalizedRole));
     } catch (requestError) {
       setError(

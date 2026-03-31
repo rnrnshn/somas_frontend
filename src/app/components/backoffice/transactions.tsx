@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useDisbursementBatchesQuery,
   useFailedTransactionsQuery,
@@ -18,8 +18,12 @@ import { Search, Package, Download, Eye, RefreshCw, TrendingUp, Activity, CheckC
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useAuth } from "@/lib/auth/auth-context";
+import { normalizeRole } from "@/lib/auth/roles";
 
 export function BackofficeTransactions() {
+  const { user } = useAuth();
+  const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics';
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -57,6 +61,12 @@ export function BackofficeTransactions() {
   const transactionsPagination = useTablePagination(transactions, undefined, [activeTab, searchQuery, statusFilter, typeFilter, campaignFilter, providerFilter]);
   const batchesPagination = useTablePagination(disbursementBatches, undefined, [activeTab]);
   const failedTransactionsPagination = useTablePagination(failedTransactionsList, undefined, [activeTab, searchQuery, campaignFilter]);
+
+  useEffect(() => {
+    if (isAnalyticsOnly && activeTab !== 'analytics') {
+      setActiveTab('analytics');
+    }
+  }, [activeTab, isAnalyticsOnly]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -114,9 +124,9 @@ export function BackofficeTransactions() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="all">All Transactions</TabsTrigger>
-          <TabsTrigger value="batches">Disbursement Batches</TabsTrigger>
-          <TabsTrigger value="failed">Failed Transactions</TabsTrigger>
+          {!isAnalyticsOnly ? <TabsTrigger value="all">All Transactions</TabsTrigger> : null}
+          {!isAnalyticsOnly ? <TabsTrigger value="batches">Disbursement Batches</TabsTrigger> : null}
+          {!isAnalyticsOnly ? <TabsTrigger value="failed">Failed Transactions</TabsTrigger> : null}
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 

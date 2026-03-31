@@ -3,7 +3,7 @@ import { Navigate, useNavigate, Link } from "@/lib/router";
 import { HttpError } from "@/lib/api/http-error";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useBackofficeLoginMutation } from "@/features/auth/hooks/use-login-mutation";
-import { getDefaultRouteForRole, isBackofficeRole, isFieldRole, normalizeRole } from "@/lib/auth/roles";
+import { getDefaultRouteForRole, isBackofficeRole, isFieldRole, normalizeAuthUser } from "@/lib/auth/roles";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -45,7 +45,8 @@ export function BackofficeLogin() {
         email,
         password,
       });
-      const normalizedRole = normalizeRole(response.user.role);
+      const normalizedUser = normalizeAuthUser(response.user);
+      const normalizedRole = normalizedUser?.role;
 
       if (!isBackofficeRole(normalizedRole)) {
         throw new Error(normalizedRole && isFieldRole(normalizedRole)
@@ -53,7 +54,7 @@ export function BackofficeLogin() {
           : 'Esta conta nao tem acesso ao backoffice.');
       }
 
-      signIn(response.token, response.user);
+      signIn(response.token, normalizedUser);
       toast.success('Signed in successfully.');
       navigate(getDefaultRouteForRole(normalizedRole));
     } catch (requestError) {

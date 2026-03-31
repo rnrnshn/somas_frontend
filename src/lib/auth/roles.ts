@@ -13,6 +13,50 @@ const ROLE_LABELS: Record<AppRole, string> = {
   inquirer: 'Inquiridor',
 }
 
+function inferRoleFromEmail(email?: string | null): AppRole | null {
+  if (!email) return null
+
+  const normalizedEmail = email.trim().toLowerCase()
+
+  switch (normalizedEmail) {
+    case 'admin@somas.app':
+      return 'admin'
+    case 'content@somas.app':
+      return 'content_manager'
+    case 'analytic@somas.app':
+      return 'analytics'
+    case 'inquirer@somas.app':
+      return 'inquirer'
+    default:
+      return null
+  }
+}
+
+function inferRoleFromIdentity(user: Pick<AuthUser, 'email' | 'name' | 'fullName'>): AppRole | null {
+  const roleFromEmail = inferRoleFromEmail(user.email)
+
+  if (roleFromEmail) return roleFromEmail
+
+  const normalizedName = (user.name ?? user.fullName ?? '').trim().toLowerCase().replace(/[-\s]+/g, '_')
+
+  switch (normalizedName) {
+    case 'admin':
+    case 'administrator':
+      return 'admin'
+    case 'content_manager':
+      return 'content_manager'
+    case 'analytics':
+    case 'analytic':
+    case 'analyst':
+      return 'analytics'
+    case 'inquirer':
+    case 'enumerator':
+      return 'inquirer'
+    default:
+      return null
+  }
+}
+
 export function normalizeRole(role?: string | null): AppRole | null {
   if (!role) return null
 
@@ -40,9 +84,11 @@ export function normalizeRole(role?: string | null): AppRole | null {
 export function normalizeAuthUser(user: AuthUser | null | undefined): AuthUser | null {
   if (!user) return null
 
+  const normalizedRole = normalizeRole(user.role) ?? inferRoleFromIdentity(user)
+
   return {
     ...user,
-    role: normalizeRole(user.role),
+    role: normalizedRole,
   }
 }
 
