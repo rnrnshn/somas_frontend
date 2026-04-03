@@ -87,6 +87,7 @@ export function CreateCampaign() {
   const [currentStep, setCurrentStep] = useState(1);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<CampaignFormData>({
     name: "",
     program: "",
@@ -102,8 +103,6 @@ export function CreateCampaign() {
     stagedDisbursement: false,
   });
   const beneficiariesPreviewPagination = useTablePagination(formData.beneficiaries, undefined, [currentStep, uploadedFile, formData.beneficiaries.length]);
-
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!campaignQuery.data) return;

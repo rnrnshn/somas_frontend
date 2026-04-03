@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
-import { Plus, Search, Download, MapPin, CheckCircle, XCircle, Clock, Upload } from "lucide-react";
+import { Search, Download, MapPin, CheckCircle, XCircle, Clock, Upload } from "lucide-react";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
@@ -149,12 +149,6 @@ export function BackofficeBeneficiaries() {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          {activeTab === "directory" && (
-            <Button onClick={() => navigate("/backoffice/beneficiaries/form/new")}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Beneficiary
-            </Button>
-          )}
         </div>
       </div>
 

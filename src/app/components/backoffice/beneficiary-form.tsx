@@ -32,6 +32,12 @@ export function BeneficiaryForm() {
   });
 
   useEffect(() => {
+    if (!isEdit) {
+      toast.info('Beneficiary creation is not available in this version yet.');
+      navigate('/backoffice/beneficiaries');
+      return;
+    }
+
     const profile = queries.profile.data;
     if (!profile) return;
     setFormData({
@@ -43,17 +49,11 @@ export function BeneficiaryForm() {
       community: profile.community ?? '',
       notes: profile.notes ?? '',
     });
-  }, [queries.profile.data]);
+  }, [isEdit, navigate, queries.profile.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
-
-    if (!isEdit) {
-      toast.error('Create beneficiary is not wired yet with the current backend surface.');
-      setSubmitError('Create beneficiary is not wired yet with the current backend surface.');
-      return;
-    }
 
     void updateMutation
       .mutateAsync({
