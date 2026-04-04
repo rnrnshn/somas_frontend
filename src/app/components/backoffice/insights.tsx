@@ -26,9 +26,13 @@ import type { DashboardFilters } from '@/features/dashboard/types/dashboard'
 import { formatCompactMetical, formatMetical } from '@/lib/format/currency'
 import { DataTablePagination, useTablePagination } from '../ui/table-pagination'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '@/lib/auth/auth-context'
+import { normalizeRole } from '@/lib/auth/roles'
 
 export function Insights() {
+  const { user } = useAuth()
   const { t } = useTranslation()
+  const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics'
   const [activeTab, setActiveTab] = useState('overview')
   const [campaignFilter, setCampaignFilter] = useState('all')
   const [provinceFilter, setProvinceFilter] = useState('all')
@@ -85,7 +89,7 @@ export function Insights() {
           <TabsTrigger value="overview">{t('insightsPage.overview')}</TabsTrigger>
           <TabsTrigger value="financial">{t('insightsPage.financial')}</TabsTrigger>
           <TabsTrigger value="beneficiary">{t('insightsPage.beneficiary')}</TabsTrigger>
-          <TabsTrigger value="savings">{t('insightsPage.savings')}</TabsTrigger>
+          {isAnalyticsOnly ? null : <TabsTrigger value="savings">{t('insightsPage.savings')}</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -94,7 +98,7 @@ export function Insights() {
             [t('insightsPage.totalBeneficiaries'), String(overview.totalBeneficiaries), Users, 'var(--primary)'],
             [t('insightsPage.activePrograms'), String(overview.activePrograms), Target, 'var(--primary)'],
             [t('insightsPage.totalTransactions'), String(overview.totalTransactions), Activity, 'var(--primary)'],
-            [t('insightsPage.totalSaved'), formatCompactCurrency(overview.totalSaved), PiggyBank, 'var(--success)'],
+            ...(isAnalyticsOnly ? [] : [[t('insightsPage.totalSaved'), formatCompactCurrency(overview.totalSaved), PiggyBank, 'var(--success)']] as Array<[string, string, typeof DollarSign, string]>),
           ]} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChartCard title={t('insightsPage.paymentsOverTime')}>
@@ -122,7 +126,7 @@ export function Insights() {
         <TabsContent value="beneficiary" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <MetricCard icon={DollarSign} label={t('insightsPage.avgPaymentPerBeneficiary')} value={formatCurrency(beneficiaries.averagePaymentPerBeneficiary)} />
-            <MetricCard icon={Percent} label={t('insightsPage.participationRate')} value={`${beneficiaries.participationRate.toFixed(1)}%`} accent="var(--success)" />
+            {isAnalyticsOnly ? null : <MetricCard icon={Percent} label={t('insightsPage.participationRate')} value={`${beneficiaries.participationRate.toFixed(1)}%`} accent="var(--success)" />}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card><CardHeader><CardTitle style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>{t('insightsPage.beneficiariesByProvince')}</CardTitle></CardHeader><CardContent className="space-y-4">{beneficiaries.beneficiariesByProvince.map((province) => <div key={province.province}><div className="flex items-center justify-between mb-2"><div className="flex items-center gap-2"><MapPin className="w-4 h-4" style={{ color: 'var(--muted-foreground)' }} /><p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>{province.province}</p></div><div className="flex items-center gap-3"><p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>{province.count}</p><p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>{province.percentage}%</p></div></div><div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--muted)' }}><div className="h-full" style={{ width: `${province.percentage}%`, backgroundColor: 'var(--primary)' }} /></div></div>)}</CardContent></Card>
@@ -130,14 +134,14 @@ export function Insights() {
           </div>
         </TabsContent>
 
-        <TabsContent value="savings" className="space-y-6">
+        {isAnalyticsOnly ? null : <TabsContent value="savings" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <MetricCard icon={PiggyBank} label={t('insightsPage.totalSaved')} value={formatCurrency(overview.totalSaved)} accent="var(--success)" />
             <MetricCard icon={Users} label={t('insightsPage.savers')} value="N/A" />
             <MetricCard icon={DollarSign} label={t('insightsPage.averageSavingsPerBeneficiary')} value="N/A" />
           </div>
           <Card><CardHeader><CardTitle style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>{t('insightsPage.savingsAnalysis')}</CardTitle></CardHeader><CardContent><p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>{t('insightsPage.savingsBackendNote')}</p></CardContent></Card>
-        </TabsContent>
+        </TabsContent>}
       </Tabs>
     </div>
   )

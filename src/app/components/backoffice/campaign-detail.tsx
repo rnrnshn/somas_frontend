@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
+import { useAuth } from "@/lib/auth/auth-context";
+import { normalizeRole } from "@/lib/auth/roles";
 import { formatCompactMetical, formatMetical } from "@/lib/format/currency";
 import { useAllCampaignBeneficiariesQuery, useCampaignBeneficiariesQuery, useCampaignProgressQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
 import { useExecuteCampaignDisbursementMutation } from "@/features/campaigns/hooks/use-campaign-mutations";
@@ -55,6 +57,7 @@ import {
 
 export function CampaignDetail() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { id } = useParams();
   const campaignId = Number(id);
   const [activeTab, setActiveTab] = useState("overview");
@@ -63,6 +66,7 @@ export function CampaignDetail() {
   const [showCloseDialog, setShowCloseDialog] = useState(false);
   const [showExecuteDialog, setShowExecuteDialog] = useState(false);
   const { t } = useTranslation();
+  const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics';
   const beneficiarySearch = searchQuery.trim();
 
   const campaignQuery = useCampaignQuery(campaignId);
@@ -225,24 +229,26 @@ export function CampaignDetail() {
               {campaign ? `${campaign.id} • ${campaign.program} • ${campaign.region}` : t('campaignDetailPage.loadingDetails')}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate(`/backoffice/campaigns/${campaignId}/edit`)}>
-              <SquarePen className="w-4 h-4 mr-2" />
-              {t('campaignDetailPage.edit')}
-            </Button>
-            <Button onClick={() => setShowExecuteDialog(true)} disabled={!canExecuteDisbursement || executeDisbursementMutation.isPending}>
-              <Play className="w-4 h-4 mr-2" />
-              {executeDisbursementMutation.isPending ? t('campaignDetailPage.executing') : t('campaignDetailPage.executeDisbursement')}
-            </Button>
-            <Button variant="outline" onClick={() => setShowSuspendDialog(true)}>
-              <Pause className="w-4 h-4 mr-2" />
-              {t('campaignDetailPage.suspend')}
-            </Button>
-            <Button variant="outline" onClick={() => setShowCloseDialog(true)}>
-              <XCircle className="w-4 h-4 mr-2" />
-              {t('campaignDetailPage.close')}
-            </Button>
-          </div>
+          {isAnalyticsOnly ? null : (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => navigate(`/backoffice/campaigns/${campaignId}/edit`)}>
+                <SquarePen className="w-4 h-4 mr-2" />
+                {t('campaignDetailPage.edit')}
+              </Button>
+              <Button onClick={() => setShowExecuteDialog(true)} disabled={!canExecuteDisbursement || executeDisbursementMutation.isPending}>
+                <Play className="w-4 h-4 mr-2" />
+                {executeDisbursementMutation.isPending ? t('campaignDetailPage.executing') : t('campaignDetailPage.executeDisbursement')}
+              </Button>
+              <Button variant="outline" onClick={() => setShowSuspendDialog(true)}>
+                <Pause className="w-4 h-4 mr-2" />
+                {t('campaignDetailPage.suspend')}
+              </Button>
+              <Button variant="outline" onClick={() => setShowCloseDialog(true)}>
+                <XCircle className="w-4 h-4 mr-2" />
+                {t('campaignDetailPage.close')}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -262,13 +268,13 @@ export function CampaignDetail() {
 
       {/* Tabs */}
       {campaign ? <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="overview">{t('campaignDetailPage.overview')}</TabsTrigger>
-          <TabsTrigger value="beneficiaries">{t('campaignDetailPage.beneficiaries')}</TabsTrigger>
-          <TabsTrigger value="transactions">{t('campaignDetailPage.transactions')}</TabsTrigger>
-          {campaign.enabledSavings && <TabsTrigger value="savings">{t('campaignDetailPage.savings')}</TabsTrigger>}
-          <TabsTrigger value="reports">{t('campaignDetailPage.reports')}</TabsTrigger>
-        </TabsList>
+          <TabsList className="mb-6">
+            <TabsTrigger value="overview">{t('campaignDetailPage.overview')}</TabsTrigger>
+            <TabsTrigger value="beneficiaries">{t('campaignDetailPage.beneficiaries')}</TabsTrigger>
+            <TabsTrigger value="transactions">{t('campaignDetailPage.transactions')}</TabsTrigger>
+            {campaign.enabledSavings && !isAnalyticsOnly && <TabsTrigger value="savings">{t('campaignDetailPage.savings')}</TabsTrigger>}
+            <TabsTrigger value="reports">{t('campaignDetailPage.reports')}</TabsTrigger>
+          </TabsList>
 
         {/* OVERVIEW TAB */}
         <TabsContent value="overview" className="space-y-6">
@@ -591,7 +597,7 @@ export function CampaignDetail() {
         </TabsContent>
 
         {/* SAVINGS TAB */}
-        {campaign.enabledSavings && (
+        {campaign.enabledSavings && !isAnalyticsOnly && (
           <TabsContent value="savings" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
@@ -767,8 +773,8 @@ export function CampaignDetail() {
                 </div>
               </div>
 
-              {campaign.enabledSavings && (
-                <div className="flex items-center justify-between p-4 border rounded-[--radius]" style={{ borderColor: "var(--border)" }}>
+               {campaign.enabledSavings && !isAnalyticsOnly && (
+                 <div className="flex items-center justify-between p-4 border rounded-[--radius]" style={{ borderColor: "var(--border)" }}>
                   <div className="flex items-center gap-3">
                     <PiggyBank className="w-5 h-5" style={{ color: "var(--muted-foreground)" }} />
                     <div>

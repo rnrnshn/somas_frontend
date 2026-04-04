@@ -149,6 +149,8 @@ export function canAccessBackofficePath(role: string | null | undefined, path: s
       '/backoffice/transactions',
       '/backoffice/disbursements',
     ].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+      || path === '/backoffice/campaigns'
+      || /^\/backoffice\/campaigns\/[^/]+$/.test(path)
   }
 
   return false

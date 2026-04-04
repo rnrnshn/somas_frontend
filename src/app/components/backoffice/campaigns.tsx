@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
+import { useAuth } from "@/lib/auth/auth-context";
+import { normalizeRole } from "@/lib/auth/roles";
 import { formatCompactMetical } from "@/lib/format/currency";
 import { useCampaignDetailsQueries, useCampaignsQuery, useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
 import { adaptCampaignListItem } from "@/features/campaigns/adapters/campaigns";
@@ -41,11 +43,13 @@ import { useTranslation } from "react-i18next";
 
 export function BackofficeCampaigns() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [regionFilter, setRegionFilter] = useState("all");
   const [programFilter, setProgramFilter] = useState("all");
   const { t } = useTranslation();
+  const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics';
 
   const filters: CampaignListFilters = {
     page: 1,
@@ -141,10 +145,12 @@ export function BackofficeCampaigns() {
             {t('campaignsPage.subtitle')}
           </p>
         </div>
-        <Button onClick={() => navigate('/backoffice/campaigns/create')}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t('campaignsPage.create')}
-        </Button>
+        {isAnalyticsOnly ? null : (
+          <Button onClick={() => navigate('/backoffice/campaigns/create')}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t('campaignsPage.create')}
+          </Button>
+        )}
       </div>
 
       {/* Filters */}
@@ -291,20 +297,24 @@ export function BackofficeCampaigns() {
                             <Eye className="w-4 h-4 mr-2" />
                             {t('campaignsPage.view')}
                           </DropdownMenuItem>
-                           <DropdownMenuItem onClick={() => navigate(`/backoffice/campaigns/${campaign.numericId}/edit`)}>
-                            <Edit className="w-4 h-4 mr-2" />
-                            {t('campaignsPage.edit')}
-                          </DropdownMenuItem>
-                          {getCampaignStatusActions(campaign.statusCode, t).map((action) => (
-                            <DropdownMenuItem
-                              key={action.status}
-                              onClick={() => handleStatusChange(campaign.numericId, action.status)}
-                              disabled={updateCampaignStatusMutation.isPending}
-                            >
-                              {updateCampaignStatusMutation.isPending ? <LoaderCircle className="w-4 h-4 mr-2 animate-spin" /> : <action.icon className="w-4 h-4 mr-2" />}
-                              {action.label}
-                            </DropdownMenuItem>
-                          ))}
+                          {isAnalyticsOnly ? null : (
+                            <>
+                              <DropdownMenuItem onClick={() => navigate(`/backoffice/campaigns/${campaign.numericId}/edit`)}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                {t('campaignsPage.edit')}
+                              </DropdownMenuItem>
+                              {getCampaignStatusActions(campaign.statusCode, t).map((action) => (
+                                <DropdownMenuItem
+                                  key={action.status}
+                                  onClick={() => handleStatusChange(campaign.numericId, action.status)}
+                                  disabled={updateCampaignStatusMutation.isPending}
+                                >
+                                  {updateCampaignStatusMutation.isPending ? <LoaderCircle className="w-4 h-4 mr-2 animate-spin" /> : <action.icon className="w-4 h-4 mr-2" />}
+                                  {action.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </>
+                          )}
                           <DropdownMenuItem>
                             <Download className="w-4 h-4 mr-2" />
                             {t('campaignsPage.exportData')}

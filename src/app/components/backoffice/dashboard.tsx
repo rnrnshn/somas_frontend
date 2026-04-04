@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
+import { useAuth } from "@/lib/auth/auth-context";
+import { normalizeRole } from "@/lib/auth/roles";
 import { formatCompactMetical, formatMetical } from "@/lib/format/currency";
 import { useBackofficeDashboardQueries } from "@/features/dashboard/hooks/use-dashboard-queries";
 import { useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
@@ -58,11 +60,13 @@ import { useTranslation } from "react-i18next";
 
 export function BackofficeDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [dateRange, setDateRange] = useState("today");
   const [region, setRegion] = useState("all");
   const [campaign, setCampaign] = useState("all");
   const { t } = useTranslation();
+  const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics';
 
   const filters: DashboardFilters = {
     period: mapDateRange(dateRange),
@@ -190,13 +194,13 @@ export function BackofficeDashboard() {
       ) : null}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-8">
-          <TabsTrigger value="overview">{t('dashboardPage.overview')}</TabsTrigger>
-          <TabsTrigger value="transactions">{t('dashboardPage.transactions')}</TabsTrigger>
-          <TabsTrigger value="savings">{t('dashboardPage.savings')}</TabsTrigger>
-          <TabsTrigger value="beneficiaries">{t('dashboardPage.beneficiaries')}</TabsTrigger>
-          <TabsTrigger value="operational">{t('dashboardPage.operationalHealth')}</TabsTrigger>
-        </TabsList>
+          <TabsList className="mb-8">
+            <TabsTrigger value="overview">{t('dashboardPage.overview')}</TabsTrigger>
+            <TabsTrigger value="transactions">{t('dashboardPage.transactions')}</TabsTrigger>
+            {isAnalyticsOnly ? null : <TabsTrigger value="savings">{t('dashboardPage.savings')}</TabsTrigger>}
+            <TabsTrigger value="beneficiaries">{t('dashboardPage.beneficiaries')}</TabsTrigger>
+            <TabsTrigger value="operational">{t('dashboardPage.operationalHealth')}</TabsTrigger>
+          </TabsList>
 
         {/* OVERVIEW TAB */}
         <TabsContent value="overview" className="space-y-8">
@@ -290,33 +294,37 @@ export function BackofficeDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardContent className="p-6">
-                  <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Total Saved
-                  </p>
-                  <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
-                    1,750,000 MZN
-                  </div>
-                  <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-                    Savings programs
-                  </p>
-                </CardContent>
-              </Card>
+              {isAnalyticsOnly ? null : (
+                <>
+                  <Card>
+                    <CardContent className="p-6">
+                      <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
+                        Total Saved
+                      </p>
+                      <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
+                        1,750,000 MZN
+                      </div>
+                      <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
+                        Savings programs
+                      </p>
+                    </CardContent>
+                  </Card>
 
-              <Card>
-                <CardContent className="p-6">
-                  <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Participation Rate
-                  </p>
-                  <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
-                    {kpiMetrics.participationRate}%
-                  </div>
-                  <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-                    Beneficiaries with savings
-                  </p>
-                </CardContent>
-              </Card>
+                  <Card>
+                    <CardContent className="p-6">
+                      <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
+                        Participation Rate
+                      </p>
+                      <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
+                        {kpiMetrics.participationRate}%
+                      </div>
+                      <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
+                        Beneficiaries with savings
+                      </p>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
             </div>
           </div>
 
@@ -377,22 +385,24 @@ export function BackofficeDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardContent className="p-6">
-                  <p style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Savings Today
-                  </p>
-                  <div style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
-                    {formatCurrency(dailyMetrics.savingsToday)}
-                  </div>
-                  <div className="flex items-center gap-1 mt-2">
-                    <ArrowUpRight className="w-4 h-4" style={{ color: "var(--success)" }} />
-                    <span style={{ fontSize: "var(--text-12)", color: "var(--success)" }}>
-                      +{dailyMetrics.savingsTrend}% from yesterday
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+              {isAnalyticsOnly ? null : (
+                <Card>
+                  <CardContent className="p-6">
+                    <p style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
+                      Savings Today
+                    </p>
+                    <div style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                      {formatCurrency(dailyMetrics.savingsToday)}
+                    </div>
+                    <div className="flex items-center gap-1 mt-2">
+                      <ArrowUpRight className="w-4 h-4" style={{ color: "var(--success)" }} />
+                      <span style={{ fontSize: "var(--text-12)", color: "var(--success)" }}>
+                        +{dailyMetrics.savingsTrend}% from yesterday
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
 
@@ -643,7 +653,7 @@ export function BackofficeDashboard() {
         </TabsContent>
 
         {/* SAVINGS TAB */}
-        <TabsContent value="savings" className="space-y-6">
+        {isAnalyticsOnly ? null : <TabsContent value="savings" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Card>
               <CardContent className="p-6">
@@ -731,7 +741,7 @@ export function BackofficeDashboard() {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent>}
 
         {/* BENEFICIARIES TAB */}
         <TabsContent value="beneficiaries" className="space-y-6">
@@ -769,16 +779,18 @@ export function BackofficeDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <p style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    With Savings
-                  </p>
-                  <div style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
-                    {beneficiaryKpis.withSavings.toLocaleString()}
-                  </div>
-              </CardContent>
-            </Card>
+            {isAnalyticsOnly ? null : (
+              <Card>
+                <CardContent className="p-6">
+                  <p style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
+                      With Savings
+                    </p>
+                    <div style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
+                      {beneficiaryKpis.withSavings.toLocaleString()}
+                    </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           <Card>
