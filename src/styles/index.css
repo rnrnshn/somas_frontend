@@ -1,3 +1,105 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+.app-language-shell {
+  min-height: 100%;
+}
+
+.app-language-shell__content :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  label,
+  a,
+  button,
+  th,
+  td,
+  li,
+  strong,
+  em,
+  small,
+  [data-slot='card-title'],
+  [data-slot='card-description']
+) {
+  transition: opacity 160ms ease, color 160ms ease;
+}
+
+.app-language-shell--transitioning .app-language-shell__content :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  label,
+  a,
+  button,
+  th,
+  td,
+  li,
+  strong,
+  em,
+  small,
+  [data-slot='card-title'],
+  [data-slot='card-description']
+) {
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-language-shell__content :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label,
+    a,
+    button,
+    th,
+    td,
+    li,
+    strong,
+    em,
+    small,
+    [data-slot='card-title'],
+    [data-slot='card-description']
+  ) {
+    transition: none;
+  }
+
+  .app-language-shell--transitioning .app-language-shell__content :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label,
+    a,
+    button,
+    th,
+    td,
+    li,
+    strong,
+    em,
+    small,
+    [data-slot='card-title'],
+    [data-slot='card-description']
+  ) {
+    opacity: 1;
+  }
+}
