@@ -1,6 +1,6 @@
-import { Button } from '@/app/components/ui/button'
 import { i18n } from '@/lib/i18n'
 import type { Language } from '@/lib/i18n/resources'
+import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 
 const languageOptions: Array<{ value: Language; label: string }> = [
@@ -13,18 +13,26 @@ export function LanguageSwitcher() {
   const activeLanguage = (i18nInstance.resolvedLanguage ?? i18n.language ?? 'en') as Language
 
   return (
-    <div className="flex items-center gap-1 rounded-[--radius] border border-border p-1">
+    <div
+      className="inline-flex w-full items-center rounded-[calc(var(--radius)+2px)] bg-muted p-1"
+      role="group"
+      aria-label="Language switcher"
+    >
       {languageOptions.map((option) => (
-        <Button
+        <button
           key={option.value}
           type="button"
-          variant={activeLanguage === option.value ? 'default' : 'ghost'}
-          size="sm"
-          className="h-8 px-3"
+          className={cn(
+            'flex-1 rounded-[calc(var(--radius)-2px)] px-4 py-2 text-sm font-semibold tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--ring]',
+            activeLanguage === option.value
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-muted-foreground hover:bg-background/80 hover:text-foreground'
+          )}
+          aria-pressed={activeLanguage === option.value}
           onClick={() => void i18n.changeLanguage(option.value)}
         >
           {option.label}
-        </Button>
+        </button>
       ))}
     </div>
   )

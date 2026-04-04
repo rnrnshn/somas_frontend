@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { useAuth } from "@/lib/auth/auth-context";
 import { canAccessBackofficePath, getDefaultRouteForRole, isBackofficeRole, normalizeRole } from "@/lib/auth/roles";
@@ -8,13 +8,23 @@ import {
   Users, 
   Receipt, 
   BarChart3,
-  Settings
+  Settings,
+  ChevronsUpDown,
+  LogOut
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { LanguageSwitcher } from "../language-switcher";
 import { Skeleton } from "../ui/skeleton";
 import { TenantSwitcher } from "./tenant-switcher";
 import { useTranslation } from "react-i18next";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 type NavItem = {
   path: string;
@@ -100,15 +110,6 @@ export function BackofficeLayout() {
           </h2>
           <TenantSwitcher />
         </div>
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          {user?.email ? (
-            <div className="text-right">
-              <p className="text-sm font-medium">{user.email}</p>
-              <p className="text-xs text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
-            </div>
-          ) : null}
-        </div>
       </header>
 
       <div className="flex min-h-0 flex-1">
@@ -137,17 +138,41 @@ export function BackofficeLayout() {
             })}
           </nav>
 
-          <div className="p-4 border-t border-sidebar-border">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
-              onClick={async () => {
-                await signOut();
-                navigate('/');
-              }}
-            >
-              {t('backToGateway')}
-            </Button>
+          <div className="border-t border-sidebar-border p-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-auto w-full justify-between px-3 py-3 text-sidebar-foreground hover:bg-sidebar-accent"
+                >
+                  <div className="min-w-0 text-left">
+                    <p className="truncate text-sm font-medium">{user?.email ?? t('brand')}</p>
+                    <p className="truncate text-xs text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
+                  </div>
+                  <ChevronsUpDown className="h-4 w-4 shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="top" className="w-56">
+                <DropdownMenuLabel className="space-y-1">
+                  <p className="truncate text-sm font-medium">{user?.email ?? t('brand')}</p>
+                  <p className="truncate text-xs font-normal text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className="px-2 py-2">
+                  <LanguageSwitcher />
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await signOut();
+                    navigate('/');
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  {t('logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </aside>
 

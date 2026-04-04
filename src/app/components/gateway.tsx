@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
-import { LanguageSwitcher } from "./language-switcher";
 import { Building2, Smartphone, Key } from "lucide-react";
 
 export function Gateway() {
@@ -16,9 +15,6 @@ export function Gateway() {
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="w-full max-w-4xl">
         <div className="mb-12">
-          <div className="mb-6 flex justify-end">
-            <LanguageSwitcher />
-          </div>
           <div className="text-center">
             <h1 className="mb-4">{t('brand')}</h1>
           <p style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-regular)', color: 'var(--muted-foreground)' }}>
