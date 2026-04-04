@@ -14,6 +14,7 @@ import { Search, Download, MapPin, CheckCircle, XCircle, Clock, Upload } from "l
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useTranslation } from "react-i18next";
 
 export function BackofficeBeneficiaries() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export function BackofficeBeneficiaries() {
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [provinceFilter, setProvinceFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const { t } = useTranslation();
 
   const filters: BeneficiaryListFilters = {
     page: 1,
@@ -80,16 +82,16 @@ export function BackofficeBeneficiaries() {
 
       return {
         id: `VER-${detail.id}`,
-        beneficiary: detail.beneficiary?.name ?? row.campaign?.name ?? 'Beneficiary',
+        beneficiary: detail.beneficiary?.name ?? row.campaign?.name ?? t('beneficiariesPage.beneficiaryFallback'),
         beneficiaryCode: `BEN-${String(detail.beneficiaryId).padStart(6, '0')}`,
-        enumerator: 'Field App',
+        enumerator: t('beneficiariesPage.fieldApp'),
         location:
           typeof detail.latitude === 'number' && typeof detail.longitude === 'number'
             ? `${detail.latitude.toFixed(4)}, ${detail.longitude.toFixed(4)}`
-            : 'Not captured',
+            : t('beneficiariesPage.notCaptured'),
         date: formatDisplayDate(detail.verifiedAt ?? row.createdAt),
         status: mapVerificationStatus(detail.disbursementStatus),
-        notes: detail.testimony ?? buildEvidenceSummary(detail.signatureUrl, detail.photoUrl),
+        notes: detail.testimony ?? buildEvidenceSummary(detail.signatureUrl, detail.photoUrl, t),
       };
     })
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
@@ -133,29 +135,29 @@ export function BackofficeBeneficiaries() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>Beneficiaries</h1>
+          <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>{t('beneficiariesPage.title')}</h1>
           <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
-            Manage beneficiary directory and field verification activities
+            {t('beneficiariesPage.subtitle')}
           </p>
         </div>
         <div className="flex gap-3">
           {activeTab === "directory" && (
             <Button variant="outline">
               <Upload className="w-4 h-4 mr-2" />
-              Import CSV
+              {t('beneficiariesPage.importCsv')}
             </Button>
           )}
           <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
-            Export
+            {t('beneficiariesPage.export')}
           </Button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="directory">Directory</TabsTrigger>
-          <TabsTrigger value="field-verification">Field Verification</TabsTrigger>
+          <TabsTrigger value="directory">{t('beneficiariesPage.directory')}</TabsTrigger>
+          <TabsTrigger value="field-verification">{t('beneficiariesPage.fieldVerification')}</TabsTrigger>
         </TabsList>
 
         {/* DIRECTORY TAB */}
@@ -166,7 +168,7 @@ export function BackofficeBeneficiaries() {
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                   <Input
-                    placeholder="Search by name or ID..."
+                    placeholder={t('beneficiariesPage.searchByNameOrId')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
@@ -179,12 +181,12 @@ export function BackofficeBeneficiaries() {
                     className="w-full"
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Filter by campaign">
-                        {campaignFilter === "all" ? "All Campaigns" : campaignFilter}
+                      <SelectValue placeholder={t('beneficiariesPage.filterByCampaign')}>
+                        {campaignFilter === "all" ? t('beneficiariesPage.allCampaigns') : campaignFilter}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="w-full">
-                      <SelectItem value="all">All Campaigns</SelectItem>
+                      <SelectItem value="all">{t('beneficiariesPage.allCampaigns')}</SelectItem>
                       {Array.from(new Set(beneficiaries.map((item) => item.campaign))).filter((item) => item && item !== '—').map((item) => (
                         <SelectItem key={item} value={item}>{item}</SelectItem>
                       ))}
@@ -198,12 +200,12 @@ export function BackofficeBeneficiaries() {
                     className="w-full"
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Filter by province">
-                        {provinceFilter === "all" ? "All Provinces" : provinceFilter}
+                      <SelectValue placeholder={t('beneficiariesPage.filterByProvince')}>
+                        {provinceFilter === "all" ? t('beneficiariesPage.allProvinces') : provinceFilter}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="w-full">
-                      <SelectItem value="all">All Provinces</SelectItem>
+                      <SelectItem value="all">{t('beneficiariesPage.allProvinces')}</SelectItem>
                       {Array.from(new Set(beneficiaries.map((item) => item.province))).filter((item) => item && item !== '—').map((item) => (
                         <SelectItem key={item} value={item}>{item}</SelectItem>
                       ))}
@@ -217,23 +219,23 @@ export function BackofficeBeneficiaries() {
                     className="w-full"
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Filter by status">
-                        {statusFilter === "all" ? "All Statuses" : statusFilter}
+                      <SelectValue placeholder={t('beneficiariesPage.filterByStatus')}>
+                        {statusFilter === "all" ? t('beneficiariesPage.allStatuses') : statusFilter}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="w-full">
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="Active">Active</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Suspended">Suspended</SelectItem>
-                      <SelectItem value="Verified">Verified</SelectItem>
-                      <SelectItem value="Rejected">Rejected</SelectItem>
+                      <SelectItem value="all">{t('beneficiariesPage.allStatuses')}</SelectItem>
+                      <SelectItem value="Active">{t('campaignsPage.active')}</SelectItem>
+                      <SelectItem value="Pending">{t('beneficiariesPage.pending')}</SelectItem>
+                      <SelectItem value="Suspended">{t('campaignsPage.suspended')}</SelectItem>
+                      <SelectItem value="Verified">{t('beneficiariesPage.verified')}</SelectItem>
+                      <SelectItem value="Rejected">{t('beneficiariesPage.rejected')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 {beneficiariesQuery.error ? (
                   <p style={{ fontSize: 'var(--text-13)', color: 'var(--error)' }}>
-                    {beneficiariesQuery.error instanceof Error ? beneficiariesQuery.error.message : 'Beneficiaries could not be loaded.'}
+                    {beneficiariesQuery.error instanceof Error ? beneficiariesQuery.error.message : t('beneficiariesPage.loadError')}
                   </p>
                 ) : null}
               </div>
@@ -242,13 +244,13 @@ export function BackofficeBeneficiaries() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Beneficiary ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Province</TableHead>
-                    <TableHead>District</TableHead>
-                    <TableHead>Campaign</TableHead>
-                    <TableHead>Last Transaction</TableHead>
+                    <TableHead>{t('beneficiariesPage.beneficiaryId')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.name')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.phone')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.province')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.district')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.campaign')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.lastTransaction')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -256,7 +258,7 @@ export function BackofficeBeneficiaries() {
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                          {beneficiariesQuery.isPending ? 'Loading beneficiaries...' : 'No beneficiaries found'}
+                          {beneficiariesQuery.isPending ? t('beneficiariesPage.loadingBeneficiaries') : t('beneficiariesPage.noBeneficiaries')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -303,17 +305,17 @@ export function BackofficeBeneficiaries() {
                   <MapPin className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Field Verification Records
+                      {t('beneficiariesPage.fieldVerificationRecords')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Track on-site verification activities by enumerators
+                      {t('beneficiariesPage.fieldVerificationSubtitle')}
                     </p>
                   </div>
                 </div>
                 <div className="relative w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                   <Input
-                    placeholder="Search verifications..."
+                    placeholder={t('beneficiariesPage.searchVerifications')}
                     className="pl-9"
                   />
                 </div>
@@ -323,13 +325,13 @@ export function BackofficeBeneficiaries() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Verification ID</TableHead>
-                    <TableHead>Beneficiary</TableHead>
-                    <TableHead>Enumerator</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Notes</TableHead>
+                    <TableHead>{t('beneficiariesPage.verificationId')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.name')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.enumerator')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.location')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.date')}</TableHead>
+                    <TableHead>{t('campaignsPage.status')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.notes')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -337,7 +339,7 @@ export function BackofficeBeneficiaries() {
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                          Loading field verification records...
+                          {t('beneficiariesPage.loadingFieldVerification')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -345,7 +347,7 @@ export function BackofficeBeneficiaries() {
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                          No field verification records found.
+                          {t('beneficiariesPage.noFieldVerification')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -410,11 +412,11 @@ function mapVerificationStatus(status: string) {
   return 'Pending';
 }
 
-function buildEvidenceSummary(signatureUrl?: string | null, photoUrl?: string | null) {
+function buildEvidenceSummary(signatureUrl?: string | null, photoUrl?: string | null, t?: (key: string) => string) {
   const parts = [];
-  if (signatureUrl) parts.push('Signature attached');
-  if (photoUrl) parts.push('Photo attached');
-  return parts.join(' • ') || 'No notes';
+  if (signatureUrl) parts.push(t ? t('beneficiariesPage.signatureAttached') : 'Signature attached');
+  if (photoUrl) parts.push(t ? t('beneficiariesPage.photoAttached') : 'Photo attached');
+  return parts.join(' • ') || (t ? t('beneficiariesPage.noNotes') : 'No notes');
 }
 
 function formatDisplayDate(value: string) {

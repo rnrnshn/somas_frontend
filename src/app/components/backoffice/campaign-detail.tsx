@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
+import { formatCompactMetical, formatMetical } from "@/lib/format/currency";
 import { useAllCampaignBeneficiariesQuery, useCampaignBeneficiariesQuery, useCampaignProgressQuery, useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
 import { useExecuteCampaignDisbursementMutation } from "@/features/campaigns/hooks/use-campaign-mutations";
 import { adaptCampaignDetail, adaptCampaignProgressSeries } from "@/features/campaigns/adapters/campaigns";
@@ -39,6 +40,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useTranslation } from "react-i18next";
 import {
   LineChart,
   Line,
@@ -60,6 +62,7 @@ export function CampaignDetail() {
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [showCloseDialog, setShowCloseDialog] = useState(false);
   const [showExecuteDialog, setShowExecuteDialog] = useState(false);
+  const { t } = useTranslation();
   const beneficiarySearch = searchQuery.trim();
 
   const campaignQuery = useCampaignQuery(campaignId);
@@ -172,14 +175,7 @@ export function CampaignDetail() {
     return <Badge {...(variants[status] || {})}>{status}</Badge>;
   };
 
-  const formatCurrency = (amount: number) => {
-    if (amount >= 1000000) {
-      return `$${(amount / 1000000).toFixed(2)}M`;
-    } else if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(1)}K`;
-    }
-    return `$${amount.toLocaleString()}`;
-  };
+  const formatCurrency = (amount: number) => formatCompactMetical(amount);
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -197,11 +193,11 @@ export function CampaignDetail() {
       toast.success(
         transactionsCount !== null
           ? `Disbursement batch ${result.code ?? result.batchId ?? ''} started for ${transactionsCount} transaction${transactionsCount === 1 ? '' : 's'}.`.trim()
-          : 'Disbursement execution started successfully.'
+          : t('campaignDetailPage.executionStarted')
       );
       setShowExecuteDialog(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Disbursement execution could not be started.');
+      toast.error(error instanceof Error ? error.message : t('campaignDetailPage.executionFailed'));
     }
   };
 
@@ -215,36 +211,36 @@ export function CampaignDetail() {
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Campaigns
+          {t('campaignDetailPage.backToCampaigns')}
         </Button>
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
-                {campaign?.name ?? (campaignQuery.isPending ? 'Loading campaign...' : 'Campaign unavailable')}
+                {campaign?.name ?? (campaignQuery.isPending ? t('campaignDetailPage.loadingCampaign') : t('campaignDetailPage.campaignUnavailable'))}
               </h1>
               {campaign ? getStatusBadge(campaign.status) : null}
             </div>
             <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-              {campaign ? `${campaign.id} • ${campaign.program} • ${campaign.region}` : 'Loading campaign details'}
+              {campaign ? `${campaign.id} • ${campaign.program} • ${campaign.region}` : t('campaignDetailPage.loadingDetails')}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => navigate(`/backoffice/campaigns/${campaignId}/edit`)}>
               <SquarePen className="w-4 h-4 mr-2" />
-              Edit
+              {t('campaignDetailPage.edit')}
             </Button>
             <Button onClick={() => setShowExecuteDialog(true)} disabled={!canExecuteDisbursement || executeDisbursementMutation.isPending}>
               <Play className="w-4 h-4 mr-2" />
-              {executeDisbursementMutation.isPending ? 'Executing...' : 'Execute Disbursement'}
+              {executeDisbursementMutation.isPending ? t('campaignDetailPage.executing') : t('campaignDetailPage.executeDisbursement')}
             </Button>
             <Button variant="outline" onClick={() => setShowSuspendDialog(true)}>
               <Pause className="w-4 h-4 mr-2" />
-              Suspend
+              {t('campaignDetailPage.suspend')}
             </Button>
             <Button variant="outline" onClick={() => setShowCloseDialog(true)}>
               <XCircle className="w-4 h-4 mr-2" />
-              Close
+              {t('campaignDetailPage.close')}
             </Button>
           </div>
         </div>
@@ -259,7 +255,7 @@ export function CampaignDetail() {
       {campaign && !hasPaymentChannel ? (
         <Alert className="mb-6" variant="destructive">
           <AlertDescription>
-            This campaign cannot be executed until a payment channel is configured. Edit the campaign and select a payment channel first.
+            {t('campaignDetailPage.paymentChannelRequired')}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -267,11 +263,11 @@ export function CampaignDetail() {
       {/* Tabs */}
       {campaign ? <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="beneficiaries">Beneficiaries</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          {campaign.enabledSavings && <TabsTrigger value="savings">Savings</TabsTrigger>}
-          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="overview">{t('campaignDetailPage.overview')}</TabsTrigger>
+          <TabsTrigger value="beneficiaries">{t('campaignDetailPage.beneficiaries')}</TabsTrigger>
+          <TabsTrigger value="transactions">{t('campaignDetailPage.transactions')}</TabsTrigger>
+          {campaign.enabledSavings && <TabsTrigger value="savings">{t('campaignDetailPage.savings')}</TabsTrigger>}
+          <TabsTrigger value="reports">{t('campaignDetailPage.reports')}</TabsTrigger>
         </TabsList>
 
         {/* OVERVIEW TAB */}
@@ -281,7 +277,7 @@ export function CampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                  Total Beneficiaries
+                  {t('campaignDetailPage.totalBeneficiaries')}
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
                   {totalBeneficiaries.toLocaleString()}
@@ -292,7 +288,7 @@ export function CampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                  Amount Disbursed
+                  {t('campaignDetailPage.amountDisbursed')}
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
                   {formatCurrency(amountDisbursed)}
@@ -303,7 +299,7 @@ export function CampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                  Success Rate
+                  {t('campaignDetailPage.successRate')}
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
                   {successRate}%
@@ -314,7 +310,7 @@ export function CampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                  Pending Payments
+                  {t('campaignDetailPage.pendingPayments')}
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--warning)" }}>
                   {pendingPayments}
@@ -325,7 +321,7 @@ export function CampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                  Failed Payments
+                  {t('campaignDetailPage.failedPayments')}
                 </p>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--error)" }}>
                   {failedPayments}
@@ -337,7 +333,7 @@ export function CampaignDetail() {
           {/* Campaign Progress */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Campaign Completion</CardTitle>
+              <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('campaignDetailPage.campaignCompletion')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -357,7 +353,7 @@ export function CampaignDetail() {
           {/* Disbursement Progress Chart */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Disbursement Progress Over Time</CardTitle>
+              <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('campaignDetailPage.disbursementProgress')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -371,7 +367,7 @@ export function CampaignDetail() {
                     dataKey="amount"
                     stroke="var(--primary)"
                     strokeWidth={2}
-                    name="Disbursed ($)"
+                    name="Disbursed (MZN)"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -384,11 +380,11 @@ export function CampaignDetail() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle style={{ fontSize: "var(--text-16)" }}>Beneficiaries</CardTitle>
+                <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('campaignDetailPage.beneficiaries')}</CardTitle>
                 <div className="relative w-64">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                   <Input
-                    placeholder="Search beneficiaries..."
+                    placeholder={t('campaignDetailPage.searchBeneficiaries')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -400,13 +396,13 @@ export function CampaignDetail() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>{t('campaignDetailPage.beneficiaryTableName')}</TableHead>
                     <TableHead>MSISDN</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Amount</TableHead>
+                    <TableHead>{t('campaignDetailPage.beneficiaryTableLocation')}</TableHead>
+                    <TableHead>{t('campaignDetailPage.beneficiaryTableAmount')}</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Last Activity</TableHead>
-                    <TableHead className="w-24">Actions</TableHead>
+                    <TableHead>{t('campaignDetailPage.beneficiaryTableLastActivity')}</TableHead>
+                    <TableHead className="w-24">{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -414,7 +410,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                          Loading beneficiaries...
+                          {t('campaignDetailPage.loadingBeneficiaries')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -422,7 +418,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--error)" }}>
-                          {campaignBeneficiariesQuery.error instanceof Error ? campaignBeneficiariesQuery.error.message : 'Campaign beneficiaries could not be loaded.'}
+                          {campaignBeneficiariesQuery.error instanceof Error ? campaignBeneficiariesQuery.error.message : t('campaignDetailPage.beneficiariesLoadError')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -430,7 +426,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                          Loading beneficiaries...
+                          {t('campaignDetailPage.loadingBeneficiaries')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -438,7 +434,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--error)" }}>
-                          {campaignBeneficiariesListQuery.error instanceof Error ? campaignBeneficiariesListQuery.error.message : 'Campaign beneficiaries could not be loaded.'}
+                          {campaignBeneficiariesListQuery.error instanceof Error ? campaignBeneficiariesListQuery.error.message : t('campaignDetailPage.beneficiariesLoadError')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -446,7 +442,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                          {beneficiarySearch.length > 0 ? 'No beneficiaries match your search.' : 'No beneficiaries were found for this campaign.'}
+                          {beneficiarySearch.length > 0 ? t('campaignDetailPage.noBeneficiariesSearch') : t('campaignDetailPage.noBeneficiariesCampaign')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -469,7 +465,7 @@ export function CampaignDetail() {
                         {beneficiary.location}
                       </TableCell>
                       <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                        {typeof beneficiary.amount === 'number' ? `$${beneficiary.amount.toLocaleString()}` : '—'}
+                        {typeof beneficiary.amount === 'number' ? formatMetical(beneficiary.amount) : '—'}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(beneficiary.status)}
@@ -506,18 +502,18 @@ export function CampaignDetail() {
         <TabsContent value="transactions" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Transactions</CardTitle>
+              <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('campaignDetailPage.transactions')}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Transaction ID</TableHead>
+                    <TableHead>{t('campaignDetailPage.transactionId')}</TableHead>
                     <TableHead>Beneficiary</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Error Message</TableHead>
-                    <TableHead>Execution Date</TableHead>
+                    <TableHead>{t('campaignDetailPage.errorMessage')}</TableHead>
+                    <TableHead>{t('campaignDetailPage.executionDate')}</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -526,7 +522,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                          Loading transactions...
+                          {t('transactionsPage.loadingTransactions')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -534,7 +530,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--error)" }}>
-                          {campaignTransactionsQuery.error instanceof Error ? campaignTransactionsQuery.error.message : 'Campaign transactions could not be loaded.'}
+                          {campaignTransactionsQuery.error instanceof Error ? campaignTransactionsQuery.error.message : t('campaignDetailPage.transactionsLoadError')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -542,7 +538,7 @@ export function CampaignDetail() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                          No transactions have been created for this campaign yet.
+                          {t('campaignDetailPage.noTransactionsYet')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -555,7 +551,7 @@ export function CampaignDetail() {
                         {txn.beneficiary}
                       </TableCell>
                       <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                        ${txn.amount.toLocaleString()}
+                        {formatMetical(txn.amount)}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(txn.status)}
@@ -634,7 +630,7 @@ export function CampaignDetail() {
 
             <Card>
               <CardHeader>
-                <CardTitle style={{ fontSize: "var(--text-16)" }}>Savings Participation</CardTitle>
+                <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('campaignDetailPage.savingsParticipation')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -643,7 +639,7 @@ export function CampaignDetail() {
                     <XAxis dataKey="category" style={{ fontSize: "var(--text-12)" }} />
                     <YAxis style={{ fontSize: "var(--text-12)" }} />
                     <Tooltip />
-                    <Bar dataKey="count" fill="var(--primary)" name="Beneficiaries" />
+                    <Bar dataKey="count" fill="var(--primary)" name={t('campaignDetailPage.beneficiaries')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -651,15 +647,15 @@ export function CampaignDetail() {
 
             <Card>
               <CardHeader>
-                <CardTitle style={{ fontSize: "var(--text-16)" }}>Savings Details</CardTitle>
+                <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('campaignDetailPage.savingsDetails')}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Beneficiary</TableHead>
-                      <TableHead>Saved Amount</TableHead>
-                      <TableHead>Last Deposit</TableHead>
+                      <TableHead>{t('campaignDetailPage.beneficiaries')}</TableHead>
+                      <TableHead>{t('campaignDetailPage.savedAmount')}</TableHead>
+                      <TableHead>{t('campaignDetailPage.lastDeposit')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -667,7 +663,7 @@ export function CampaignDetail() {
                       <TableRow>
                         <TableCell colSpan={3} className="text-center py-12">
                           <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                            Savings detail rows are not wired yet for this screen.
+                            {t('campaignDetailPage.savingsNotWired')}
                           </p>
                         </TableCell>
                       </TableRow>
@@ -677,7 +673,7 @@ export function CampaignDetail() {
                           {saving.beneficiary}
                         </TableCell>
                         <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                          ${saving.savedAmount.toLocaleString()}
+                          {formatMetical(saving.savedAmount)}
                         </TableCell>
                         <TableCell style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
                           {formatDate(saving.lastDeposit)}
@@ -702,7 +698,7 @@ export function CampaignDetail() {
         <TabsContent value="reports" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Export Reports</CardTitle>
+              <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('campaignDetailPage.exportReports')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-[--radius]" style={{ borderColor: "var(--border)" }}>
@@ -710,10 +706,10 @@ export function CampaignDetail() {
                   <FileText className="w-5 h-5" style={{ color: "var(--muted-foreground)" }} />
                   <div>
                     <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                      Export Beneficiaries
+                      {t('campaignDetailPage.exportBeneficiaries')}
                     </p>
                     <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                      Download complete beneficiary list with payment status
+                      {t('campaignDetailPage.exportBeneficiariesHelp')}
                     </p>
                   </div>
                 </div>
@@ -732,10 +728,10 @@ export function CampaignDetail() {
                   <FileText className="w-5 h-5" style={{ color: "var(--muted-foreground)" }} />
                   <div>
                     <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                      Export Transactions
+                      {t('campaignDetailPage.exportTransactions')}
                     </p>
                     <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                      Download all transaction records with details
+                      {t('campaignDetailPage.exportTransactionsHelp')}
                     </p>
                   </div>
                 </div>
@@ -754,10 +750,10 @@ export function CampaignDetail() {
                   <FileText className="w-5 h-5" style={{ color: "var(--muted-foreground)" }} />
                   <div>
                     <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                      Export Campaign Summary
+                      {t('campaignDetailPage.exportCampaignSummary')}
                     </p>
                     <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                      Download comprehensive campaign performance report
+                      {t('campaignDetailPage.exportCampaignSummaryHelp')}
                     </p>
                   </div>
                 </div>
@@ -777,10 +773,10 @@ export function CampaignDetail() {
                     <PiggyBank className="w-5 h-5" style={{ color: "var(--muted-foreground)" }} />
                     <div>
                       <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                        Export Savings Data
+                        {t('campaignDetailPage.exportSavingsData')}
                       </p>
                       <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                        Download savings participation and amounts
+                        {t('campaignDetailPage.exportSavingsHelp')}
                       </p>
                     </div>
                   </div>
@@ -804,24 +800,24 @@ export function CampaignDetail() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle style={{ fontSize: "var(--text-20)" }}>
-              Execute Disbursement
+              {t('campaignDetailPage.executeTitle')}
             </DialogTitle>
             <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-              This will create and process campaign transactions for the current beneficiaries.
+              {t('campaignDetailPage.executeDescription')}
             </DialogDescription>
           </DialogHeader>
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription style={{ fontSize: "var(--text-13)" }}>
-              {campaign ? `${campaign.pendingPayments} pending payment${campaign.pendingPayments === 1 ? '' : 's'} will be considered for execution.` : 'Pending campaign payments will be considered for execution.'}
+              {campaign ? (campaign.pendingPayments === 1 ? t('campaignDetailPage.executePending', { count: campaign.pendingPayments }) : t('campaignDetailPage.executePendingPlural', { count: campaign.pendingPayments })) : t('campaignDetailPage.executePendingFallback')}
             </AlertDescription>
           </Alert>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowExecuteDialog(false)} disabled={executeDisbursementMutation.isPending}>
-              Cancel
+              {t('campaignDetailPage.cancel')}
             </Button>
             <Button onClick={handleExecuteDisbursement} disabled={!canExecuteDisbursement || executeDisbursementMutation.isPending}>
-              {executeDisbursementMutation.isPending ? 'Executing...' : 'Execute Disbursement'}
+              {executeDisbursementMutation.isPending ? t('campaignDetailPage.executing') : t('campaignDetailPage.executeTitle')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -832,24 +828,24 @@ export function CampaignDetail() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle style={{ fontSize: "var(--text-20)" }}>
-              Suspend Campaign
+              {t('campaignDetailPage.suspendTitle')}
             </DialogTitle>
             <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-              Are you sure you want to suspend this campaign? All pending disbursements will be paused.
+              {t('campaignDetailPage.suspendDescription')}
             </DialogDescription>
           </DialogHeader>
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription style={{ fontSize: "var(--text-13)" }}>
-              This action will temporarily halt all campaign activities
+              {t('campaignDetailPage.suspendWarning')}
             </AlertDescription>
           </Alert>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSuspendDialog(false)}>
-              Cancel
+              {t('campaignDetailPage.cancel')}
             </Button>
             <Button variant="destructive" onClick={() => setShowSuspendDialog(false)}>
-              Suspend Campaign
+              {t('campaignDetailPage.suspendTitle')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -860,24 +856,24 @@ export function CampaignDetail() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle style={{ fontSize: "var(--text-20)" }}>
-              Close Campaign
+              {t('campaignDetailPage.closeTitle')}
             </DialogTitle>
             <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-              Are you sure you want to close this campaign? This action cannot be undone.
+              {t('campaignDetailPage.closeDescription')}
             </DialogDescription>
           </DialogHeader>
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription style={{ fontSize: "var(--text-13)" }}>
-              Once closed, no further disbursements can be made
+              {t('campaignDetailPage.closeWarning')}
             </AlertDescription>
           </Alert>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCloseDialog(false)}>
-              Cancel
+              {t('campaignDetailPage.cancel')}
             </Button>
             <Button variant="destructive" onClick={() => setShowCloseDialog(false)}>
-              Close Campaign
+              {t('campaignDetailPage.closeTitle')}
             </Button>
           </DialogFooter>
         </DialogContent>

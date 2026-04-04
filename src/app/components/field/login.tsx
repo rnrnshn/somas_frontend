@@ -10,6 +10,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Smartphone, Loader2, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function FieldLogin() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export function FieldLogin() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isLoading = loginMutation.isPending;
+  const { t } = useTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ export function FieldLogin() {
       const normalizedRole = normalizedUser?.role;
 
       if (!isFieldRole(normalizedRole)) {
-        throw new Error('Esta conta nao tem acesso ao app de Inquiridor.');
+        throw new Error(t('auth.fieldNoAccess'));
       }
 
       signIn(response.token, normalizedUser);
@@ -44,7 +46,7 @@ export function FieldLogin() {
           ? requestError.message
           : requestError instanceof Error
             ? requestError.message
-            : 'Invalid credentials. Please try again.'
+            : t('auth.invalidCredentials')
       );
     }
   };
@@ -60,18 +62,18 @@ export function FieldLogin() {
           <div className="w-16 h-16 rounded-[--radius-card] bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <Smartphone className="w-8 h-8 text-accent" />
           </div>
-          <h2 className="mb-2">Field Operations</h2>
+          <h2 className="mb-2">{t('auth.fieldTitle')}</h2>
           <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-            Sign in to access field tools
+            {t('auth.fieldSubtitle')}
           </p>
         </div>
 
         <Card>
           <form onSubmit={handleLogin}>
             <CardHeader>
-              <CardTitle>Sign In</CardTitle>
+              <CardTitle>{t('auth.signIn')}</CardTitle>
               <CardDescription>
-                Enter your field credentials
+                {t('auth.enterFieldCredentials')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -83,7 +85,7 @@ export function FieldLogin() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="username">Email</Label>
+                <Label htmlFor="username">{t('auth.email')}</Label>
                 <Input
                   id="username"
                   type="email"
@@ -95,7 +97,7 @@ export function FieldLogin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="pin">Password</Label>
+                <Label htmlFor="pin">{t('auth.password')}</Label>
                 <Input
                   id="pin"
                   type="password"
@@ -112,14 +114,14 @@ export function FieldLogin() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    {t('auth.signingIn')}
                   </>
                 ) : (
-                  'Sign In'
+                  t('auth.signIn')
                 )}
               </Button>
               <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', textAlign: 'center' }}>
-                Access is monitored for compliance.
+                {t('auth.accessMonitored')}
               </p>
               <Button
                 type="button"
@@ -128,7 +130,7 @@ export function FieldLogin() {
                 onClick={() => navigate('/')}
                 disabled={isLoading}
               >
-                Back to Gateway
+                {t('backToGateway')}
               </Button>
             </CardFooter>
           </form>

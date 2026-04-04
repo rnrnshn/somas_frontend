@@ -9,6 +9,7 @@ import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Building2, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export function ForgotPassword() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export function ForgotPassword() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isLoading = forgotPasswordMutation.isPending;
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,11 +26,11 @@ export function ForgotPassword() {
 
     try {
       await forgotPasswordMutation.mutateAsync({ email });
-      toast.success('Reset instructions sent if the account exists.');
+      toast.success(t('auth.resetInstructionsSent'));
       setIsSubmitted(true);
     } catch (requestError) {
-      toast.error(requestError instanceof HttpError ? requestError.message : 'Reset instructions could not be sent.');
-      setError(requestError instanceof HttpError ? requestError.message : 'Reset instructions could not be sent.');
+      toast.error(requestError instanceof HttpError ? requestError.message : t('auth.resetInstructionsFailed'));
+      setError(requestError instanceof HttpError ? requestError.message : t('auth.resetInstructionsFailed'));
     }
   };
 
@@ -40,29 +42,28 @@ export function ForgotPassword() {
             <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Building2 className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="mb-2">Password Reset</h2>
+            <h2 className="mb-2">{t('auth.passwordReset')}</h2>
             <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-              Check your email for instructions
+              {t('auth.checkEmailInstructions')}
             </p>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Check Your Email</CardTitle>
+              <CardTitle>{t('auth.checkEmail')}</CardTitle>
               <CardDescription>
-                Reset link sent
+                {t('auth.resetLinkSent')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert>
                 <CheckCircle2 className="h-4 w-4" />
                 <AlertDescription>
-                  If an account exists with the email <strong>{email}</strong>, a password reset link has been sent.
+                  {t('auth.resetMessage', { email })}
                 </AlertDescription>
               </Alert>
               <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                Please check your email inbox and follow the instructions to reset your password. 
-                The link will expire in 24 hours.
+                {t('auth.resetExpiry')}
               </p>
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
@@ -71,7 +72,7 @@ export function ForgotPassword() {
                 className="w-full"
                 onClick={() => navigate('/backoffice/login')}
               >
-                Back to Sign In
+                {t('auth.backToSignIn')}
               </Button>
             </CardFooter>
           </Card>
@@ -87,18 +88,18 @@ export function ForgotPassword() {
           <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="mb-2">Reset Password</h2>
+          <h2 className="mb-2">{t('auth.resetPassword')}</h2>
           <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-            Enter your email to receive reset instructions
+            {t('auth.resetPasswordSubtitle')}
           </p>
         </div>
 
         <Card>
           <form onSubmit={handleSubmit}>
             <CardHeader>
-              <CardTitle>Forgot Password?</CardTitle>
+              <CardTitle>{t('auth.forgotPasswordTitle')}</CardTitle>
               <CardDescription>
-                We'll send you a secure reset link
+                {t('auth.forgotPasswordDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -108,7 +109,7 @@ export function ForgotPassword() {
                 </Alert>
               ) : null}
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">{t('auth.emailAddress')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -129,10 +130,10 @@ export function ForgotPassword() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending...
+                    {t('auth.sending')}
                   </>
                 ) : (
-                  'Send Reset Link'
+                  t('auth.sendResetLink')
                 )}
               </Button>
               <Button
@@ -142,7 +143,7 @@ export function ForgotPassword() {
                 onClick={() => navigate('/backoffice/login')}
                 disabled={isLoading}
               >
-                Back to Sign In
+                {t('auth.backToSignIn')}
               </Button>
             </CardFooter>
           </form>

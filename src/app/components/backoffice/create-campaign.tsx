@@ -9,12 +9,12 @@ import {
 } from "@/features/campaigns/hooks/use-campaign-mutations";
 import { importCampaignBeneficiaries } from "@/features/campaigns/api/campaigns-api";
 import { HttpError } from "@/lib/api/http-error";
+import { formatMetical } from "@/lib/format/currency";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { Switch } from "../ui/switch";
 import { Progress } from "../ui/progress";
 import { Skeleton } from "../ui/skeleton";
 import { Alert, AlertDescription } from "../ui/alert";
@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useTranslation } from "react-i18next";
 
 type CampaignFormData = {
   name: string;
@@ -84,6 +85,7 @@ export function CreateCampaign() {
   const createCampaignMutation = useCreateCampaignMutation();
   const updateCampaignMutation = useUpdateCampaignMutation(campaignId);
   const validateUploadMutation = useValidateCampaignBeneficiariesUploadMutation();
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -168,7 +170,7 @@ export function CreateCampaign() {
           })),
         }));
       } catch (error) {
-        setSubmitError(error instanceof HttpError ? error.message : 'Beneficiary file could not be validated.');
+        setSubmitError(error instanceof HttpError ? error.message : t('createCampaignPage.fileValidationError'));
       }
     }
   };
@@ -204,7 +206,7 @@ export function CreateCampaign() {
 
   const handleCreateCampaign = async () => {
     if (!formData.paymentChannel) {
-      setSubmitError('Select a payment channel before saving the campaign.');
+      setSubmitError(t('createCampaignPage.selectPaymentBeforeSaving'));
       setShowConfirmDialog(false);
       return;
     }
@@ -241,12 +243,12 @@ export function CreateCampaign() {
         await importCampaignBeneficiaries(savedCampaign.id, validRows);
       }
 
-      toast.success(isEditMode ? 'Campaign updated successfully.' : 'Campaign created successfully.');
+      toast.success(isEditMode ? t('createCampaignPage.updatedSuccess') : t('createCampaignPage.createdSuccess'));
       setShowConfirmDialog(false);
       navigate(`/backoffice/campaigns/${savedCampaign.id}`);
     } catch (error) {
-      toast.error(error instanceof HttpError ? error.message : `Campaign could not be ${isEditMode ? 'updated' : 'created'}.`);
-      setSubmitError(error instanceof HttpError ? error.message : `Campaign could not be ${isEditMode ? 'updated' : 'created'}.`);
+      toast.error(error instanceof HttpError ? error.message : t('createCampaignPage.saveFailed', { action: isEditMode ? 'updated' : 'created' }));
+      setSubmitError(error instanceof HttpError ? error.message : t('createCampaignPage.saveFailed', { action: isEditMode ? 'updated' : 'created' }));
       setShowConfirmDialog(false);
     }
   };
@@ -287,13 +289,13 @@ export function CreateCampaign() {
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Campaigns
+          {t('createCampaignPage.backToCampaigns')}
         </Button>
         <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
-          {isEditMode ? 'Edit Campaign' : 'Create Campaign'}
+          {isEditMode ? t('createCampaignPage.editCampaign') : t('createCampaignPage.createCampaign')}
         </h1>
         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-          Step {currentStep} of {totalSteps}
+          {t('createCampaignPage.stepOf', { current: currentStep, total: totalSteps })}
         </p>
       </div>
 
@@ -302,10 +304,10 @@ export function CreateCampaign() {
         <Progress value={progressPercentage} className="h-2" />
         <div className="grid grid-cols-4 gap-4 mt-4">
           {[
-            { step: 1, label: "Campaign Details" },
-            { step: 2, label: "Beneficiary Upload" },
-            { step: 3, label: "Disbursement Config" },
-            { step: 4, label: "Review & Confirm" }
+            { step: 1, label: t('createCampaignPage.campaignDetails') },
+            { step: 2, label: t('createCampaignPage.beneficiaryUpload') },
+            { step: 3, label: t('createCampaignPage.disbursementConfig') },
+            { step: 4, label: t('createCampaignPage.reviewConfirm') }
           ].map((item) => (
             <div
               key={item.step}
@@ -342,32 +344,32 @@ export function CreateCampaign() {
       {currentStep === 1 && (
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-20)" }}>Campaign Details</CardTitle>
+            <CardTitle style={{ fontSize: "var(--text-20)" }}>{t('createCampaignPage.campaignDetails')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {catalogs.error || submitError ? (
               <Alert variant="destructive">
                 <AlertDescription>
-                  {submitError ?? (catalogs.error instanceof Error ? catalogs.error.message : campaignQuery.error instanceof Error ? campaignQuery.error.message : 'Campaign catalogs could not be loaded.')}
+                  {submitError ?? (catalogs.error instanceof Error ? catalogs.error.message : campaignQuery.error instanceof Error ? campaignQuery.error.message : t('createCampaignPage.catalogsLoadError'))}
                 </AlertDescription>
               </Alert>
             ) : null}
             <div className="space-y-2">
-              <Label htmlFor="name">Campaign Name *</Label>
+              <Label htmlFor="name">{t('createCampaignPage.campaignName')}</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Flood Relief 2024"
+                placeholder={t('createCampaignPage.campaignNamePlaceholder')}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="program">Program Name *</Label>
+                <Label htmlFor="program">{t('createCampaignPage.programName')}</Label>
                 <Select value={formData.program} onValueChange={(value) => setFormData({ ...formData, program: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select program" />
+                    <SelectValue placeholder={t('createCampaignPage.selectProgram')} />
                   </SelectTrigger>
                   <SelectContent>
                     {(catalogs.programs.data ?? []).map((option) => (
@@ -378,10 +380,10 @@ export function CreateCampaign() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="region">Region *</Label>
+                <Label htmlFor="region">{t('createCampaignPage.region')}</Label>
                 <Select value={formData.region} onValueChange={(value) => setFormData({ ...formData, region: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select region" />
+                    <SelectValue placeholder={t('createCampaignPage.selectRegion')} />
                   </SelectTrigger>
                   <SelectContent>
                     {(catalogs.regions.data ?? []).map((option) => (
@@ -394,7 +396,7 @@ export function CreateCampaign() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date *</Label>
+                <Label htmlFor="startDate">{t('createCampaignPage.startDate')}</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -404,7 +406,7 @@ export function CreateCampaign() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date *</Label>
+                <Label htmlFor="endDate">{t('createCampaignPage.endDate')}</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -415,30 +417,16 @@ export function CreateCampaign() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
+              <Label htmlFor="description">{t('createCampaignPage.descriptionOptional')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Provide additional campaign details..."
+                placeholder={t('createCampaignPage.descriptionPlaceholder')}
                 rows={4}
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 border rounded-[--radius]" style={{ borderColor: "var(--border)" }}>
-              <div>
-                <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                  Enable Savings Campaign
-                </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                  Allow beneficiaries to participate in savings initiatives
-                </p>
-              </div>
-              <Switch
-                checked={formData.enableSavings}
-                onCheckedChange={(checked) => setFormData({ ...formData, enableSavings: checked })}
-              />
-            </div>
           </CardContent>
         </Card>
       )}
@@ -447,7 +435,7 @@ export function CreateCampaign() {
       {currentStep === 2 && (
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-20)" }}>Beneficiary Upload</CardTitle>
+            <CardTitle style={{ fontSize: "var(--text-20)" }}>{t('createCampaignPage.beneficiaryUpload')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Upload Area */}
@@ -458,10 +446,10 @@ export function CreateCampaign() {
             >
               <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--muted-foreground)" }} />
               <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)", marginBottom: "8px" }}>
-                {uploadedFile ? uploadedFile.name : "Drop your file here or click to upload"}
+                {uploadedFile ? uploadedFile.name : t('createCampaignPage.dropFile')}
               </p>
               <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                Supported formats: CSV, Excel (XLSX)
+                {t('createCampaignPage.supportedFormats')}
               </p>
               <input
                 id="file-upload"
@@ -476,7 +464,7 @@ export function CreateCampaign() {
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription style={{ fontSize: "var(--text-13)" }}>
-                  Existing campaign beneficiaries are loaded from the campaign beneficiary API, including their current disbursement amounts.
+                  {t('createCampaignPage.existingBeneficiariesLoaded')}
                   </AlertDescription>
                 </Alert>
               ) : null}
@@ -487,7 +475,7 @@ export function CreateCampaign() {
                 <div className="grid grid-cols-3 gap-4">
                   <Card>
                     <CardContent className="p-4">
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>Total Records</p>
+                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>{t('createCampaignPage.totalRecords')}</p>
                       <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", marginTop: "4px" }}>
                         {getValidationSummary().total}
                       </p>
@@ -495,7 +483,7 @@ export function CreateCampaign() {
                   </Card>
                   <Card>
                     <CardContent className="p-4">
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>Valid Records</p>
+                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>{t('createCampaignPage.validRecords')}</p>
                       <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", marginTop: "4px", color: "var(--success)" }}>
                         {getValidationSummary().valid}
                       </p>
@@ -503,7 +491,7 @@ export function CreateCampaign() {
                   </Card>
                   <Card>
                     <CardContent className="p-4">
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>Errors Detected</p>
+                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>{t('createCampaignPage.errorsDetected')}</p>
                       <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", marginTop: "4px", color: "var(--error)" }}>
                         {getValidationSummary().errors}
                       </p>
@@ -517,10 +505,10 @@ export function CreateCampaign() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription style={{ fontSize: "var(--text-13)" }}>
                       <p style={{ fontWeight: "var(--font-weight-medium)" }}>
-                        {getValidationSummary().errors} errors detected
+                        {t('createCampaignPage.errorsDetectedCount', { count: getValidationSummary().errors })}
                       </p>
                       <p style={{ color: "var(--muted-foreground)", marginTop: "4px" }}>
-                        Please review and fix duplicate or invalid entries before proceeding
+                        {t('createCampaignPage.reviewErrors')}
                       </p>
                     </AlertDescription>
                   </Alert>
@@ -529,17 +517,17 @@ export function CreateCampaign() {
                 {/* Preview Table */}
                 <div>
                   <h3 style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-medium)", marginBottom: "12px" }}>
-                    Preview
+                    {t('createCampaignPage.preview')}
                   </h3>
                   <div className="border rounded-[--radius]" style={{ borderColor: "var(--border)" }}>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Name</TableHead>
+                          <TableHead>{t('createCampaignPage.name')}</TableHead>
                           <TableHead>MSISDN</TableHead>
-                          <TableHead>Location</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Status</TableHead>
+                          <TableHead>{t('createCampaignPage.location')}</TableHead>
+                          <TableHead>{t('createCampaignPage.amount')}</TableHead>
+                          <TableHead>{t('createCampaignPage.status')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -555,7 +543,7 @@ export function CreateCampaign() {
                               {beneficiary.location}
                             </TableCell>
                             <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                              {typeof beneficiary.amount === 'number' ? `$${beneficiary.amount.toLocaleString()}` : '—'}
+                              {typeof beneficiary.amount === 'number' ? formatMetical(beneficiary.amount) : '—'}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
@@ -586,14 +574,14 @@ export function CreateCampaign() {
       {currentStep === 3 && (
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-20)" }}>Disbursement Configuration</CardTitle>
+            <CardTitle style={{ fontSize: "var(--text-20)" }}>{t('createCampaignPage.disbursementConfiguration')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label>Payment Channel *</Label>
+              <Label>{t('createCampaignPage.paymentChannel')}</Label>
               <Select value={formData.paymentChannel} onValueChange={(value) => setFormData({ ...formData, paymentChannel: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select payment channel" />
+                    <SelectValue placeholder={t('createCampaignPage.selectPaymentChannel')} />
                   </SelectTrigger>
                   <SelectContent>
                     {(catalogs.paymentChannels.data ?? []).map((option) => (
@@ -604,10 +592,10 @@ export function CreateCampaign() {
             </div>
 
             <div className="space-y-2">
-              <Label>Disbursement Type *</Label>
+              <Label>{t('createCampaignPage.disbursementType')}</Label>
               <Select value={formData.disbursementType} onValueChange={(value) => setFormData({ ...formData, disbursementType: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select disbursement type" />
+                    <SelectValue placeholder={t('createCampaignPage.selectDisbursementType')} />
                   </SelectTrigger>
                   <SelectContent>
                     {(catalogs.disbursementTypes.data ?? []).map((option) => (
@@ -618,7 +606,7 @@ export function CreateCampaign() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="executionDate">Execution Date *</Label>
+              <Label htmlFor="executionDate">{t('createCampaignPage.executionDate')}</Label>
               <Input
                 id="executionDate"
                 type="date"
@@ -630,10 +618,10 @@ export function CreateCampaign() {
             <div className="flex items-center justify-between p-4 border rounded-[--radius]" style={{ borderColor: "var(--border)" }}>
               <div>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                  Enable Staged Disbursement
+                  {t('createCampaignPage.enableStagedDisbursement')}
                 </p>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                  Disburse payments in multiple phases over time
+                  {t('createCampaignPage.stagedDisbursementHelp')}
                 </p>
               </div>
               <Switch
@@ -649,13 +637,13 @@ export function CreateCampaign() {
       {currentStep === 4 && (
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-20)" }}>Review & Confirm</CardTitle>
+            <CardTitle style={{ fontSize: "var(--text-20)" }}>{t('createCampaignPage.reviewConfirm')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Campaign Name
+                  {t('createCampaignPage.campaignName')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
                   {formData.name || "—"}
@@ -664,7 +652,7 @@ export function CreateCampaign() {
 
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Program
+                  {t('campaignsPage.program')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
                   {getCatalogLabel(catalogs.programs.data ?? [], formData.program) || "—"}
@@ -673,7 +661,7 @@ export function CreateCampaign() {
 
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Region
+                  {t('createCampaignPage.region')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
                   {getCatalogLabel(catalogs.regions.data ?? [], formData.region) || "—"}
@@ -682,7 +670,7 @@ export function CreateCampaign() {
 
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Payment Channel
+                  {t('createCampaignPage.paymentChannel')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
                   {getCatalogLabel(catalogs.paymentChannels.data ?? [], formData.paymentChannel) || "—"}
@@ -691,7 +679,7 @@ export function CreateCampaign() {
 
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Total Beneficiaries
+                  {t('createCampaignPage.totalBeneficiaries')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
                   {getValidationSummary().valid.toLocaleString()}
@@ -700,16 +688,16 @@ export function CreateCampaign() {
 
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Total Disbursement Amount
+                  {t('createCampaignPage.totalDisbursementAmount')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                  {hasKnownDisbursementAmounts ? `$${getTotalDisbursement().toLocaleString()}` : '—'}
+                  {hasKnownDisbursementAmounts ? formatMetical(getTotalDisbursement()) : '—'}
                 </p>
               </div>
 
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Execution Date
+                  {t('createCampaignPage.executionDate')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
                   {formData.executionDate || "—"}
@@ -718,10 +706,10 @@ export function CreateCampaign() {
 
               <div>
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
-                  Savings Enabled
+                  {t('createCampaignPage.savingsEnabled')}
                 </p>
                 <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                  {formData.enableSavings ? "Yes" : "No"}
+                  {formData.enableSavings ? t('createCampaignPage.yes') : t('createCampaignPage.no')}
                 </p>
               </div>
             </div>
@@ -737,18 +725,18 @@ export function CreateCampaign() {
           disabled={currentStep === 1}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t('createCampaignPage.back')}
         </Button>
 
         <Button onClick={handleNext}>
           {currentStep === totalSteps ? (
             <>
               <Check className="w-4 h-4 mr-2" />
-              {isEditMode ? 'Update Campaign' : 'Create Campaign'}
+                  {isEditMode ? t('createCampaignPage.updateCampaign') : t('createCampaignPage.createCampaign')}
             </>
           ) : (
             <>
-              Next
+              {t('createCampaignPage.next')}
               <ArrowRight className="w-4 h-4 ml-2" />
             </>
           )}
@@ -760,12 +748,12 @@ export function CreateCampaign() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle style={{ fontSize: "var(--text-20)" }}>
-              {isEditMode ? 'Confirm Campaign Update' : 'Confirm Campaign Creation'}
+              {isEditMode ? t('createCampaignPage.confirmCampaignUpdate') : t('createCampaignPage.confirmCampaignCreation')}
             </DialogTitle>
             <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
               {isEditMode
-                ? 'Are you sure you want to update this campaign?'
-                : 'Are you sure you want to create this campaign? This action will initialize the disbursement process.'}
+                ? t('createCampaignPage.confirmUpdateQuestion')
+                : t('createCampaignPage.confirmCreateQuestion')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -774,22 +762,22 @@ export function CreateCampaign() {
               <AlertDescription style={{ fontSize: "var(--text-13)" }}>
                 <p style={{ fontWeight: "var(--font-weight-medium)" }}>
                   {hasKnownDisbursementAmounts
-                    ? `${getValidationSummary().valid} beneficiaries • $${getTotalDisbursement().toLocaleString()} total`
+                    ? `${getValidationSummary().valid} beneficiaries • ${formatMetical(getTotalDisbursement())} total`
                     : `${getValidationSummary().valid} beneficiaries`}
                 </p>
                 <p style={{ color: "var(--muted-foreground)", marginTop: "4px" }}>
-                  {isEditMode ? 'Campaign settings will be updated.' : `Campaign will be activated on ${formData.executionDate}`}
+                  {isEditMode ? t('createCampaignPage.settingsUpdated') : t('createCampaignPage.activatedOn', { date: formData.executionDate })}
                 </p>
               </AlertDescription>
             </Alert>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
-              Cancel
+              {t('createCampaignPage.cancel')}
             </Button>
              <Button disabled={createCampaignMutation.isPending || updateCampaignMutation.isPending} onClick={() => void handleCreateCampaign()}>
                {createCampaignMutation.isPending || updateCampaignMutation.isPending ? <LoaderCircle className="w-4 h-4 mr-2 animate-spin" /> : null}
-               {isEditMode ? 'Confirm & Update' : 'Confirm & Create'}
+               {isEditMode ? t('createCampaignPage.confirmUpdate') : t('createCampaignPage.confirmCreate')}
              </Button>
           </DialogFooter>
         </DialogContent>

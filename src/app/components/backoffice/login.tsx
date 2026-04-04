@@ -11,6 +11,7 @@ import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Building2, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 type AccountStatus = 'active' | 'locked' | 'disabled' | null;
 
@@ -24,6 +25,7 @@ export function BackofficeLogin() {
   const [accountStatus, setAccountStatus] = useState<AccountStatus>(null);
   const [detectedTenant, setDetectedTenant] = useState<string | null>(null);
   const isLoading = loginMutation.isPending;
+  const { t } = useTranslation();
 
   const handleEmailBlur = () => {
     // Simulate tenant detection after email is entered
@@ -48,29 +50,29 @@ export function BackofficeLogin() {
       const normalizedUser = normalizeAuthUser(response.user);
       const normalizedRole = normalizedUser?.role;
 
-      if (!isBackofficeRole(normalizedRole)) {
-        throw new Error(normalizedRole && isFieldRole(normalizedRole)
-          ? 'Use o acesso de Inquiridor para esta conta.'
-          : 'Esta conta nao tem acesso ao backoffice.');
+        if (!isBackofficeRole(normalizedRole)) {
+          throw new Error(normalizedRole && isFieldRole(normalizedRole)
+          ? t('auth.inquirerAccess')
+          : t('auth.noBackofficeAccess'));
       }
 
       signIn(response.token, normalizedUser);
-      toast.success('Signed in successfully.');
+      toast.success(t('auth.signedInSuccess'));
       navigate(getDefaultRouteForRole(normalizedRole));
     } catch (requestError) {
       if (email.includes('locked')) {
         setAccountStatus('locked');
-        setError('Account locked due to multiple failed login attempts. Contact your administrator.');
+        setError(t('auth.accountLocked'));
       } else if (email.includes('disabled')) {
         setAccountStatus('disabled');
-        setError('This account has been disabled. Contact your administrator.');
+        setError(t('auth.accountDisabled'));
       } else {
         setError(
           requestError instanceof HttpError
             ? requestError.message
             : requestError instanceof Error
               ? requestError.message
-              : 'Invalid email or password. Please try again.'
+              : t('auth.invalidEmailPassword')
         );
       }
       toast.error(
@@ -78,7 +80,7 @@ export function BackofficeLogin() {
           ? requestError.message
           : requestError instanceof Error
             ? requestError.message
-            : 'Invalid email or password. Please try again.'
+            : t('auth.invalidEmailPassword')
       );
     }
   };
@@ -94,18 +96,18 @@ export function BackofficeLogin() {
           <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="mb-2">Backoffice Platform</h2>
+          <h2 className="mb-2">{t('auth.backofficeTitle')}</h2>
           <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-            Sign in to access the admin portal
+            {t('auth.backofficeSubtitle')}
           </p>
         </div>
 
         <Card>
           <form onSubmit={handleLogin}>
             <CardHeader>
-              <CardTitle>Sign In</CardTitle>
+              <CardTitle>{t('auth.signIn')}</CardTitle>
               <CardDescription>
-                Enter your credentials to continue
+                {t('auth.enterCredentials')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -117,7 +119,7 @@ export function BackofficeLogin() {
               )}
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -130,20 +132,20 @@ export function BackofficeLogin() {
                 />
                 {detectedTenant && (
                   <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                    Tenant: {detectedTenant}
+                    {t('auth.tenant')}: {detectedTenant}
                   </p>
                 )}
               </div>
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.password')}</Label>
                   <Link 
                     to="/backoffice/forgot-password" 
                     style={{ fontSize: 'var(--text-12)', color: 'var(--primary)' }}
                     className="hover:underline"
                   >
-                    Forgot password?
+                    {t('auth.forgotPassword')}
                   </Link>
                 </div>
                 <Input
@@ -166,14 +168,14 @@ export function BackofficeLogin() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    {t('auth.signingIn')}
                   </>
                 ) : (
-                  'Sign In'
+                  t('auth.signIn')
                 )}
               </Button>
               <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', textAlign: 'center' }}>
-                Access is monitored for compliance.
+                {t('auth.accessMonitored')}
               </p>
               <Button
                 type="button"
@@ -182,7 +184,7 @@ export function BackofficeLogin() {
                 onClick={() => navigate('/')}
                 disabled={isLoading}
               >
-                Back to Gateway
+                {t('backToGateway')}
               </Button>
             </CardFooter>
           </form>

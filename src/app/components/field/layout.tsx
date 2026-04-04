@@ -1,21 +1,25 @@
 import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { LayoutDashboard, Search, WifiOff, ChevronLeft, Menu } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
-import { getDefaultRouteForRole, getRoleLabel, isFieldRole } from "@/lib/auth/roles";
+import { getDefaultRouteForRole, isFieldRole, normalizeRole } from "@/lib/auth/roles";
 import { Button } from "../ui/button";
 import { Suspense, useState } from "react";
+import { LanguageSwitcher } from "../language-switcher";
 import { Skeleton } from "../ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 export function FieldLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isBootstrapping, signOut, user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useTranslation();
+  const normalizedRole = normalizeRole(user?.role);
 
   const navItems = [
-    { path: '/field/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/field/search', label: 'Search', icon: Search },
-    { path: '/field/status', label: 'Status', icon: WifiOff },
+    { path: '/field/dashboard', label: t('dashboard'), icon: LayoutDashboard },
+    { path: '/field/search', label: t('search'), icon: Search },
+    { path: '/field/status', label: t('status'), icon: WifiOff },
   ];
 
   if (isBootstrapping) {
@@ -36,17 +40,20 @@ export function FieldLayout() {
       <header className="bg-card border-b border-border p-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div>
-            <h2 style={{ fontSize: 'var(--text-18)' }}>SOMAS Field</h2>
+            <h2 style={{ fontSize: 'var(--text-18)' }}>{t('fieldHeader')}</h2>
             <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-              {getRoleLabel(user?.role)}
+              {t(`roles.${normalizedRole ?? 'fallback'}`)}
             </p>
           </div>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 hover:bg-accent rounded-[--radius]"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 hover:bg-accent rounded-[--radius]"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -83,7 +90,7 @@ export function FieldLayout() {
               }}
             >
               <ChevronLeft className="w-5 h-5 mr-2" />
-              Back to Gateway
+              {t('backToGateway')}
             </Button>
           </div>
         )}

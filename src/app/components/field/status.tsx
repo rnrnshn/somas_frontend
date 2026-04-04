@@ -6,8 +6,10 @@ import { Wifi, WifiOff, Database, Upload, Download } from "lucide-react";
 import { useOfflineConfirmations } from "@/features/field/hooks/use-offline-confirmations";
 import { clearOfflineConfirmations, removeOfflineConfirmation } from "@/features/field/lib/offline-queue";
 import { useSyncFieldConfirmationsMutation } from "@/features/field/hooks/use-field-queries";
+import { useTranslation } from "react-i18next";
 
 export function FieldStatus() {
+  const { t } = useTranslation();
   const items = useOfflineConfirmations();
   const syncMutation = useSyncFieldConfirmationsMutation();
   const [isOnline, setIsOnline] = useState(() => navigator.onLine);
@@ -25,9 +27,9 @@ export function FieldStatus() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 style={{ fontSize: 'var(--text-24)' }}>System Status</h1>
+        <h1 style={{ fontSize: 'var(--text-24)' }}>{t('fieldStatusPage.title')}</h1>
         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-1">
-          Connection and sync information
+          {t('fieldStatusPage.subtitle')}
         </p>
       </div>
 
@@ -35,7 +37,7 @@ export function FieldStatus() {
       <Card className="mb-6">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle style={{ fontSize: 'var(--text-18)' }}>Connection</CardTitle>
+            <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldStatusPage.connection')}</CardTitle>
             <Badge
               variant={isOnline ? 'default' : 'outline'}
               style={{
@@ -47,12 +49,12 @@ export function FieldStatus() {
               {isOnline ? (
                 <>
                   <Wifi className="w-3 h-3 mr-1" />
-                  Online
+                  {t('fieldStatusPage.online')}
                 </>
               ) : (
                 <>
                   <WifiOff className="w-3 h-3 mr-1" />
-                  Offline
+                  {t('fieldStatusPage.offline')}
                 </>
               )}
             </Badge>
@@ -61,8 +63,8 @@ export function FieldStatus() {
         <CardContent>
           <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
             {isOnline
-              ? 'Connected to SOMAS server. All data is being synchronized.'
-              : 'No connection available. Working in offline mode.'}
+               ? t('fieldStatusPage.onlineMessage')
+               : t('fieldStatusPage.offlineMessage')}
           </p>
         </CardContent>
       </Card>
@@ -70,7 +72,7 @@ export function FieldStatus() {
       {/* Local Data */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>Local Data</CardTitle>
+          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldStatusPage.localData')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between p-3 border border-border rounded-[--radius]">
@@ -78,10 +80,10 @@ export function FieldStatus() {
               <Database className="w-5 h-5 text-primary" />
               <div>
                 <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
-                  Cached Records
+                  {t('fieldStatusPage.cachedRecords')}
                 </p>
                 <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                  Available offline
+                  {t('fieldStatusPage.availableOffline')}
                 </p>
               </div>
             </div>
@@ -95,10 +97,10 @@ export function FieldStatus() {
               <Upload className="w-5 h-5 text-accent" />
               <div>
                 <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
-                  Pending Upload
+                  {t('fieldStatusPage.pendingUpload')}
                 </p>
                 <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                  Waiting to sync
+                  {t('fieldStatusPage.waitingToSync')}
                 </p>
               </div>
             </div>
@@ -112,12 +114,12 @@ export function FieldStatus() {
       {/* Sync Actions */}
       <Card>
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>Sync Actions</CardTitle>
+          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldStatusPage.syncActions')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Button className="w-full justify-start" size="lg" disabled={!isOnline}>
             <Download className="w-5 h-5 mr-2" />
-            Download Latest Data
+            {t('fieldStatusPage.downloadLatest')}
           </Button>
           <Button
             className="w-full justify-start"
@@ -140,10 +142,10 @@ export function FieldStatus() {
             }}
           >
             <Upload className="w-5 h-5 mr-2" />
-            Upload Pending Changes
+            {t('fieldStatusPage.uploadPending')}
           </Button>
           <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }} className="text-center">
-            {items.length > 0 ? `${items.length} confirmation(s) queued on this device` : 'No queued confirmations'}
+            {items.length > 0 ? t('fieldStatusPage.queuedCount', { count: items.length }) : t('fieldStatusPage.noQueued')}
           </p>
           {items.length > 0 ? (
             <div className="space-y-2 pt-2">
@@ -153,7 +155,7 @@ export function FieldStatus() {
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>{item.beneficiaryName}</p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>{item.status} • {new Date(item.createdAt).toLocaleString()}</p>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => removeOfflineConfirmation(item.localId)}>Remove</Button>
+                  <Button size="sm" variant="ghost" onClick={() => removeOfflineConfirmation(item.localId)}>{t('fieldStatusPage.remove')}</Button>
                 </div>
               ))}
             </div>

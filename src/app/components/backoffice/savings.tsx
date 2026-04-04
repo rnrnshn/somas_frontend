@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
+import { formatCompactMetical } from "@/lib/format/currency";
 import { useCampaignDetailsQueries } from "@/features/campaigns/hooks/use-campaign-queries";
 import { useSavingsProgramsQuery } from "@/features/savings-programs/hooks/use-savings-program-queries";
 import { adaptSavingsProgramListItem } from "@/features/savings-programs/adapters/savings-programs";
@@ -86,14 +87,7 @@ export function BackofficeSavings() {
     return <Badge {...(variants[status] || {})}>{status}</Badge>;
   };
 
-  const formatCurrency = (amount: number) => {
-    if (amount >= 1000000) {
-      return `$${(amount / 1000000).toFixed(2)}M`;
-    } else if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(1)}K`;
-    }
-    return `$${amount.toLocaleString()}`;
-  };
+  const formatCurrency = (amount: number) => formatCompactMetical(amount);
 
   const getGoalProgress = (saved: number, goal: number) => {
     return Math.min((saved / goal) * 100, 100);

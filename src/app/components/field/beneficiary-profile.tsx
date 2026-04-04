@@ -1,11 +1,14 @@
 import { useNavigate, useParams } from "@/lib/router";
 import { useFieldDisbursementQuery } from "@/features/field/hooks/use-field-queries";
+import { formatMetical } from "@/lib/format/currency";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { ArrowLeft, Phone, MapPin, Calendar, DollarSign } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function BeneficiaryProfile() {
+  const { t } = useTranslation();
   const { campaignId, campaignBeneficiaryId } = useParams<{ campaignId?: string; campaignBeneficiaryId?: string }>();
   const navigate = useNavigate();
   const numericCampaignId = Number(campaignId);
@@ -13,20 +16,20 @@ export function BeneficiaryProfile() {
   const query = useFieldDisbursementQuery(numericCampaignId, numericCampaignBeneficiaryId);
 
   if (query.isPending) {
-    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>Loading beneficiary record...</p></CardContent></Card></div>;
+    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>{t('fieldBeneficiaryPage.loadingRecord')}</p></CardContent></Card></div>;
   }
 
   if (query.error || !query.data) {
-    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{ fontSize: 'var(--text-14)', color: 'var(--error)' }}>{query.error instanceof Error ? query.error.message : 'Beneficiary record could not be loaded.'}</p></CardContent></Card></div>;
+    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{ fontSize: 'var(--text-14)', color: 'var(--error)' }}>{query.error instanceof Error ? query.error.message : t('fieldBeneficiaryPage.loadError')}</p></CardContent></Card></div>;
   }
 
   const beneficiary = {
     id: `CB-${query.data.id}`,
-    name: query.data.beneficiary?.name ?? 'Beneficiary',
+    name: query.data.beneficiary?.name ?? t('fieldBeneficiaryPage.beneficiary'),
     phone: query.data.beneficiary?.msisdn ?? '—',
-    address: 'Address details are not available in the field disbursement endpoint.',
-    status: formatDisbursementStatus(query.data.disbursementStatus),
-    campaign: query.data.campaign?.name ?? 'Campaign unavailable',
+    address: t('fieldBeneficiaryPage.addressUnavailable'),
+    status: formatDisbursementStatus(query.data.disbursementStatus, t),
+    campaign: query.data.campaign?.name ?? t('fieldBeneficiaryPage.campaignUnavailable'),
     enrollmentDate: null,
     lastPayment: null,
     totalReceived: formatMzn(query.data.disbursementAmount),
@@ -42,7 +45,7 @@ export function BeneficiaryProfile() {
           onClick={() => navigate('/field/search')}
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
+          {t('fieldBeneficiaryPage.back')}
         </Button>
         <div className="flex items-start justify-between">
           <div>
@@ -60,14 +63,14 @@ export function BeneficiaryProfile() {
       {/* Profile Info */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>Personal Information</CardTitle>
+          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldBeneficiaryPage.personalInformation')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-start gap-3">
             <Phone className="w-5 h-5 text-muted-foreground mt-0.5" />
             <div className="flex-1">
               <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                Phone Number
+                {t('fieldBeneficiaryPage.phoneNumber')}
               </p>
               <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
                 {beneficiary.phone}
@@ -79,7 +82,7 @@ export function BeneficiaryProfile() {
             <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
             <div className="flex-1">
               <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                Address
+                {t('fieldBeneficiaryPage.address')}
               </p>
               <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
                 {beneficiary.address}
@@ -92,12 +95,12 @@ export function BeneficiaryProfile() {
       {/* Program Info */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>Program Details</CardTitle>
+          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldBeneficiaryPage.programDetails')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-              Campaign
+              {t('fieldBeneficiaryPage.campaign')}
             </p>
             <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
               {beneficiary.campaign}
@@ -107,7 +110,7 @@ export function BeneficiaryProfile() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                Enrolled
+                {t('fieldBeneficiaryPage.enrolled')}
               </p>
               <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
                 {beneficiary.enrollmentDate ? new Date(beneficiary.enrollmentDate).toLocaleDateString() : '—'}
@@ -115,7 +118,7 @@ export function BeneficiaryProfile() {
             </div>
             <div>
               <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                Last Payment
+                {t('fieldBeneficiaryPage.lastPayment')}
               </p>
               <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
                 {beneficiary.lastPayment ? new Date(beneficiary.lastPayment).toLocaleDateString() : '—'}
@@ -125,7 +128,7 @@ export function BeneficiaryProfile() {
 
           <div className="pt-3 border-t border-border">
             <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-              Total Received
+              {t('fieldBeneficiaryPage.totalReceived')}
             </p>
             <p style={{ fontSize: 'var(--text-24)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--accent)' }}>
               {beneficiary.totalReceived}
@@ -136,7 +139,7 @@ export function BeneficiaryProfile() {
 
       <Card>
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>Verification Action</CardTitle>
+          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldBeneficiaryPage.verificationAction')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between rounded-[--radius] border border-border p-3">
@@ -146,10 +149,10 @@ export function BeneficiaryProfile() {
               </div>
               <div>
                 <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
-                  Disbursement amount
+                  {t('fieldBeneficiaryPage.disbursementAmount')}
                 </p>
                 <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                  Current status: {beneficiary.status}
+                  {t('fieldBeneficiaryPage.currentStatus', { status: beneficiary.status })}
                 </p>
               </div>
             </div>
@@ -159,7 +162,7 @@ export function BeneficiaryProfile() {
           </div>
 
           <Button className="w-full" onClick={() => navigate(`/field/beneficiary/${numericCampaignId}/${numericCampaignBeneficiaryId}/verify`)}>
-            Start Verification
+            {t('fieldBeneficiaryPage.startVerification')}
           </Button>
         </CardContent>
       </Card>
@@ -167,21 +170,21 @@ export function BeneficiaryProfile() {
   );
 }
 
-function formatDisbursementStatus(status: string) {
+function formatDisbursementStatus(status: string, t: (key: string) => string) {
   switch (status) {
     case 'confirmed':
-      return 'Confirmed';
+      return t('fieldSearchPage.confirmed');
     case 'not_confirmed':
-      return 'Not confirmed';
+      return t('fieldSearchPage.notConfirmed');
     case 'not_found':
-      return 'Not found';
+      return t('fieldSearchPage.notFound');
     case 'pending':
-      return 'Pending';
+      return t('fieldSearchPage.pending');
     default:
       return status;
   }
 }
 
 function formatMzn(amount: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'MZN', maximumFractionDigits: 0 }).format(amount);
+  return formatMetical(amount);
 }

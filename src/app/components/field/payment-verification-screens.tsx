@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { useTranslation } from "react-i18next";
 
 interface PaymentScreenProps {
   onBack: () => void;
@@ -31,6 +32,7 @@ interface PaymentScreenProps {
 
 // Beneficiary Payment Screen
 export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }: PaymentScreenProps) {
+  const { t, i18n } = useTranslation();
   // Mock payment data
   const paymentData = {
     transactionRef: "TXN-87654321",
@@ -57,7 +59,7 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
           </Button>
           <div>
             <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Verificação de Pagamento
+              {t('paymentVerificationPage.paymentVerification')}
             </p>
             <p style={{ fontSize: "var(--text-12)", opacity: 0.8 }}>
               {selectedBeneficiary.name}
@@ -71,7 +73,7 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
         <Card>
           <CardHeader>
             <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Último Pagamento
+              {t('paymentVerificationPage.latestPayment')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -87,14 +89,14 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
                 {paymentData.currency} {paymentData.amount.toLocaleString('pt-MZ')}
               </p>
               <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
-                Valor do Pagamento
+                 {t('paymentVerificationPage.paymentAmount')}
               </p>
             </div>
 
             {/* Transaction Reference */}
             <div>
               <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Referência da Transação
+                {t('paymentVerificationPage.transactionReference')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <CreditCard className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
@@ -107,7 +109,7 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
             {/* Campaign */}
             <div>
               <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Programa
+                {t('campaignsPage.program')}
               </p>
               <p style={{ fontSize: "var(--text-14)", marginTop: "8px" }}>
                 {paymentData.campaign}
@@ -117,12 +119,12 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
             {/* Payment Date */}
             <div>
               <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Data do Pagamento
+                {t('paymentVerificationPage.paymentDate')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Calendar className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                 <p style={{ fontSize: "var(--text-14)" }}>
-                  {new Date(paymentData.paymentDate).toLocaleDateString('pt-MZ', { 
+                  {new Date(paymentData.paymentDate).toLocaleDateString(i18n.language === 'pt' ? 'pt-MZ' : 'en-US', { 
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric'
@@ -134,7 +136,7 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
             {/* Mobile Money Provider */}
             <div>
               <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Operador de Mobile Money
+                {t('paymentVerificationPage.mobileMoneyProvider')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Phone className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
@@ -147,7 +149,7 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
             {/* Phone Number */}
             <div>
               <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Número de Telefone
+                {t('fieldBeneficiaryPage.phoneNumber')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Phone className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
@@ -162,7 +164,7 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
         {/* Verify Button */}
         <Button className="w-full" onClick={onNext}>
           <CheckCircle className="w-4 h-4 mr-2" />
-          Verificar Pagamento
+          {t('paymentVerificationPage.verifyPayment')}
         </Button>
       </div>
     </div>
@@ -180,6 +182,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
   paymentNotes: string;
   setPaymentNotes: (v: string) => void;
 }) {
+  const { t } = useTranslation();
   const [paymentReceived, setPaymentReceived] = React.useState("yes");
   const [phoneNumberConfirmed, setPhoneNumberConfirmed] = React.useState("yes");
   const [issueReported, setIssueReported] = React.useState("");
@@ -200,7 +203,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
           </Button>
           <div>
             <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Formulário de Verificação
+              {t('paymentVerificationPage.verificationForm')}
             </p>
             <p style={{ fontSize: "var(--text-12)", opacity: 0.8 }}>
               {selectedBeneficiary.name}
@@ -214,7 +217,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         <Card>
           <CardHeader>
             <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Pagamento Recebido?
+               {t('paymentVerificationPage.paymentReceived')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -226,13 +229,13 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
                 <SelectItem value="yes">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                    <span>Sim</span>
+                     <span>{t('createCampaignPage.yes')}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="no">
                   <div className="flex items-center gap-2">
                     <XCircle className="w-4 h-4" style={{ color: "var(--destructive)" }} />
-                    <span>Não</span>
+                     <span>{t('createCampaignPage.no')}</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -244,7 +247,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         <Card>
           <CardHeader>
             <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Número de Telefone Confirmado?
+               {t('paymentVerificationPage.phoneConfirmed')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -256,13 +259,13 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
                 <SelectItem value="yes">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                    <span>Sim</span>
+                     <span>{t('createCampaignPage.yes')}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="no">
                   <div className="flex items-center gap-2">
                     <XCircle className="w-4 h-4" style={{ color: "var(--destructive)" }} />
-                    <span>Não</span>
+                     <span>{t('createCampaignPage.no')}</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -274,21 +277,21 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         <Card>
           <CardHeader>
             <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Problema Relatado (Opcional)
+               {t('paymentVerificationPage.issueReported')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Select value={issueReported} onValueChange={setIssueReported}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecionar problema..." />
+                 <SelectValue placeholder={t('paymentVerificationPage.selectIssue')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhum</SelectItem>
-                <SelectItem value="wrong-amount">Valor Incorreto</SelectItem>
-                <SelectItem value="not-received">Não Recebeu</SelectItem>
-                <SelectItem value="wrong-number">Número Errado</SelectItem>
-                <SelectItem value="technical-issue">Problema Técnico</SelectItem>
-                <SelectItem value="other">Outro</SelectItem>
+                 <SelectItem value="">{t('paymentVerificationPage.none')}</SelectItem>
+                 <SelectItem value="wrong-amount">{t('paymentVerificationPage.wrongAmount')}</SelectItem>
+                 <SelectItem value="not-received">{t('paymentVerificationPage.didNotReceive')}</SelectItem>
+                 <SelectItem value="wrong-number">{t('paymentVerificationPage.wrongNumber')}</SelectItem>
+                 <SelectItem value="technical-issue">{t('paymentVerificationPage.technicalIssue')}</SelectItem>
+                 <SelectItem value="other">{t('paymentVerificationPage.other')}</SelectItem>
               </SelectContent>
             </Select>
           </CardContent>
@@ -298,12 +301,12 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         <Card>
           <CardHeader>
             <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Notas do Enumerador
+               {t('paymentVerificationPage.enumeratorNotes')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
-              placeholder="Adicionar observações sobre a verificação do pagamento..."
+              placeholder={t('paymentVerificationPage.enumeratorNotesPlaceholder')}
               value={paymentNotes}
               onChange={(e) => setPaymentNotes(e.target.value)}
               rows={4}
@@ -316,7 +319,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
           className="w-full"
           onClick={onNext}
         >
-          Capturar Evidência
+          {t('paymentVerificationPage.captureEvidence')}
         </Button>
       </div>
     </div>
@@ -325,6 +328,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
 
 // Payment Selfie Capture Screen
 export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentScreenProps) {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--background)" }}>
       {/* Header */}
@@ -340,7 +344,7 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
           </Button>
           <div>
             <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Capturar Evidência
+              {t('paymentVerificationPage.captureEvidence')}
             </p>
           </div>
         </div>
@@ -355,10 +359,10 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
           <div className="text-center">
             <Camera className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--muted-foreground)" }} />
             <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-              Visualização da câmera
+               {t('paymentVerificationPage.cameraPreview')}
             </p>
             <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
-              Posicione o beneficiário no centro
+               {t('paymentVerificationPage.centerBeneficiary')}
             </p>
           </div>
         </div>
@@ -372,7 +376,7 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                  Timestamp
+                   {t('paymentVerificationPage.timestamp')}
                 </p>
               </div>
               <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
@@ -383,7 +387,7 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                  Localização GPS
+                   {t('paymentVerificationPage.gpsLocation')}
                 </p>
               </div>
               <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
@@ -394,7 +398,7 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                 <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                  Enumerador
+                   {t('paymentVerificationPage.enumerator')}
                 </p>
               </div>
               <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
@@ -406,7 +410,7 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
 
         <Button className="w-full" onClick={onNext}>
           <Camera className="w-4 h-4 mr-2" />
-          Capturar Foto
+           {t('paymentVerificationPage.capturePhoto')}
         </Button>
       </div>
     </div>
@@ -419,6 +423,7 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
   setVerificationResult: (v: string) => void;
   onSubmit: () => void;
 }) {
+  const { t } = useTranslation();
   const [verificationResult, setVerificationResult] = React.useState("confirmed");
 
   return (
@@ -436,7 +441,7 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
           </Button>
           <div>
             <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Resultado da Verificação
+              {t('paymentVerificationPage.verificationResult')}
             </p>
           </div>
         </div>
@@ -447,13 +452,13 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
         <Card>
           <CardHeader>
             <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Resumo da Verificação de Pagamento
+              {t('paymentVerificationPage.paymentVerificationSummary')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Beneficiário
+                 {t('paymentVerificationPage.beneficiary')}
               </p>
               <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)", marginTop: "4px" }}>
                 {selectedBeneficiary.name}
@@ -466,31 +471,31 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Pagamento
+                  {t('paymentVerificationPage.payment')}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                  <p style={{ fontSize: "var(--text-13)" }}>Recebido</p>
+                  <p style={{ fontSize: "var(--text-13)" }}>{t('paymentVerificationPage.received')}</p>
                 </div>
               </div>
               <div>
                 <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Telefone
+                  {t('paymentVerificationPage.phone')}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                  <p style={{ fontSize: "var(--text-13)" }}>Confirmado</p>
+                  <p style={{ fontSize: "var(--text-13)" }}>{t('paymentVerificationPage.confirmed')}</p>
                 </div>
               </div>
             </div>
 
             <div>
               <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em)" }}>
-                Evidência Fotográfica
+                {t('paymentVerificationPage.photoEvidence')}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                <p style={{ fontSize: "var(--text-13)" }}>Capturada com GPS</p>
+                <p style={{ fontSize: "var(--text-13)" }}>{t('paymentVerificationPage.capturedWithGps')}</p>
               </div>
             </div>
           </CardContent>
@@ -500,7 +505,7 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
         <Card>
           <CardHeader>
             <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
-              Estado da Verificação
+              {t('paymentVerificationPage.verificationStatus')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -512,19 +517,19 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
                 <SelectItem value="confirmed">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                    <span>Confirmado</span>
+                    <span>{t('paymentVerificationPage.confirmed')}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="not-received">
                   <div className="flex items-center gap-2">
                     <XCircle className="w-4 h-4" style={{ color: "var(--destructive)" }} />
-                    <span>Não Recebido</span>
+                    <span>{t('paymentVerificationPage.notReceived')}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="issue-reported">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" style={{ color: "var(--warning)" }} />
-                    <span>Problema Relatado</span>
+                    <span>{t('paymentVerificationPage.issueReportedStatus')}</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -538,10 +543,10 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
             <Clock className="w-5 h-5 mt-0.5" style={{ color: "var(--warning)" }} />
             <div>
               <p style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                Estado: Pendente Sincronização
+                {t('paymentVerificationPage.pendingSyncStatus')}
               </p>
               <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
-                Esta verificação será sincronizada automaticamente quando houver conexão à internet.
+                {t('paymentVerificationPage.pendingSyncHelp')}
               </p>
             </div>
           </div>
@@ -553,7 +558,7 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
           // props.onSubmit();
         }}>
           <Upload className="w-4 h-4 mr-2" />
-          Submeter Verificação
+          {t('paymentVerificationPage.submitVerification')}
         </Button>
       </div>
     </div>

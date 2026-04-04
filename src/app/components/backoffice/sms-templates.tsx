@@ -9,7 +9,7 @@ export function BackofficeSMSTemplates() {
       id: 'SMS-001',
       name: 'Payment Confirmation',
       campaign: 'All Campaigns',
-      message: 'Hello {name}, your payment of ${amount} has been processed. Campaign: {campaign}. Thank you.',
+      message: 'Hello {name}, your payment of MZN {amount} has been processed. Campaign: {campaign}. Thank you.',
       usageCount: 45678,
       status: 'Active'
     },
@@ -25,7 +25,7 @@ export function BackofficeSMSTemplates() {
       id: 'SMS-003',
       name: 'Savings Update',
       campaign: 'All Campaigns',
-      message: '{name}, your total savings is now ${savings}. Keep saving! Campaign: {campaign}',
+      message: '{name}, your total savings is now MZN {savings}. Keep saving! Campaign: {campaign}',
       usageCount: 34567,
       status: 'Active'
     },

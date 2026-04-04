@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
+import { formatCompactMetical, formatMetical } from "@/lib/format/currency";
 import { useCampaignQuery } from "@/features/campaigns/hooks/use-campaign-queries";
 import { useSavingsProgramQuery } from "@/features/savings-programs/hooks/use-savings-program-queries";
 import {
@@ -82,14 +83,7 @@ export function SavingsCampaignDetail() {
     return <Badge {...(variants[status] || {})}>{status}</Badge>;
   };
 
-  const formatCurrency = (amount: number) => {
-    if (amount >= 1000000) {
-      return `$${(amount / 1000000).toFixed(2)}M`;
-    } else if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(1)}K`;
-    }
-    return `$${amount.toLocaleString()}`;
-  };
+  const formatCurrency = (amount: number) => formatCompactMetical(amount);
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -218,7 +212,7 @@ export function SavingsCampaignDetail() {
                   <TrendingUp className="w-5 h-5" style={{ color: "var(--primary)" }} />
                 </div>
                 <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
-                  ${campaign.avgSavingsPerBeneficiary}
+                  {formatMetical(campaign.avgSavingsPerBeneficiary)}
                 </p>
               </CardContent>
             </Card>
@@ -272,7 +266,7 @@ export function SavingsCampaignDetail() {
                     Minimum Contribution
                   </p>
                   <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
-                    ${campaign.minimumContribution}
+                    {formatMetical(campaign.minimumContribution)}
                   </p>
                 </div>
                 <div>
@@ -346,7 +340,7 @@ export function SavingsCampaignDetail() {
                         </div>
                       </TableCell>
                       <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                        ${participant.totalSaved.toLocaleString()}
+                        {formatMetical(participant.totalSaved)}
                       </TableCell>
                       <TableCell>
                         <div>
@@ -354,7 +348,7 @@ export function SavingsCampaignDetail() {
                             {formatDate(participant.lastContribution)}
                           </p>
                           <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                            ${participant.contributionAmount}
+                            {formatMetical(participant.contributionAmount)}
                           </p>
                         </div>
                       </TableCell>
@@ -362,7 +356,7 @@ export function SavingsCampaignDetail() {
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
                             <span style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
-                              ${participant.personalGoal}
+                              {formatMetical(participant.personalGoal)}
                             </span>
                             <span style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
                               {participant.goalProgress}%
@@ -424,7 +418,7 @@ export function SavingsCampaignDetail() {
                         {txn.beneficiary}
                       </TableCell>
                       <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                        ${txn.amount.toLocaleString()}
+                        {formatMetical(txn.amount)}
                       </TableCell>
                       <TableCell style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
                         {txn.date}
@@ -466,7 +460,7 @@ export function SavingsCampaignDetail() {
                     dataKey="amount"
                     stroke="var(--primary)"
                     strokeWidth={2}
-                    name="Total Saved ($)"
+                    name="Total Saved (MZN)"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -493,7 +487,7 @@ export function SavingsCampaignDetail() {
                       <XAxis dataKey="region" style={{ fontSize: "var(--text-12)" }} />
                       <YAxis style={{ fontSize: "var(--text-12)" }} />
                       <Tooltip />
-                      <Bar dataKey="amount" fill="var(--primary)" name="Amount ($)" />
+                      <Bar dataKey="amount" fill="var(--primary)" name="Amount (MZN)" />
                     </BarChart>
                   </ResponsiveContainer>
                 )}

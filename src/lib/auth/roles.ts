@@ -124,13 +124,16 @@ export function getDefaultRouteForRole(role?: string | null) {
 export function canAccessBackofficePath(role: string | null | undefined, path: string) {
   const normalizedRole = normalizeRole(role)
 
+  if (path === '/backoffice/savings' || path.startsWith('/backoffice/savings/')) {
+    return false
+  }
+
   if (!normalizedRole || normalizedRole === 'inquirer') return false
   if (normalizedRole === 'admin') return true
 
   if (normalizedRole === 'content_manager') {
     return [
       '/backoffice/campaigns',
-      '/backoffice/savings',
       '/backoffice/beneficiaries',
       '/backoffice/field-verification',
       '/backoffice/users',

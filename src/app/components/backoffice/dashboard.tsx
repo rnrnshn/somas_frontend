@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
+import { formatCompactMetical, formatMetical } from "@/lib/format/currency";
 import { useBackofficeDashboardQueries } from "@/features/dashboard/hooks/use-dashboard-queries";
 import { useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
 import {
@@ -32,7 +33,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   FileText,
-  PiggyBank,
   Target,
   Calendar,
   Download,
@@ -54,6 +54,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useTranslation } from "react-i18next";
 
 export function BackofficeDashboard() {
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ export function BackofficeDashboard() {
   const [dateRange, setDateRange] = useState("today");
   const [region, setRegion] = useState("all");
   const [campaign, setCampaign] = useState("all");
+  const { t } = useTranslation();
 
   const filters: DashboardFilters = {
     period: mapDateRange(dateRange),
@@ -129,14 +131,7 @@ export function BackofficeDashboard() {
     return <Badge {...(variants[status] || {})}>{status}</Badge>;
   };
 
-  const formatCurrency = (amount: number) => {
-    if (amount >= 1000000) {
-      return `$${(amount / 1000000).toFixed(2)}M`;
-    } else if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(1)}K`;
-    }
-    return `$${amount.toLocaleString()}`;
-  };
+  const formatCurrency = (amount: number) => formatCompactMetical(amount);
 
   return (
     <div className="p-8" style={{ backgroundColor: "var(--background)" }}>
@@ -144,19 +139,19 @@ export function BackofficeDashboard() {
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 style={{ fontSize: "var(--text-20)", fontWeight: "var(--font-weight-semi-bold)" }}>
-            Dashboard
+            {t('dashboardPage.title')}
           </h1>
           <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-            Overview of platform metrics and operations
+            {t('dashboardPage.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={campaign} onValueChange={setCampaign}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Campaign" />
+              <SelectValue placeholder={t('dashboardPage.campaign')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Campaigns</SelectItem>
+              <SelectItem value="all">{t('dashboardPage.allCampaigns')}</SelectItem>
               {availableCampaigns.map((item) => (
                 <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
               ))}
@@ -164,10 +159,10 @@ export function BackofficeDashboard() {
           </Select>
           <Select value={region} onValueChange={setRegion}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Province" />
+              <SelectValue placeholder={t('dashboardPage.province')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Provinces</SelectItem>
+              <SelectItem value="all">{t('dashboardPage.allProvinces')}</SelectItem>
               {availableRegions.map((item) => (
                 <SelectItem key={item} value={item}>{item}</SelectItem>
               ))}
@@ -175,13 +170,13 @@ export function BackofficeDashboard() {
           </Select>
           <Select value={dateRange} onValueChange={setDateRange}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Period" />
+              <SelectValue placeholder={t('dashboardPage.period')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="quarter">This Quarter</SelectItem>
+              <SelectItem value="today">{t('dashboardPage.today')}</SelectItem>
+              <SelectItem value="week">{t('dashboardPage.thisWeek')}</SelectItem>
+              <SelectItem value="month">{t('dashboardPage.thisMonth')}</SelectItem>
+              <SelectItem value="quarter">{t('dashboardPage.thisQuarter')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -196,11 +191,11 @@ export function BackofficeDashboard() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-8">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          <TabsTrigger value="savings">Savings</TabsTrigger>
-          <TabsTrigger value="beneficiaries">Beneficiaries</TabsTrigger>
-          <TabsTrigger value="operational">Operational Health</TabsTrigger>
+          <TabsTrigger value="overview">{t('dashboardPage.overview')}</TabsTrigger>
+          <TabsTrigger value="transactions">{t('dashboardPage.transactions')}</TabsTrigger>
+          <TabsTrigger value="savings">{t('dashboardPage.savings')}</TabsTrigger>
+          <TabsTrigger value="beneficiaries">{t('dashboardPage.beneficiaries')}</TabsTrigger>
+          <TabsTrigger value="operational">{t('dashboardPage.operationalHealth')}</TabsTrigger>
         </TabsList>
 
         {/* OVERVIEW TAB */}
@@ -208,19 +203,19 @@ export function BackofficeDashboard() {
           {/* KPI Summary Cards */}
           <div style={{ marginBottom: "32px" }}>
             <h3 style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-medium)", marginBottom: "24px" }}>
-              Key Performance Indicators
+               {t('dashboardPage.kpis')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
               <Card>
                 <CardContent className="p-6">
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Total Disbursed
+                    {t('dashboardPage.totalDisbursed')}
                   </p>
                   <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
-                    {kpiMetrics.totalDisbursed.toLocaleString()} MZN
+                    {formatMetical(kpiMetrics.totalDisbursed)}
                   </div>
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-                    Last 30 days
+                    {t('dashboardPage.last30Days')}
                   </p>
                 </CardContent>
               </Card>
@@ -228,13 +223,13 @@ export function BackofficeDashboard() {
               <Card>
                 <CardContent className="p-6">
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Total Transactions
+                    {t('dashboardPage.totalTransactions')}
                   </p>
                   <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
                     {kpiMetrics.totalTransactions.toLocaleString()}
                   </div>
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-                    Selected period
+                    {t('dashboardPage.selectedPeriod')}
                   </p>
                 </CardContent>
               </Card>
@@ -242,13 +237,13 @@ export function BackofficeDashboard() {
               <Card>
                 <CardContent className="p-6">
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Success Rate
+                    {t('dashboardPage.successRate')}
                   </p>
                   <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
                     {kpiMetrics.successRate}%
                   </div>
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-                    Confirmation rate
+                    {t('dashboardPage.confirmationRate')}
                   </p>
                 </CardContent>
               </Card>
@@ -256,13 +251,13 @@ export function BackofficeDashboard() {
               <Card>
                 <CardContent className="p-6">
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)", color: "var(--muted-foreground)", marginBottom: "8px" }}>
-                    Failed Transactions
+                    {t('dashboardPage.failedTransactions')}
                   </p>
                   <div style={{ fontSize: "22px", fontWeight: "var(--font-weight-semi-bold)", color: "var(--foreground)" }}>
                     {kpiMetrics.failedTransactions.toLocaleString()}
                   </div>
                   <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-regular)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-                    Requires attention
+                    {t('dashboardPage.requiresAttention')}
                   </p>
                 </CardContent>
               </Card>
@@ -448,24 +443,20 @@ export function BackofficeDashboard() {
             {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle style={{ fontSize: "var(--text-16)" }}>Quick Actions</CardTitle>
+                <CardTitle style={{ fontSize: "var(--text-16)" }}>{t('dashboardPage.quickActions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/backoffice/campaigns')}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Campaign
-                </Button>
-                <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/backoffice/savings')}>
-                  <PiggyBank className="w-4 h-4 mr-2" />
-                  Create Savings Campaign
+                  {t('dashboardPage.createCampaign')}
                 </Button>
                 <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/backoffice/reports')}>
                   <Download className="w-4 h-4 mr-2" />
-                  Export Report
+                  {t('dashboardPage.exportReport')}
                 </Button>
                 <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/backoffice/audit')}>
                   <FileText className="w-4 h-4 mr-2" />
-                  View Audit Logs
+                  {t('dashboardPage.viewAuditLogs')}
                 </Button>
               </CardContent>
             </Card>
@@ -596,7 +587,7 @@ export function BackofficeDashboard() {
                     dataKey="amount"
                     stroke="var(--accent)"
                     strokeWidth={2}
-                    name="Amount ($)"
+                    name="Amount (MZN)"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -715,7 +706,7 @@ export function BackofficeDashboard() {
                     dataKey="amount"
                     stroke="var(--success)"
                     strokeWidth={2}
-                    name="Savings Amount ($)"
+                    name="Savings Amount (MZN)"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -734,7 +725,7 @@ export function BackofficeDashboard() {
                   <YAxis style={{ fontSize: "var(--text-12)" }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="amount" fill="var(--success)" name="Savings Amount ($)" />
+                  <Bar dataKey="amount" fill="var(--success)" name="Savings Amount (MZN)" />
                   <Bar dataKey="participants" fill="var(--accent)" name="Participants" />
                 </BarChart>
               </ResponsiveContainer>

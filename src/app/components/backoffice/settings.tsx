@@ -28,8 +28,10 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { BackendSettingsPanel } from "@/features/settings/components/backend-settings-panel";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useTranslation } from "react-i18next";
 
 export function Settings() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("users");
   const [searchQuery, setSearchQuery] = useState("");
   const [language, setLanguage] = useState("pt-MZ");
@@ -197,7 +199,7 @@ export function Settings() {
     {
       id: 'TPL-001',
       name: 'Disbursement Notification',
-      message: 'Your payment of ${amount} has been processed. Ref: ${ref_number}',
+      message: 'Your payment of MZN ${amount} has been processed. Ref: ${ref_number}',
       campaign: 'All Campaigns',
       status: 'Active'
     },
@@ -211,7 +213,7 @@ export function Settings() {
     {
       id: 'TPL-003',
       name: 'Savings Milestone',
-      message: 'Congratulations! You reached ${milestone} in savings.',
+      message: 'Congratulations! You reached MZN ${milestone} in savings.',
       campaign: 'Savings Program',
       status: 'Draft'
     },
@@ -237,10 +239,10 @@ export function Settings() {
     <div className="p-8">
       <div className="mb-8">
         <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-          Settings
+          {t('settingsPage.title')}
         </h1>
         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
-          Manage platform configuration and governance features
+          {t('settingsPage.subtitle')}
         </p>
       </div>
 
@@ -248,14 +250,14 @@ export function Settings() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="roles">Roles</TabsTrigger>
-          <TabsTrigger value="permissions">Permissions</TabsTrigger>
-          <TabsTrigger value="audit">Audit Logs</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
-          <TabsTrigger value="events">System Events</TabsTrigger>
-          <TabsTrigger value="sms">SMS Templates</TabsTrigger>
-          <TabsTrigger value="tenant">Tenant Settings</TabsTrigger>
+          <TabsTrigger value="users">{t('settingsPage.users')}</TabsTrigger>
+          <TabsTrigger value="roles">{t('settingsPage.roles')}</TabsTrigger>
+          <TabsTrigger value="permissions">{t('settingsPage.permissions')}</TabsTrigger>
+          <TabsTrigger value="audit">{t('settingsPage.auditLogs')}</TabsTrigger>
+          <TabsTrigger value="sessions">{t('settingsPage.sessions')}</TabsTrigger>
+          <TabsTrigger value="events">{t('settingsPage.systemEvents')}</TabsTrigger>
+          <TabsTrigger value="sms">{t('settingsPage.smsTemplates')}</TabsTrigger>
+          <TabsTrigger value="tenant">{t('settingsPage.tenantSettings')}</TabsTrigger>
         </TabsList>
 
         {/* USERS TAB */}
@@ -267,10 +269,10 @@ export function Settings() {
                   
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      System Users
+                      {t('settingsPage.systemUsers')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Manage user accounts and access control
+                      {t('settingsPage.manageUsers')}
                     </p>
                   </div>
                 </div>
@@ -278,7 +280,7 @@ export function Settings() {
                   <div className="relative w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                     <Input
-                      placeholder="Search users..."
+                      placeholder={t('settingsPage.searchUsers')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9"
@@ -286,7 +288,7 @@ export function Settings() {
                   </div>
                   <Button>
                     <Plus className="w-4 h-4 mr-2" />
-                    Add User
+                    {t('settingsPage.addUser')}
                   </Button>
                 </div>
               </div>
@@ -295,13 +297,13 @@ export function Settings() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User ID</TableHead>
+                    <TableHead>{t('settingsPage.userId')}</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Last Login</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('settingsPage.roles')}</TableHead>
+                    <TableHead>{t('campaignsPage.status')}</TableHead>
+                    <TableHead>{t('settingsPage.lastLogin')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -364,16 +366,16 @@ export function Settings() {
                   <Shield className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Role Management
+                      {t('settingsPage.roleManagement')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Define and manage user roles and access levels
+                      {t('settingsPage.manageRoles')}
                     </p>
                   </div>
                 </div>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Role
+                   {t('settingsPage.createRole')}
                 </Button>
               </div>
             </CardHeader>
@@ -381,12 +383,12 @@ export function Settings() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Role ID</TableHead>
-                    <TableHead>Role Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Users</TableHead>
-                    <TableHead className="text-right">Permissions</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('settingsPage.roleId')}</TableHead>
+                    <TableHead>{t('settingsPage.roleName')}</TableHead>
+                    <TableHead>{t('settingsPage.description')}</TableHead>
+                    <TableHead className="text-right">{t('settingsPage.users')}</TableHead>
+                    <TableHead className="text-right">{t('settingsPage.permissions')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -443,10 +445,10 @@ export function Settings() {
                   <Shield className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Permission Matrix
+                      {t('settingsPage.permissionMatrix')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Configure module-level permissions for Administrator role
+                      {t('settingsPage.configurePermissions')}
                     </p>
                   </div>
                 </div>
@@ -467,11 +469,11 @@ export function Settings() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead style={{ width: '30%' }}>Module</TableHead>
-                    <TableHead className="text-center">View</TableHead>
-                    <TableHead className="text-center">Create</TableHead>
-                    <TableHead className="text-center">Edit</TableHead>
-                    <TableHead className="text-center">Delete</TableHead>
+                    <TableHead style={{ width: '30%' }}>{t('settingsPage.module')}</TableHead>
+                    <TableHead className="text-center">{t('settingsPage.view')}</TableHead>
+                    <TableHead className="text-center">{t('settingsPage.create')}</TableHead>
+                    <TableHead className="text-center">{t('settingsPage.edit')}</TableHead>
+                    <TableHead className="text-center">{t('settingsPage.delete')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -529,7 +531,7 @@ export function Settings() {
               />
               <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
                 <Button>
-                  Save Permissions
+                  {t('settingsPage.savePermissions')}
                 </Button>
               </div>
             </CardContent>
@@ -545,10 +547,10 @@ export function Settings() {
                   <FileText className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Audit Logs
+                      {t('settingsPage.auditLogsTitle')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Track administrative actions and system changes
+                      {t('settingsPage.trackAudit')}
                     </p>
                   </div>
                 </div>
@@ -558,14 +560,14 @@ export function Settings() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all-users">All Users</SelectItem>
+                      <SelectItem value="all-users">{t('settingsPage.allUsers')}</SelectItem>
                       <SelectItem value="maria">Maria Santos</SelectItem>
                       <SelectItem value="john">John Smith</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button variant="outline">
                     <Download className="w-4 h-4 mr-2" />
-                    Export
+                    {t('transactionsPage.export')}
                   </Button>
                 </div>
               </div>
@@ -574,11 +576,11 @@ export function Settings() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Log ID</TableHead>
+                    <TableHead>{t('settingsPage.logId')}</TableHead>
                     <TableHead>User</TableHead>
                     <TableHead>Action</TableHead>
                     <TableHead>Entity</TableHead>
-                    <TableHead>Entity ID</TableHead>
+                    <TableHead>{t('settingsPage.entityId')}</TableHead>
                     <TableHead>Timestamp</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -630,10 +632,10 @@ export function Settings() {
                 <Monitor className="w-5 h-5" style={{ color: "var(--primary)" }} />
                 <div>
                   <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                    Active Sessions
+                      {t('settingsPage.activeSessions')}
                   </h3>
                   <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                    Monitor and manage active user sessions
+                      {t('settingsPage.manageSessions')}
                   </p>
                 </div>
               </div>
@@ -642,13 +644,13 @@ export function Settings() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Session ID</TableHead>
+                    <TableHead>{t('settingsPage.sessionId')}</TableHead>
                     <TableHead>User</TableHead>
-                    <TableHead>Device</TableHead>
-                    <TableHead>IP Address</TableHead>
+                    <TableHead>{t('settingsPage.device')}</TableHead>
+                    <TableHead>{t('settingsPage.ipAddress')}</TableHead>
                     <TableHead>Last Activity</TableHead>
-                    <TableHead>Expires At</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('settingsPage.expiresAt')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -680,7 +682,7 @@ export function Settings() {
                         <div className="flex justify-end">
                           <Button variant="ghost" size="sm">
                             <X className="w-4 h-4 mr-1" />
-                            Revoke
+                            {t('settingsPage.revoke')}
                           </Button>
                         </div>
                       </TableCell>
@@ -708,16 +710,16 @@ export function Settings() {
                   <Activity className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      System Events
+                      {t('settingsPage.systemEventsTitle')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Monitor technical system events and operations
+                      {t('settingsPage.monitorEvents')}
                     </p>
                   </div>
                 </div>
                 <Button variant="outline">
                   <Download className="w-4 h-4 mr-2" />
-                  Export Logs
+                    {t('settingsPage.exportLogs')}
                 </Button>
               </div>
             </CardHeader>
@@ -725,9 +727,9 @@ export function Settings() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Event ID</TableHead>
-                    <TableHead>Event Type</TableHead>
-                    <TableHead>Payload</TableHead>
+                    <TableHead>{t('settingsPage.eventId')}</TableHead>
+                    <TableHead>{t('settingsPage.eventType')}</TableHead>
+                    <TableHead>{t('settingsPage.payload')}</TableHead>
                     <TableHead>Timestamp</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -776,16 +778,16 @@ export function Settings() {
                   <MessageSquare className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      SMS Templates
+                      {t('settingsPage.smsTemplates')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Manage message templates for beneficiary communication
+                      {t('settingsPage.manageTemplates')}
                     </p>
                   </div>
                 </div>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Template
+                   {t('settingsPage.createTemplate')}
                 </Button>
               </div>
             </CardHeader>
@@ -793,12 +795,12 @@ export function Settings() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Template ID</TableHead>
-                    <TableHead>Template Name</TableHead>
-                    <TableHead>Message Content</TableHead>
+                    <TableHead>{t('settingsPage.templateId')}</TableHead>
+                    <TableHead>{t('settingsPage.templateName')}</TableHead>
+                    <TableHead>{t('settingsPage.messageContent')}</TableHead>
                     <TableHead>Campaign</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('campaignsPage.status')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -857,10 +859,10 @@ export function Settings() {
                   <SettingsIcon className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Tenant Identity
+                      {t('settingsPage.tenantIdentity')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Configure organization branding and identity
+                      {t('settingsPage.configureIdentity')}
                     </p>
                   </div>
                 </div>
@@ -869,20 +871,20 @@ export function Settings() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Tenant Name
+                      {t('settingsPage.tenantName')}
                     </label>
                     <Input defaultValue="Department of Social Welfare - Region V" />
                   </div>
                   <div className="space-y-2">
                     <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Short Code
+                      {t('settingsPage.shortCode')}
                     </label>
                     <Input defaultValue="DSWD-R5" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                    Tenant Logo
+                    {t('settingsPage.tenantLogo')}
                   </label>
                   <div className="flex items-center gap-4">
                     <div 
@@ -893,11 +895,11 @@ export function Settings() {
                     </div>
                     <Button variant="outline">
                       <Upload className="w-4 h-4 mr-2" />
-                      Upload Logo
+                      {t('settingsPage.uploadLogo')}
                     </Button>
                   </div>
                   <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                    Recommended: 256x256px PNG with transparent background
+                    {t('settingsPage.logoRecommendation')}
                   </p>
                 </div>
               </CardContent>
@@ -909,10 +911,10 @@ export function Settings() {
                   <Globe className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Definições Regionais
+                      {t('settingsPage.regionalSettings')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Configurar fuso horário e preferências regionais
+                      {t('settingsPage.configureRegional')}
                     </p>
                   </div>
                 </div>
@@ -921,7 +923,7 @@ export function Settings() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Província Principal
+                      {t('settingsPage.primaryProvince')}
                     </label>
                     <Select defaultValue="maputo-cidade">
                       <SelectTrigger>
@@ -944,7 +946,7 @@ export function Settings() {
                   </div>
                   <div className="space-y-2">
                     <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Fuso Horário
+                      {t('settingsPage.timezone')}
                     </label>
                     <Select defaultValue="africa-maputo">
                       <SelectTrigger>
@@ -960,7 +962,7 @@ export function Settings() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Moeda
+                      {t('settingsPage.currency')}
                     </label>
                     <Select defaultValue="mzn">
                       <SelectTrigger>
@@ -968,7 +970,6 @@ export function Settings() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="mzn">Metical Moçambicano (MZN)</SelectItem>
-                        <SelectItem value="usd">Dólar Americano (USD)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -976,7 +977,7 @@ export function Settings() {
                     <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4" />
-                        <span>Idioma</span>
+                        <span>{t('settingsPage.language')}</span>
                       </div>
                     </label>
                     <Select value={language} onValueChange={setLanguage}>
@@ -993,10 +994,10 @@ export function Settings() {
                 </div>
                 <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
                   <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)', marginBottom: '4px' }}>
-                    Idioma Selecionado: {language === 'pt-MZ' ? 'Português (Moçambique)' : language === 'en' ? 'English' : 'Português (Portugal)'}
+                     {t('settingsPage.selectedLanguage', { language: language === 'pt-MZ' ? 'Português (Moçambique)' : language === 'en' ? 'English' : 'Português (Portugal)' })}
                   </p>
                   <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                    Esta definição será aplicada a toda a interface do sistema após salvar as configurações.
+                     {t('settingsPage.selectedLanguageHelp')}
                   </p>
                 </div>
               </CardContent>
@@ -1008,10 +1009,10 @@ export function Settings() {
                   <SettingsIcon className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Notification Settings
+                      {t('settingsPage.notificationSettings')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Configure system notifications and alerts
+                      {t('settingsPage.configureNotifications')}
                     </p>
                   </div>
                 </div>
@@ -1020,10 +1021,10 @@ export function Settings() {
                 <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
                   <div>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Email Notifications
+                      {t('settingsPage.emailNotifications')}
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                      Receive email alerts for critical system events
+                      {t('settingsPage.emailNotificationsHelp')}
                     </p>
                   </div>
                   <input type="checkbox" defaultChecked className="w-5 h-5" />
@@ -1031,10 +1032,10 @@ export function Settings() {
                 <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
                   <div>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      SMS Gateway Alerts
+                      {t('settingsPage.smsAlerts')}
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                      Get notified when SMS delivery fails
+                      {t('settingsPage.smsAlertsHelp')}
                     </p>
                   </div>
                   <input type="checkbox" defaultChecked className="w-5 h-5" />
@@ -1042,10 +1043,10 @@ export function Settings() {
                 <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
                   <div>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Transaction Notifications
+                      {t('settingsPage.transactionNotifications')}
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                      Receive updates on disbursement status changes
+                      {t('settingsPage.transactionNotificationsHelp')}
                     </p>
                   </div>
                   <input type="checkbox" defaultChecked className="w-5 h-5" />
@@ -1054,8 +1055,8 @@ export function Settings() {
             </Card>
 
             <div className="flex justify-end gap-3">
-              <Button variant="outline">Cancel</Button>
-              <Button>Save Settings</Button>
+              <Button variant="outline">{t('settingsPage.cancel')}</Button>
+              <Button>{t('settingsPage.saveSettings')}</Button>
             </div>
           </div>
         </TabsContent>

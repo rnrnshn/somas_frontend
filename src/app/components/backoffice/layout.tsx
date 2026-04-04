@@ -1,19 +1,20 @@
 import { Suspense, useState } from "react";
 import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { useAuth } from "@/lib/auth/auth-context";
-import { canAccessBackofficePath, getDefaultRouteForRole, getRoleLabel, isBackofficeRole } from "@/lib/auth/roles";
+import { canAccessBackofficePath, getDefaultRouteForRole, isBackofficeRole, normalizeRole } from "@/lib/auth/roles";
 import { 
   LayoutDashboard, 
   Megaphone, 
-  PiggyBank,
   Users, 
   Receipt, 
   BarChart3,
   Settings
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { LanguageSwitcher } from "../language-switcher";
 import { Skeleton } from "../ui/skeleton";
 import { TenantSwitcher } from "./tenant-switcher";
+import { useTranslation } from "react-i18next";
 
 type NavItem = {
   path: string;
@@ -25,16 +26,17 @@ export function BackofficeLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isBootstrapping, signOut, user } = useAuth();
+  const { t } = useTranslation();
+  const normalizedRole = normalizeRole(user?.role);
 
   const navItems: NavItem[] = [
-    { path: '/backoffice/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/backoffice/campaigns', label: 'Campaigns', icon: Megaphone },
-    { path: '/backoffice/savings', label: 'Savings Programs', icon: PiggyBank },
-    { path: '/backoffice/beneficiaries', label: 'Beneficiaries', icon: Users },
-    { path: '/backoffice/users', label: 'Inquiridores', icon: Users },
-    { path: '/backoffice/transactions', label: 'Transactions', icon: Receipt },
-    { path: '/backoffice/metrics', label: 'Insights', icon: BarChart3 },
-    { path: '/backoffice/settings', label: 'Settings', icon: Settings }
+    { path: '/backoffice/dashboard', label: t('dashboard'), icon: LayoutDashboard },
+    { path: '/backoffice/campaigns', label: t('campaigns'), icon: Megaphone },
+    { path: '/backoffice/beneficiaries', label: t('beneficiaries'), icon: Users },
+    { path: '/backoffice/users', label: t('inquirers'), icon: Users },
+    { path: '/backoffice/transactions', label: t('transactions'), icon: Receipt },
+    { path: '/backoffice/metrics', label: t('insights'), icon: BarChart3 },
+    { path: '/backoffice/settings', label: t('settings'), icon: Settings }
   ].filter((item) => canAccessBackofficePath(user?.role, item.path));
 
   const isPathActive = (path: string) => {
@@ -94,15 +96,16 @@ export function BackofficeLayout() {
       <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-6">
           <h2 style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-            SOMAS
+            {t('brand')}
           </h2>
           <TenantSwitcher />
         </div>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
           {user?.email ? (
             <div className="text-right">
               <p className="text-sm font-medium">{user.email}</p>
-              <p className="text-xs text-muted-foreground">{getRoleLabel(user.role)}</p>
+              <p className="text-xs text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
             </div>
           ) : null}
         </div>
@@ -143,7 +146,7 @@ export function BackofficeLayout() {
                 navigate('/');
               }}
             >
-              Back to Gateway
+              {t('backToGateway')}
             </Button>
           </div>
         </aside>

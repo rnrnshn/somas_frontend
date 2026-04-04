@@ -20,6 +20,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 import { useAuth } from "@/lib/auth/auth-context";
 import { normalizeRole } from "@/lib/auth/roles";
+import { formatMetical } from "@/lib/format/currency";
+import { useTranslation } from "react-i18next";
 
 export function BackofficeTransactions() {
   const { user } = useAuth();
@@ -32,6 +34,7 @@ export function BackofficeTransactions() {
   const [providerFilter, setProviderFilter] = useState("all");
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
   const [showTransactionDetail, setShowTransactionDetail] = useState(false);
+  const { t } = useTranslation();
 
   const filters: TransactionListFilters = {
     page: 1,
@@ -116,18 +119,18 @@ export function BackofficeTransactions() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>Transactions</h1>
+        <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>{t('transactionsPage.title')}</h1>
         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
-          Monitor all financial movements, disbursement batches, and transaction analytics
+          {t('transactionsPage.subtitle')}
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          {!isAnalyticsOnly ? <TabsTrigger value="all">All Transactions</TabsTrigger> : null}
-          {!isAnalyticsOnly ? <TabsTrigger value="batches">Disbursement Batches</TabsTrigger> : null}
-          {!isAnalyticsOnly ? <TabsTrigger value="failed">Failed Transactions</TabsTrigger> : null}
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          {!isAnalyticsOnly ? <TabsTrigger value="all">{t('transactionsPage.allTransactions')}</TabsTrigger> : null}
+          {!isAnalyticsOnly ? <TabsTrigger value="batches">{t('transactionsPage.disbursementBatches')}</TabsTrigger> : null}
+          {!isAnalyticsOnly ? <TabsTrigger value="failed">{t('transactionsPage.failedTransactions')}</TabsTrigger> : null}
+          <TabsTrigger value="analytics">{t('transactionsPage.analytics')}</TabsTrigger>
         </TabsList>
 
         {/* ALL TRANSACTIONS TAB */}
@@ -138,7 +141,7 @@ export function BackofficeTransactions() {
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
                   <Input
-                    placeholder="Search by transaction ID, beneficiary..."
+                    placeholder={t('transactionsPage.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
@@ -146,10 +149,10 @@ export function BackofficeTransactions() {
                 </div>
                 <Select value={campaignFilter} onValueChange={setCampaignFilter}>
                   <SelectTrigger className="w-52">
-                    <SelectValue placeholder="Campaign" />
+                    <SelectValue placeholder={t('transactionsPage.campaign')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Campaigns</SelectItem>
+                    <SelectItem value="all">{t('transactionsPage.allCampaigns')}</SelectItem>
                     {Array.from(new Set(transactions.map((txn) => txn.campaign))).filter((item) => item && item !== '—').map((item) => (
                       <SelectItem key={item} value={item}>{item}</SelectItem>
                     ))}
@@ -157,20 +160,20 @@ export function BackofficeTransactions() {
                 </Select>
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Type" />
+                    <SelectValue placeholder={t('transactionsPage.type')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="all">{t('transactionsPage.allTypes')}</SelectItem>
                     <SelectItem value="Disbursement">Disbursement</SelectItem>
                     <SelectItem value="Savings">Savings</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder={t('campaignsPage.status')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="all">{t('campaignsPage.allStatus')}</SelectItem>
                     <SelectItem value="Successful">Successful</SelectItem>
                     <SelectItem value="Pending">Pending</SelectItem>
                     <SelectItem value="Processing">Processing</SelectItem>
@@ -180,10 +183,10 @@ export function BackofficeTransactions() {
                 </Select>
                 <Select value={providerFilter} onValueChange={setProviderFilter}>
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Provider" />
+                    <SelectValue placeholder={t('transactionsPage.provider')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Providers</SelectItem>
+                    <SelectItem value="all">{t('transactionsPage.allProviders')}</SelectItem>
                     {Array.from(new Set(transactions.map((txn) => txn.mobileMoneyProvider))).filter((item) => item && item !== '—').map((item) => (
                       <SelectItem key={item} value={item}>{item}</SelectItem>
                     ))}
@@ -191,12 +194,12 @@ export function BackofficeTransactions() {
                 </Select>
                 <Button variant="outline">
                   <Download className="w-4 h-4 mr-2" />
-                  Export
+                  {t('transactionsPage.export')}
                 </Button>
               </div>
               {transactionsQuery.error ? (
                 <p style={{ fontSize: 'var(--text-13)', color: 'var(--error)' }}>
-                  {transactionsQuery.error instanceof Error ? transactionsQuery.error.message : 'Transactions could not be loaded.'}
+                  {transactionsQuery.error instanceof Error ? transactionsQuery.error.message : t('transactionsPage.loadError')}
                 </p>
               ) : null}
             </CardHeader>
@@ -204,16 +207,16 @@ export function BackofficeTransactions() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Transaction Ref</TableHead>
-                    <TableHead>Beneficiary</TableHead>
-                    <TableHead>Campaign</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead>Provider</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Executed</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('transactionsPage.transactionRef')}</TableHead>
+                    <TableHead>{t('transactionsPage.beneficiary')}</TableHead>
+                    <TableHead>{t('transactionsPage.campaign')}</TableHead>
+                    <TableHead>{t('transactionsPage.type')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.amount')}</TableHead>
+                    <TableHead>{t('transactionsPage.provider')}</TableHead>
+                    <TableHead>{t('campaignsPage.status')}</TableHead>
+                    <TableHead>{t('transactionsPage.created')}</TableHead>
+                    <TableHead>{t('transactionsPage.executed')}</TableHead>
+                    <TableHead>{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -221,7 +224,7 @@ export function BackofficeTransactions() {
                     <TableRow>
                       <TableCell colSpan={10} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                          {transactionsQuery.isPending ? 'Loading transactions...' : 'No transactions found'}
+                          {transactionsQuery.isPending ? t('transactionsPage.loadingTransactions') : t('transactionsPage.noTransactions')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -250,7 +253,7 @@ export function BackofficeTransactions() {
                       </TableCell>
                       <TableCell>{getTypeBadge(txn.type)}</TableCell>
                       <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
-                        MT {txn.amount.toLocaleString()}
+                        {formatMetical(txn.amount)}
                       </TableCell>
                       <TableCell>
                         <span style={{ fontSize: 'var(--text-13)' }}>{txn.mobileMoneyProvider}</span>
@@ -295,16 +298,16 @@ export function BackofficeTransactions() {
                   <Package className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Disbursement Batches
+                      {t('transactionsPage.disbursementBatches')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Bulk payment processing and batch management
+                      {t('transactionsPage.batchSubtitle')}
                     </p>
                   </div>
                 </div>
                 <Button variant="outline">
                   <Download className="w-4 h-4 mr-2" />
-                  Export Report
+                  {t('transactionsPage.exportReport')}
                 </Button>
               </div>
             </CardHeader>
@@ -312,14 +315,14 @@ export function BackofficeTransactions() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Batch ID</TableHead>
-                    <TableHead>Campaign</TableHead>
-                    <TableHead className="text-right">Total Amount</TableHead>
-                    <TableHead className="text-right">Transactions</TableHead>
-                    <TableHead>Success Rate</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Execution Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('transactionsPage.batchId')}</TableHead>
+                    <TableHead>{t('transactionsPage.campaign')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.totalAmount')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.batchTransactions')}</TableHead>
+                    <TableHead>{t('transactionsPage.successRate')}</TableHead>
+                    <TableHead>{t('campaignsPage.status')}</TableHead>
+                    <TableHead>{t('transactionsPage.executionDate')}</TableHead>
+                    <TableHead>{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -327,7 +330,7 @@ export function BackofficeTransactions() {
                     <TableRow>
                       <TableCell colSpan={8} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                          {batchesQuery.isPending ? 'Loading disbursement batches...' : 'No batches found'}
+                          {batchesQuery.isPending ? t('transactionsPage.loadingBatches') : t('transactionsPage.noBatches')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -354,7 +357,7 @@ export function BackofficeTransactions() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
-                          MT {batch.totalAmount.toLocaleString()}
+                          {formatMetical(batch.totalAmount)}
                         </TableCell>
                         <TableCell className="text-right">
                           <div>
@@ -362,9 +365,9 @@ export function BackofficeTransactions() {
                               {batch.transactions.toLocaleString()}
                             </p>
                             <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)' }}>
-                              {batch.successful > 0 && `${batch.successful} success`}
-                              {batch.failed > 0 && ` • ${batch.failed} failed`}
-                              {batch.pending > 0 && ` • ${batch.pending} pending`}
+                               {batch.successful > 0 && `${batch.successful} ${t('transactionsPage.success')}`}
+                               {batch.failed > 0 && ` • ${batch.failed} ${t('transactionsPage.failed')}`}
+                               {batch.pending > 0 && ` • ${batch.pending} pending`}
                             </p>
                           </div>
                         </TableCell>
@@ -389,7 +392,7 @@ export function BackofficeTransactions() {
                         </TableCell>
                         <TableCell>{getStatusBadge(batch.status)}</TableCell>
                         <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                          {batch.executedAt || 'Not executed'}
+                          {batch.executedAt || t('transactionsPage.notExecuted')}
                         </TableCell>
                         <TableCell>
                           <Button variant="ghost" size="icon">
@@ -421,21 +424,21 @@ export function BackofficeTransactions() {
                   <AlertCircle className="w-5 h-5" style={{ color: "var(--destructive)" }} />
                   <div>
                     <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      Failed Transactions
+                      {t('transactionsPage.failedTransactions')}
                     </h3>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Review and retry failed payment transactions
+                      {t('transactionsPage.failedSubtitle')}
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline">
                     <Download className="w-4 h-4 mr-2" />
-                    Export
+                    {t('transactionsPage.export')}
                   </Button>
                   <Button variant="default">
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Retry Selected
+                    {t('transactionsPage.retrySelected')}
                   </Button>
                 </div>
               </div>
@@ -444,13 +447,13 @@ export function BackofficeTransactions() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Transaction Ref</TableHead>
-                    <TableHead>Beneficiary</TableHead>
-                    <TableHead>Campaign</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead>Error Message</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('transactionsPage.transactionRef')}</TableHead>
+                    <TableHead>{t('transactionsPage.beneficiary')}</TableHead>
+                    <TableHead>{t('transactionsPage.campaign')}</TableHead>
+                    <TableHead className="text-right">{t('transactionsPage.amount')}</TableHead>
+                    <TableHead>{t('transactionsPage.errorMessage')}</TableHead>
+                    <TableHead>{t('beneficiariesPage.date')}</TableHead>
+                    <TableHead>{t('transactionsPage.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -458,7 +461,7 @@ export function BackofficeTransactions() {
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                          {failedTransactionsQuery.isPending ? 'Loading failed transactions...' : 'No failed transactions found'}
+                          {failedTransactionsQuery.isPending ? t('transactionsPage.loadingFailed') : t('transactionsPage.noFailed')}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -481,7 +484,7 @@ export function BackofficeTransactions() {
                         <p style={{ fontSize: 'var(--text-13)' }}>{txn.campaign}</p>
                       </TableCell>
                       <TableCell className="text-right" style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
-                        MT {txn.amount.toLocaleString()}
+                        {formatMetical(txn.amount)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -497,7 +500,7 @@ export function BackofficeTransactions() {
                       <TableCell>
                         <Button variant="outline" size="sm">
                           <RefreshCw className="w-3 h-3 mr-1" />
-                          Retry
+                          {t('transactionsPage.retry')}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -524,16 +527,16 @@ export function BackofficeTransactions() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Total Disbursed
+                      {t('transactionsPage.totalDisbursed')}
                     </p>
                     <DollarSign className="w-4 h-4" style={{ color: 'var(--success)' }} />
                   </div>
                   <p style={{ fontSize: 'var(--text-28)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                    MT {analytics.totalDisbursed.toLocaleString()}
+                    {formatMetical(analytics.totalDisbursed)}
                   </p>
                   <p style={{ fontSize: 'var(--text-12)', color: 'var(--success)', marginTop: '4px' }}>
                     <TrendingUp className="inline w-3 h-3 mr-1" />
-                    +12% from last month
+                    {t('transactionsPage.fromLastMonth')}
                   </p>
                 </CardContent>
               </Card>
@@ -542,7 +545,7 @@ export function BackofficeTransactions() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Total Transactions
+                      {t('transactionsPage.totalTransactions')}
                     </p>
                     <Activity className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                   </div>
@@ -550,7 +553,7 @@ export function BackofficeTransactions() {
                     {analytics.totalTransactions}
                   </p>
                   <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                    All transaction types
+                    {t('transactionsPage.allTransactionTypes')}
                   </p>
                 </CardContent>
               </Card>
@@ -559,7 +562,7 @@ export function BackofficeTransactions() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      Success Rate
+                      {t('transactionsPage.successRate')}
                     </p>
                     <CheckCircle className="w-4 h-4" style={{ color: 'var(--success)' }} />
                   </div>
@@ -567,7 +570,7 @@ export function BackofficeTransactions() {
                     {analytics.successRate}%
                   </p>
                   <p style={{ fontSize: 'var(--text-12)', color: 'var(--success)', marginTop: '4px' }}>
-                    {analytics.successfulTransactions} successful
+                    {t('transactionsPage.successfulCount', { count: analytics.successfulTransactions })}
                   </p>
                 </CardContent>
               </Card>
@@ -621,7 +624,7 @@ export function BackofficeTransactions() {
                           />
                         </div>
                         <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                          MT {campaign.amount.toLocaleString()}
+                          {formatMetical(campaign.amount)}
                         </p>
                       </div>
                     ))}
@@ -739,7 +742,7 @@ export function BackofficeTransactions() {
                     Amount
                   </p>
                   <p style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                    MT {selectedTransaction.amount.toLocaleString()}
+                    {formatMetical(selectedTransaction.amount)}
                   </p>
                   <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
                     {selectedTransaction.currency}

@@ -2,23 +2,25 @@ import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { useOfflineConfirmations } from "@/features/field/hooks/use-offline-confirmations";
+import { useTranslation } from "react-i18next";
 
 export function FieldDashboard() {
+  const { t } = useTranslation();
   const queue = useOfflineConfirmations();
   const confirmed = queue.filter((item) => item.status === 'confirmed').length;
   const pending = queue.length;
   const issues = queue.filter((item) => item.status !== 'confirmed').length;
 
   const todayStats = [
-    { label: 'Verified', value: String(confirmed), icon: CheckCircle2, color: 'text-[--success]' },
-    { label: 'Pending Sync', value: String(pending), icon: Clock, color: 'text-[--warning]' },
-    { label: 'Issues', value: String(issues), icon: AlertCircle, color: 'text-[--error]' },
+    { label: t('fieldDashboardPage.verified'), value: String(confirmed), icon: CheckCircle2, color: 'text-[--success]' },
+    { label: t('fieldDashboardPage.pendingSync'), value: String(pending), icon: Clock, color: 'text-[--warning]' },
+    { label: t('fieldDashboardPage.issues'), value: String(issues), icon: AlertCircle, color: 'text-[--error]' },
   ];
 
   const recentActivity = queue.slice(-5).reverse().map((item) => ({
     id: `CB-${item.campaignBeneficiaryId}`,
     name: item.beneficiaryName,
-    action: item.status === 'confirmed' ? 'Verified' : item.status === 'not_confirmed' ? 'Flagged' : 'Not Found',
+    action: item.status === 'confirmed' ? t('fieldDashboardPage.actionVerified') : item.status === 'not_confirmed' ? t('fieldDashboardPage.actionFlagged') : t('fieldDashboardPage.actionNotFound'),
     time: new Date(item.createdAt).toLocaleString(),
     status: item.status === 'confirmed' ? 'success' : 'warning'
   }));
@@ -26,7 +28,7 @@ export function FieldDashboard() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 style={{ fontSize: 'var(--text-24)' }}>Today's Summary</h1>
+        <h1 style={{ fontSize: 'var(--text-24)' }}>{t('fieldDashboardPage.title')}</h1>
         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-1">
           Monday, March 2, 2026
         </p>
@@ -55,13 +57,13 @@ export function FieldDashboard() {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>Recent Activity</CardTitle>
+          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldDashboardPage.recentActivity')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {recentActivity.length === 0 ? (
             <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-              No recent field activity is stored on this device yet.
-            </p>
+               {t('fieldDashboardPage.noActivity')}
+             </p>
           ) : recentActivity.map((activity) => (
             <div
               key={activity.id}

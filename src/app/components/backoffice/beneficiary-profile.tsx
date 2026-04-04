@@ -14,10 +14,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
 import { ArrowLeft, Phone, MapPin, CheckCircle } from "lucide-react";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { formatMetical } from "@/lib/format/currency";
+import { useTranslation } from "react-i18next";
 
 export function BeneficiaryProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   const beneficiaryId = Number(id);
   const queries = useBeneficiaryDetailQueries(beneficiaryId);
@@ -66,7 +69,7 @@ export function BeneficiaryProfile() {
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Beneficiaries
+          {t('beneficiaryProfilePage.backToBeneficiaries')}
         </Button>
       </div>
 
@@ -85,16 +88,16 @@ export function BeneficiaryProfile() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <h1 style={{ fontSize: 'var(--text-28)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                  {beneficiary?.fullName ?? (queries.withMetrics.isPending ? 'Loading beneficiary...' : 'Beneficiary unavailable')}
+                  {beneficiary?.fullName ?? (queries.withMetrics.isPending ? t('beneficiaryProfilePage.loadingBeneficiary') : t('beneficiaryProfilePage.beneficiaryUnavailable'))}
                 </h1>
                 {beneficiary ? getStatusBadge(beneficiary.status) : null}
               </div>
               <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                {beneficiary?.beneficiaryCode ?? 'Loading beneficiary details'}
+                 {beneficiary?.beneficiaryCode ?? t('beneficiaryProfilePage.loadingDetails')}
               </p>
             </div>
             <Button onClick={() => navigate(`/backoffice/beneficiaries/form/${id}`)}>
-              Edit Profile
+              {t('beneficiaryProfilePage.editProfile')}
             </Button>
           </div>
 
@@ -103,7 +106,7 @@ export function BeneficiaryProfile() {
               <Phone className="w-5 h-5 mt-1" style={{ color: 'var(--muted-foreground)' }} />
               <div>
                 <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Phone Number
+                  {t('beneficiaryProfilePage.phoneNumber')}
                 </p>
                 <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)', marginTop: '4px' }}>
                    {beneficiary?.msisdn ?? '—'}
@@ -114,7 +117,7 @@ export function BeneficiaryProfile() {
               <MapPin className="w-5 h-5 mt-1" style={{ color: 'var(--muted-foreground)' }} />
               <div>
                 <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Location
+                  {t('beneficiaryProfilePage.location')}
                 </p>
                 <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)', marginTop: '4px' }}>
                    {beneficiary ? `${beneficiary.district}, ${beneficiary.province}` : '—'}
@@ -128,7 +131,7 @@ export function BeneficiaryProfile() {
               <CheckCircle className="w-5 h-5 mt-1" style={{ color: 'var(--success)' }} />
               <div>
                 <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Verification Status
+                  {t('beneficiaryProfilePage.verificationStatus')}
                 </p>
                 <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)', marginTop: '4px' }}>
                    {beneficiary?.verificationStatus ?? 'Pending'}
@@ -144,27 +147,27 @@ export function BeneficiaryProfile() {
         <Card>
           <CardContent className="p-6">
             <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
-              Total Received
+              {t('beneficiaryProfilePage.totalReceived')}
             </p>
             <p style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-               MT {beneficiary?.totalReceived.toLocaleString() ?? '0'}
+               {formatMetical(beneficiary?.totalReceived ?? 0)}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6">
             <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
-              Total Saved
+              {t('beneficiaryProfilePage.totalSaved')}
             </p>
             <p style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-               MT {beneficiary?.totalSaved.toLocaleString() ?? '0'}
+               {formatMetical(beneficiary?.totalSaved ?? 0)}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6">
             <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
-              Last Transaction
+              {t('beneficiaryProfilePage.lastTransaction')}
             </p>
             <p style={{ fontSize: 'var(--text-18)', fontWeight: 'var(--font-weight-semi-bold)' }}>
                {beneficiary?.lastTransaction ?? '—'}
@@ -174,7 +177,7 @@ export function BeneficiaryProfile() {
         <Card>
           <CardContent className="p-6">
             <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
-              Active Campaigns
+              {t('beneficiaryProfilePage.activeCampaigns')}
             </p>
             <p style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
                {beneficiary?.campaignCount ?? 0}
@@ -186,11 +189,11 @@ export function BeneficiaryProfile() {
       {/* Tabs */}
       {beneficiary ? <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          <TabsTrigger value="savings">Savings</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="verification">Verification</TabsTrigger>
+          <TabsTrigger value="overview">{t('beneficiaryProfilePage.overview')}</TabsTrigger>
+          <TabsTrigger value="transactions">{t('beneficiaryProfilePage.transactions')}</TabsTrigger>
+          <TabsTrigger value="savings">{t('beneficiaryProfilePage.savings')}</TabsTrigger>
+          <TabsTrigger value="campaigns">{t('beneficiaryProfilePage.campaigns')}</TabsTrigger>
+          <TabsTrigger value="verification">{t('beneficiaryProfilePage.verification')}</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -199,14 +202,14 @@ export function BeneficiaryProfile() {
             <Card>
               <CardHeader>
                 <h3 style={{ fontSize: 'var(--text-18)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                  Personal Information
+                  {t('beneficiaryProfilePage.personalInformation')}
                 </h3>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
                   <div>
                     <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
-                      Full Name
+                      {t('beneficiaryProfilePage.fullName')}
                     </p>
                     <p style={{ fontSize: 'var(--text-15)', fontWeight: 'var(--font-weight-medium)' }}>
                       {beneficiary.fullName}
@@ -435,7 +438,7 @@ export function BeneficiaryProfile() {
                         {transaction.campaign}
                       </TableCell>
                       <TableCell className="text-right" style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                        MT {transaction.amount.toLocaleString()}
+                        {formatMetical(transaction.amount)}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(transaction.status)}
@@ -466,7 +469,7 @@ export function BeneficiaryProfile() {
                 Savings Contributions
               </h3>
               <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                Total Saved: MT {beneficiary.totalSaved.toLocaleString()}
+                Total Saved: {formatMetical(beneficiary.totalSaved)}
               </p>
             </CardHeader>
             <CardContent className="p-0">
@@ -498,7 +501,7 @@ export function BeneficiaryProfile() {
                         {saving.campaign}
                       </TableCell>
                       <TableCell className="text-right" style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
-                        MT {saving.amount.toLocaleString()}
+                        {formatMetical(saving.amount)}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(saving.status)}

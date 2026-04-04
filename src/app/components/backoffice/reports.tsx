@@ -1,24 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { useTranslation } from "react-i18next";
 
 export function Reports() {
+  const { t } = useTranslation();
   return (
     <div className="p-8">
       <div className="mb-8">
         <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
-          Reports
+          {t('reportsPage.title')}
         </h1>
         <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-          Export campaign, transaction, and beneficiary data
+          {t('reportsPage.subtitle')}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Coming Soon</CardTitle>
+          <CardTitle>{t('reportsPage.comingSoon')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-            Reports and export functionality will be available soon.
+            {t('reportsPage.body')}
           </p>
         </CardContent>
       </Card>

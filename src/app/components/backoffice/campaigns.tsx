@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
+import { formatCompactMetical } from "@/lib/format/currency";
 import { useCampaignDetailsQueries, useCampaignsQuery, useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
 import { adaptCampaignListItem } from "@/features/campaigns/adapters/campaigns";
 import { useUpdateCampaignStatusMutation } from "@/features/campaigns/hooks/use-campaign-mutations";
@@ -36,6 +37,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useTranslation } from "react-i18next";
 
 export function BackofficeCampaigns() {
   const navigate = useNavigate();
@@ -43,6 +45,7 @@ export function BackofficeCampaigns() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [regionFilter, setRegionFilter] = useState("all");
   const [programFilter, setProgramFilter] = useState("all");
+  const { t } = useTranslation();
 
   const filters: CampaignListFilters = {
     page: 1,
@@ -96,15 +99,7 @@ export function BackofficeCampaigns() {
     return <Badge {...(variants[status] || {})}>{status}</Badge>;
   };
 
-  const formatCurrency = (amount: number) => {
-    if (amount === 0) return "$0";
-    if (amount >= 1000000) {
-      return `$${(amount / 1000000).toFixed(2)}M`;
-    } else if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(1)}K`;
-    }
-    return `$${amount.toLocaleString()}`;
-  };
+  const formatCurrency = (amount: number) => formatCompactMetical(amount);
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', { 
@@ -117,9 +112,9 @@ export function BackofficeCampaigns() {
   const handleStatusChange = async (campaignId: number, status: CampaignStatus) => {
     try {
       await updateCampaignStatusMutation.mutateAsync({ campaignId, status })
-      toast.success(`Campaign status updated to ${formatStatusLabel(status)}.`)
+      toast.success(t('campaignsPage.updated', { status: formatStatusLabel(status, t) }))
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Campaign status could not be updated.')
+      toast.error(error instanceof Error ? error.message : t('campaignsPage.updateFailed'))
     }
   }
 
@@ -140,15 +135,15 @@ export function BackofficeCampaigns() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
-            Campaigns
+            {t('campaignsPage.title')}
           </h1>
           <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
-            Manage social transfer programs and savings campaigns
+            {t('campaignsPage.subtitle')}
           </p>
         </div>
         <Button onClick={() => navigate('/backoffice/campaigns/create')}>
           <Plus className="w-4 h-4 mr-2" />
-          Create Campaign
+          {t('campaignsPage.create')}
         </Button>
       </div>
 
@@ -159,7 +154,7 @@ export function BackofficeCampaigns() {
             <div className="relative lg:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
               <Input
-                placeholder="Search campaigns..."
+                placeholder={t('campaignsPage.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -168,23 +163,23 @@ export function BackofficeCampaigns() {
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('campaignsPage.status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Closed">Closed</SelectItem>
-                <SelectItem value="Suspended">Suspended</SelectItem>
-                <SelectItem value="Draft">Draft</SelectItem>
+                <SelectItem value="all">{t('campaignsPage.allStatus')}</SelectItem>
+                <SelectItem value="Active">{t('campaignsPage.active')}</SelectItem>
+                <SelectItem value="Closed">{t('campaignsPage.closed')}</SelectItem>
+                <SelectItem value="Suspended">{t('campaignsPage.suspended')}</SelectItem>
+                <SelectItem value="Draft">{t('campaignsPage.draft')}</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={regionFilter} onValueChange={setRegionFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Region" />
+                <SelectValue placeholder={t('campaignsPage.region')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Regions</SelectItem>
+                <SelectItem value="all">{t('campaignsPage.allRegions')}</SelectItem>
                 {Array.from(new Set(campaigns.map((item) => item.region))).filter(Boolean).map((region) => (
                   <SelectItem key={region} value={region}>{region}</SelectItem>
                 ))}
@@ -193,10 +188,10 @@ export function BackofficeCampaigns() {
 
             <Select value={programFilter} onValueChange={setProgramFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Program" />
+                <SelectValue placeholder={t('campaignsPage.program')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Programs</SelectItem>
+                <SelectItem value="all">{t('campaignsPage.allPrograms')}</SelectItem>
                 {Array.from(new Set(campaigns.map((item) => item.program))).filter((program) => program && program !== '—').map((program) => (
                   <SelectItem key={program} value={program}>{program}</SelectItem>
                 ))}
@@ -205,7 +200,7 @@ export function BackofficeCampaigns() {
           </div>
           {campaignsQuery.error ? (
             <p style={{ fontSize: "var(--text-13)", color: "var(--error)", marginTop: "12px" }}>
-              {campaignsQuery.error instanceof Error ? campaignsQuery.error.message : 'Campaigns could not be loaded.'}
+               {campaignsQuery.error instanceof Error ? campaignsQuery.error.message : t('campaignsPage.loadError')}
             </p>
           ) : null}
         </CardContent>
@@ -217,13 +212,13 @@ export function BackofficeCampaigns() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Campaign</TableHead>
-                <TableHead>Program</TableHead>
-                <TableHead>Region</TableHead>
-                <TableHead>Start Date</TableHead>
-                <TableHead>Beneficiaries</TableHead>
-                <TableHead>Disbursement</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('campaignsPage.campaign')}</TableHead>
+                <TableHead>{t('campaignsPage.program')}</TableHead>
+                <TableHead>{t('campaignsPage.region')}</TableHead>
+                <TableHead>{t('campaignsPage.startDate')}</TableHead>
+                <TableHead>{t('campaignsPage.beneficiaries')}</TableHead>
+                <TableHead>{t('campaignsPage.disbursement')}</TableHead>
+                <TableHead>{t('campaignsPage.status')}</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -245,7 +240,7 @@ export function BackofficeCampaigns() {
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-12">
                       <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
-                        No campaigns found
+                         {t('campaignsPage.noCampaigns')}
                       </p>
                     </TableCell>
                   </TableRow>
@@ -294,13 +289,13 @@ export function BackofficeCampaigns() {
                         <DropdownMenuContent align="end">
                            <DropdownMenuItem onClick={() => navigate(`/backoffice/campaigns/${campaign.numericId}`)}>
                             <Eye className="w-4 h-4 mr-2" />
-                            View
+                            {t('campaignsPage.view')}
                           </DropdownMenuItem>
                            <DropdownMenuItem onClick={() => navigate(`/backoffice/campaigns/${campaign.numericId}/edit`)}>
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            {t('campaignsPage.edit')}
                           </DropdownMenuItem>
-                          {getCampaignStatusActions(campaign.statusCode).map((action) => (
+                          {getCampaignStatusActions(campaign.statusCode, t).map((action) => (
                             <DropdownMenuItem
                               key={action.status}
                               onClick={() => handleStatusChange(campaign.numericId, action.status)}
@@ -312,7 +307,7 @@ export function BackofficeCampaigns() {
                           ))}
                           <DropdownMenuItem>
                             <Download className="w-4 h-4 mr-2" />
-                            Export Data
+                            {t('campaignsPage.exportData')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -335,48 +330,48 @@ export function BackofficeCampaigns() {
   );
 }
 
-function getCampaignStatusActions(status: CampaignStatus) {
+function getCampaignStatusActions(status: CampaignStatus, t: (key: string) => string) {
   switch (status) {
     case 'draft':
       return [
-        { status: 'planned' as const, label: 'Mark Planned', icon: Edit },
-        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+        { status: 'planned' as const, label: t('campaignsPage.actionMarkPlanned'), icon: Edit },
+        { status: 'cancelled' as const, label: t('campaignsPage.actionCancel'), icon: XCircle },
       ]
     case 'planned':
       return [
-        { status: 'active' as const, label: 'Activate', icon: Eye },
-        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+        { status: 'active' as const, label: t('campaignsPage.actionActivate'), icon: Eye },
+        { status: 'cancelled' as const, label: t('campaignsPage.actionCancel'), icon: XCircle },
       ]
     case 'active':
       return [
-        { status: 'suspended' as const, label: 'Suspend', icon: Pause },
-        { status: 'completed' as const, label: 'Complete', icon: Eye },
-        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+        { status: 'suspended' as const, label: t('campaignsPage.actionSuspend'), icon: Pause },
+        { status: 'completed' as const, label: t('campaignsPage.actionComplete'), icon: Eye },
+        { status: 'cancelled' as const, label: t('campaignsPage.actionCancel'), icon: XCircle },
       ]
     case 'suspended':
       return [
-        { status: 'active' as const, label: 'Activate', icon: Eye },
-        { status: 'cancelled' as const, label: 'Cancel', icon: XCircle },
+        { status: 'active' as const, label: t('campaignsPage.actionActivate'), icon: Eye },
+        { status: 'cancelled' as const, label: t('campaignsPage.actionCancel'), icon: XCircle },
       ]
     default:
       return []
   }
 }
 
-function formatStatusLabel(status: CampaignStatus) {
+function formatStatusLabel(status: CampaignStatus, t: (key: string) => string) {
   switch (status) {
     case 'draft':
-      return 'Draft'
+      return t('campaignsPage.draft')
     case 'planned':
-      return 'Planned'
+      return t('campaignsPage.planned')
     case 'active':
-      return 'Active'
+      return t('campaignsPage.active')
     case 'completed':
-      return 'Completed'
+      return t('campaignsPage.completed')
     case 'suspended':
-      return 'Suspended'
+      return t('campaignsPage.suspended')
     case 'cancelled':
-      return 'Cancelled'
+      return t('campaignsPage.cancelled')
   }
 }
 

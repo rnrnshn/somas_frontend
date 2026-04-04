@@ -1,25 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router";
+import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
+import { LanguageSwitcher } from "./language-switcher";
 import { Building2, Smartphone, Key } from "lucide-react";
 
 export function Gateway() {
   const navigate = useNavigate();
   const [showCredentials, setShowCredentials] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="w-full max-w-4xl">
-        <div className="text-center mb-12">
-          <h1 className="mb-4">SOMAS</h1>
+        <div className="mb-12">
+          <div className="mb-6 flex justify-end">
+            <LanguageSwitcher />
+          </div>
+          <div className="text-center">
+            <h1 className="mb-4">{t('brand')}</h1>
           <p style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-regular)', color: 'var(--muted-foreground)' }}>
-            Social Mass Payments & Savings Platform
+            {t('socialMassPlatform')}
           </p>
           <p style={{ fontSize: 'var(--text-16)', color: 'var(--muted-foreground)', marginTop: '24px' }}>
-            Select your operational environment
+            {t('selectEnvironment')}
           </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -31,11 +39,11 @@ export function Gateway() {
               <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mb-6">
                 <Building2 className="w-8 h-8 text-primary" />
               </div>
-              <CardTitle className="mb-4">Backoffice Platform</CardTitle>
+              <CardTitle className="mb-4">{t('backofficePlatform')}</CardTitle>
               <CardDescription className="space-y-1">
-                <span className="block">Campaign Management</span>
-                <span className="block">Monitoring & Reporting</span>
-                <span className="block">Governance & Audit</span>
+                <span className="block">{t('campaignManagement')}</span>
+                <span className="block">{t('monitoringReporting')}</span>
+                <span className="block">{t('governanceAudit')}</span>
               </CardDescription>
             </CardHeader>
           </Card>
@@ -48,11 +56,11 @@ export function Gateway() {
               <div className="w-16 h-16 rounded-[--radius-card] bg-accent/10 flex items-center justify-center mb-6">
                 <Smartphone className="w-8 h-8 text-accent" />
               </div>
-              <CardTitle className="mb-4">Field Operations App</CardTitle>
+              <CardTitle className="mb-4">{t('fieldApp')}</CardTitle>
               <CardDescription className="space-y-1">
-                <span className="block">Beneficiary Verification</span>
-                <span className="block">Offline Sync</span>
-                <span className="block">Field Confirmation</span>
+                <span className="block">{t('beneficiaryVerification')}</span>
+                <span className="block">{t('offlineSync')}</span>
+                <span className="block">{t('fieldConfirmation')}</span>
               </CardDescription>
             </CardHeader>
           </Card>
@@ -66,7 +74,7 @@ export function Gateway() {
             className="gap-2"
           >
             <Key className="w-4 h-4" />
-            Credenciais de Demo
+            {t('demoCredentials')}
           </Button>
         </div>
 
@@ -75,10 +83,10 @@ export function Gateway() {
           <DialogContent className="max-w-3xl">
             <DialogHeader>
               <DialogTitle style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                Credenciais de Demo
+                {t('demoCredentials')}
               </DialogTitle>
               <DialogDescription style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
-                Use estas credenciais para testar o sistema SOMAS
+                {t('useDemoCredentials')}
               </DialogDescription>
             </DialogHeader>
 
@@ -86,10 +94,10 @@ export function Gateway() {
               {/* Backoffice Platform Users */}
               <div>
                 <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)', marginBottom: '12px' }}>
-                  Backoffice Platform
+                  {t('backofficePlatform')}
                 </h3>
                 <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '12px' }}>
-                  Senha para todos: <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>1234567890</span>
+                  {t('passwordForAll')} <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>1234567890</span>
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div style={{ 
@@ -99,13 +107,13 @@ export function Gateway() {
                     backgroundColor: 'var(--muted)'
                   }}>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Administrador
+                      {t('adminRole')}
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                       admin@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      Acesso completo ao sistema
+                      {t('fullSystemAccess')}
                     </p>
                   </div>
                   <div style={{ 
@@ -115,13 +123,13 @@ export function Gateway() {
                     backgroundColor: 'var(--muted)'
                   }}>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Analytics
+                      {t('analyticsRole')}
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                       analytic@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      Leitura de dashboards e relatórios
+                      {t('dashboardReportsRead')}
                     </p>
                   </div>
                   <div style={{ 
@@ -131,13 +139,13 @@ export function Gateway() {
                     backgroundColor: 'var(--muted)'
                   }}>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Content Manager
+                      {t('contentManagerRole')}
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                       content@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      Gestão de conteúdo
+                      {t('contentManagement')}
                     </p>
                   </div>
                 </div>
@@ -146,10 +154,10 @@ export function Gateway() {
               {/* Field Operations Users */}
               <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                 <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)', marginBottom: '12px' }}>
-                  Field Operations App
+                  {t('fieldApp')}
                 </h3>
                 <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginBottom: '12px' }}>
-                  Senha para todos: <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>1234567890</span>
+                  {t('passwordForAll')} <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)' }}>1234567890</span>
                 </p>
                 <div className="grid grid-cols-1 gap-4">
                   <div style={{ 
@@ -159,13 +167,13 @@ export function Gateway() {
                     backgroundColor: 'var(--muted)'
                   }}>
                     <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
-                      Inquiridor
+                      {t('inquirerRole')}
                     </p>
                     <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                       inquirer@somas.app
                     </p>
                     <p style={{ fontSize: 'var(--text-11)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
-                      Verificação e confirmação no local
+                      {t('fieldVerificationCopy')}
                     </p>
                   </div>
                 </div>
@@ -180,10 +188,10 @@ export function Gateway() {
                 backgroundColor: 'var(--muted)/50'
               }}>
                 <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-semi-bold)', marginBottom: '4px' }}>
-                  Testar Estados de Conta
+                  {t('testAccountStates')}
                 </p>
                 <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
-                  Use emails contendo "locked" ou "disabled" para testar diferentes estados de conta (ex: locked@somas.gov)
+                  {t('testAccountStatesCopy')}
                 </p>
               </div>
             </div>

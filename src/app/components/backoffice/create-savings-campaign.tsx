@@ -7,6 +7,7 @@ import {
   useUpdateSavingsProgramMutation,
 } from "@/features/savings-programs/hooks/use-savings-program-queries";
 import { HttpError } from "@/lib/api/http-error";
+import { formatMetical } from "@/lib/format/currency";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -254,7 +255,7 @@ export function CreateSavingsCampaign() {
                   className="absolute left-3 top-1/2 transform -translate-y-1/2" 
                   style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}
                 >
-                  $
+                  MZN
                 </span>
                 <Input
                   id="savingsGoal"
@@ -279,7 +280,7 @@ export function CreateSavingsCampaign() {
                   className="absolute left-3 top-1/2 transform -translate-y-1/2" 
                   style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}
                 >
-                  $
+                  MZN
                 </span>
                 <Input
                   id="minimumContribution"
@@ -336,7 +337,7 @@ export function CreateSavingsCampaign() {
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription style={{ fontSize: "var(--text-13)" }}>
-                    For example, a 50% matching bonus means if a beneficiary saves $10, they will receive an additional $5
+                    For example, a 50% matching bonus means if a beneficiary saves MZN 10, they will receive an additional MZN 5
                   </AlertDescription>
                 </Alert>
               </div>
@@ -407,7 +408,7 @@ export function CreateSavingsCampaign() {
               <div className="flex justify-between py-2 border-b" style={{ borderColor: "var(--border)" }}>
                 <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>Savings Goal</span>
                 <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
-                  ${formData.savingsGoal ? parseFloat(formData.savingsGoal).toLocaleString() : "0"}
+                  {formatMetical(formData.savingsGoal ? parseFloat(formData.savingsGoal) : 0)}
                 </span>
               </div>
               <div className="flex justify-between py-2">
