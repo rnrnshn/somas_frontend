@@ -33,7 +33,7 @@ export function BeneficiaryForm() {
 
   useEffect(() => {
     if (!isEdit) {
-      toast.info('Beneficiary creation is not available in this version yet.');
+      toast.info('Standalone beneficiary creation is not available here. Add beneficiaries from a campaign instead.');
       navigate('/backoffice/beneficiaries');
       return;
     }
@@ -55,8 +55,7 @@ export function BeneficiaryForm() {
     e.preventDefault();
     setSubmitError(null);
 
-    void updateMutation
-      .mutateAsync({
+    void updateMutation.mutateAsync({
         name: formData.fullName,
         msisdn: formData.phone,
         email: formData.email || null,
@@ -65,9 +64,9 @@ export function BeneficiaryForm() {
         community: formData.community || null,
         notes: formData.notes || null,
       })
-      .then(() => {
+      .then((beneficiary) => {
         toast.success('Beneficiary updated successfully.');
-        navigate(`/backoffice/beneficiaries/profile/${beneficiaryId}`);
+        navigate(`/backoffice/beneficiaries/profile/${beneficiary.id}`);
       })
       .catch((error) => {
         toast.error(error instanceof HttpError ? error.message : 'Beneficiary could not be updated.');

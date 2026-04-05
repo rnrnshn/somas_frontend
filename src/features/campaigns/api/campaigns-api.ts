@@ -1,6 +1,7 @@
 import { apiRequest } from '@/lib/api/client'
 import { normalizeDateOfBirth } from '@/features/campaigns/components/create-campaign-shared'
 import type {
+  AddCampaignBeneficiaryPayload,
   CampaignBeneficiariesFilters,
   CampaignBeneficiariesResponse,
   CampaignDisbursementExecutionResult,
@@ -90,6 +91,14 @@ export async function getAllCampaignBeneficiaries(campaignId: number) {
       firstPage: 1,
     },
   }
+}
+
+export function addCampaignBeneficiary(campaignId: number, payload: AddCampaignBeneficiaryPayload) {
+  return apiRequest(`/campaigns/${campaignId}/beneficiaries`, {
+    method: 'POST',
+    auth: true,
+    body: payload,
+  })
 }
 
 export function createCampaign(payload: CampaignMutationPayload) {

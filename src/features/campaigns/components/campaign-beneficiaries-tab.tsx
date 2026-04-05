@@ -1,4 +1,4 @@
-import { Eye, Flag, Search } from 'lucide-react'
+import { Download, Eye, Flag, Plus, Search, Upload } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { Input } from '@/app/components/ui/input'
@@ -25,6 +25,10 @@ type Props = {
   searchError: unknown
   listPending: boolean
   listError: unknown
+  canAddBeneficiary: boolean
+  onAddBeneficiary: () => void
+  onImportCsv: () => void
+  onExportCsv: () => void
   onViewBeneficiary: (beneficiaryId: number) => void
 }
 
@@ -38,6 +42,10 @@ export function CampaignBeneficiariesTab({
   searchError,
   listPending,
   listError,
+  canAddBeneficiary,
+  onAddBeneficiary,
+  onImportCsv,
+  onExportCsv,
   onViewBeneficiary,
 }: Props) {
   const { t } = useTranslation()
@@ -47,14 +55,30 @@ export function CampaignBeneficiariesTab({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle style={{ fontSize: 'var(--text-16)' }}>{t('campaignDetailPage.beneficiaries')}</CardTitle>
-          <div className="relative w-64">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" style={{ color: 'var(--muted-foreground)' }} />
-            <Input
-              placeholder={t('campaignDetailPage.searchBeneficiaries')}
-              value={searchQuery}
-              onChange={(event) => onSearchChange(event.target.value)}
-              className="pl-10"
-            />
+          <div className="flex items-center gap-3">
+            {canAddBeneficiary ? (
+              <Button onClick={onAddBeneficiary}>
+                <Plus className="mr-2 h-4 w-4" />
+                {t('campaignDetailPage.addBeneficiary')}
+              </Button>
+            ) : null}
+            <Button variant="outline" onClick={onImportCsv}>
+              <Upload className="mr-2 h-4 w-4" />
+              {t('campaignDetailPage.importCsv')}
+            </Button>
+            <Button variant="outline" onClick={onExportCsv}>
+              <Download className="mr-2 h-4 w-4" />
+              {t('campaignDetailPage.exportCsv')}
+            </Button>
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" style={{ color: 'var(--muted-foreground)' }} />
+              <Input
+                placeholder={t('campaignDetailPage.searchBeneficiaries')}
+                value={searchQuery}
+                onChange={(event) => onSearchChange(event.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
         </div>
       </CardHeader>

@@ -4,13 +4,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { useNavigate, useParams } from '@/lib/router'
 import { useAuth } from '@/lib/auth/auth-context'
 import { normalizeRole } from '@/lib/auth/roles'
+import { HttpError } from '@/lib/api/http-error'
 import { formatMetical } from '@/lib/format/currency'
 import {
   useAllCampaignBeneficiariesQuery,
   useCampaignProgressQuery,
   useCampaignQuery,
 } from '@/features/campaigns/hooks/use-campaign-queries'
-import { useExecuteCampaignDisbursementMutation } from '@/features/campaigns/hooks/use-campaign-mutations'
+import { useAddCampaignBeneficiaryMutation, useExecuteCampaignDisbursementMutation } from '@/features/campaigns/hooks/use-campaign-mutations'
 import { adaptCampaignDetail, adaptCampaignProgressSeries } from '@/features/campaigns/adapters/campaigns'
 import {
   buildDisbursementProgressFromTransactions,
@@ -22,6 +23,7 @@ import {
   type CampaignTransactionItem,
 } from '@/features/campaigns/components/campaign-detail-shared'
 import { CampaignBeneficiariesTab } from '@/features/campaigns/components/campaign-beneficiaries-tab'
+import { CampaignAddBeneficiaryDialog } from '@/features/campaigns/components/campaign-add-beneficiary-dialog'
 import { CampaignDetailDialogs } from '@/features/campaigns/components/campaign-detail-dialogs'
 import { CampaignDetailHeader } from '@/features/campaigns/components/campaign-detail-header'
 import { CampaignDetailSkeleton } from '@/features/campaigns/components/campaign-detail-skeleton'
@@ -46,6 +48,7 @@ export function CampaignDetail() {
   const [showSuspendDialog, setShowSuspendDialog] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [showExecuteDialog, setShowExecuteDialog] = useState(false)
+  const [showAddBeneficiaryDialog, setShowAddBeneficiaryDialog] = useState(false)
   const { t } = useTranslation()
 
   const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics'
@@ -63,6 +66,7 @@ export function CampaignDetail() {
     Number.isFinite(campaignId) && beneficiarySearch.length > 0
   )
   const campaignTransactionsQuery = useCampaignTransactionsQuery(campaignId)
+  const addBeneficiaryMutation = useAddCampaignBeneficiaryMutation(campaignId)
   const executeDisbursementMutation = useExecuteCampaignDisbursementMutation(campaignId)
 
   const campaign = campaignQuery.data ? adaptCampaignDetail(campaignQuery.data, progressQuery.data) : null
@@ -127,6 +131,7 @@ export function CampaignDetail() {
         : null
   const hasPaymentChannel = Boolean(campaignQuery.data?.paymentChannel?.id)
   const canExecuteDisbursement = campaign ? !['Closed', 'Suspended'].includes(campaign.status) && hasPaymentChannel : false
+  const canAddBeneficiary = !isAnalyticsOnly && Number.isFinite(campaignId)
 
   const handleExecuteDisbursement = async () => {
     try {
@@ -142,6 +147,50 @@ export function CampaignDetail() {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t('campaignDetailPage.executionFailed'))
     }
+  }
+
+  const handleAddBeneficiary = async (
+    payload: Parameters<typeof addBeneficiaryMutation.mutateAsync>[0]
+  ) => {
+    try {
+      await addBeneficiaryMutation.mutateAsync(payload)
+      toast.success(t('campaignDetailPage.addBeneficiarySuccess'))
+      setShowAddBeneficiaryDialog(false)
+    } catch (error) {
+      toast.error(
+        error instanceof HttpError ? error.message : t('campaignDetailPage.addBeneficiaryError')
+      )
+    }
+  }
+
+  const handleImportBeneficiaries = () => {
+    navigate(`/backoffice/campaigns/${campaignId}/edit`)
+  }
+
+  const handleExportBeneficiaries = () => {
+    const rows = listedBeneficiaries.map((beneficiary) => [
+      beneficiary.name,
+      beneficiary.msisdn,
+      beneficiary.location,
+      beneficiary.amount,
+      beneficiary.status,
+      beneficiary.lastActivity,
+    ])
+
+    const csv = [
+      ['name', 'msisdn', 'location', 'disbursementAmount', 'status', 'lastActivity'].join(','),
+      ...rows.map((row) => row.map(escapeCsvCell).join(',')),
+    ].join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${campaign?.name ?? 'campaign'}-beneficiaries.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   if (campaignQuery.isPending && !campaignQuery.data) {
@@ -212,6 +261,10 @@ export function CampaignDetail() {
               searchError={campaignBeneficiariesQuery.error}
               listPending={campaignBeneficiariesListQuery.isPending}
               listError={campaignBeneficiariesListQuery.error}
+              canAddBeneficiary={canAddBeneficiary}
+              onAddBeneficiary={() => setShowAddBeneficiaryDialog(true)}
+              onImportCsv={handleImportBeneficiaries}
+              onExportCsv={handleExportBeneficiaries}
               onViewBeneficiary={(beneficiaryId) => navigate(`/backoffice/beneficiaries/profile/${beneficiaryId}`)}
             />
           </TabsContent>
@@ -256,8 +309,23 @@ export function CampaignDetail() {
         isExecuting={executeDisbursementMutation.isPending}
         onExecuteDisbursement={() => void handleExecuteDisbursement()}
       />
+
+      <CampaignAddBeneficiaryDialog
+        open={showAddBeneficiaryDialog}
+        isPending={addBeneficiaryMutation.isPending}
+        onOpenChange={setShowAddBeneficiaryDialog}
+        onSubmit={handleAddBeneficiary}
+      />
     </div>
   )
+}
+
+function escapeCsvCell(value: unknown) {
+  const text = value == null ? '' : String(value)
+  if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+    return `"${text.replaceAll('"', '""')}"`
+  }
+  return text
 }
 
 function mapSearchedBeneficiaries(items: any[]): CampaignBeneficiaryItem[] {

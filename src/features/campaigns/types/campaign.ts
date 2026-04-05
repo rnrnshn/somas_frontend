@@ -146,6 +146,26 @@ export type CampaignBeneficiaryImportResult = {
   }>
 }
 
+export type AddCampaignBeneficiaryPayload = {
+  name: string
+  msisdn: string
+  disbursementAmount: number
+  testimony?: string | null
+  gender?: string | null
+  dateOfBirth?: string | null
+  email?: string | null
+  location?: string | null
+  province?: string | null
+  district?: string | null
+  community?: string | null
+  documentIdType?: string | null
+  documentIdNumber?: string | null
+  mobileMoneyProvider?: string | null
+  mobileMoneyAccountName?: string | null
+  mobileMoneyAccountNumber?: string | null
+  notes?: string | null
+}
+
 export type CampaignMutationPayload = {
   name: string
   description?: string
