@@ -100,10 +100,19 @@ export type CampaignBeneficiaryUploadPreviewRow = {
   msisdn: string
   disbursementAmount: number | null
   testimony?: string | null
+  gender?: string | null
+  dateOfBirth?: string | null
+  email?: string | null
   location?: string | null
   province?: string | null
   district?: string | null
   community?: string | null
+  documentIdType?: string | null
+  documentIdNumber?: string | null
+  mobileMoneyProvider?: string | null
+  mobileMoneyAccountName?: string | null
+  mobileMoneyAccountNumber?: string | null
+  notes?: string | null
   status: 'valid' | 'invalid' | 'duplicate'
   errors: string[]
   duplicateOf?: number
@@ -118,6 +127,12 @@ export type CampaignBeneficiaryUploadPreview = {
     errors: number
   }
   rows: CampaignBeneficiaryUploadPreviewRow[]
+  parseErrors?: Array<{
+    row: number
+    message: string
+    msisdn?: string
+    name?: string
+  }>
 }
 
 export type CampaignBeneficiaryImportResult = {

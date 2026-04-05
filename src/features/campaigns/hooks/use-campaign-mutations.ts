@@ -5,6 +5,7 @@ import {
   importCampaignBeneficiaries,
   updateCampaign,
   updateCampaignStatus,
+  validateCampaignBeneficiaryRows,
   validateCampaignBeneficiariesUpload,
 } from '@/features/campaigns/api/campaigns-api'
 import type { CampaignStatus } from '@/features/campaigns/types/campaign'
@@ -65,6 +66,10 @@ export function useUpdateCampaignStatusMutation() {
 
 export function useValidateCampaignBeneficiariesUploadMutation() {
   return useMutation({ mutationFn: validateCampaignBeneficiariesUpload })
+}
+
+export function useValidateCampaignBeneficiaryRowsMutation() {
+  return useMutation({ mutationFn: validateCampaignBeneficiaryRows })
 }
 
 export function useImportCampaignBeneficiariesMutation(campaignId: number) {
