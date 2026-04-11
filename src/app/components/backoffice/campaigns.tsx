@@ -124,12 +124,16 @@ export function BackofficeCampaigns() {
     }
   }
 
+  const availablePrograms = Array.from(
+    new Set(campaigns.map((item) => getDisplayText(item.program)).filter((program) => program !== '—'))
+  )
+
   const filteredCampaigns = campaigns.filter(campaign => {
-    const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         campaign.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = getDisplayText(campaign.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         getDisplayText(campaign.id).toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
     const matchesRegion = regionFilter === "all" || String(campaign.provinceId ?? '') === regionFilter;
-    const matchesProgram = programFilter === "all" || campaign.program === programFilter;
+    const matchesProgram = programFilter === "all" || getDisplayText(campaign.program) === programFilter;
     
     return matchesSearch && matchesStatus && matchesRegion && matchesProgram;
   });
@@ -200,7 +204,7 @@ export function BackofficeCampaigns() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t('campaignsPage.allPrograms')}</SelectItem>
-                {Array.from(new Set(campaigns.map((item) => item.program))).filter((program) => program && program !== '—').map((program) => (
+                {availablePrograms.map((program) => (
                   <SelectItem key={program} value={program}>{program}</SelectItem>
                 ))}
               </SelectContent>
@@ -270,10 +274,10 @@ export function BackofficeCampaigns() {
                       </div>
                     </TableCell>
                     <TableCell style={{ fontSize: "var(--text-13)" }}>
-                      {campaign.program}
+                      {getDisplayText(campaign.program)}
                     </TableCell>
                     <TableCell style={{ fontSize: "var(--text-13)" }}>
-                      {campaign.region}
+                      {getDisplayText(campaign.region)}
                     </TableCell>
                     <TableCell style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
                       {formatDate(campaign.startDate)}
@@ -400,4 +404,22 @@ function mapStatusFilter(status: string): CampaignStatus | undefined {
     default:
       return undefined;
   }
+}
+
+function getDisplayText(value: unknown) {
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed : '—'
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value)
+
+  if (value && typeof value === 'object') {
+    const entity = value as { name?: unknown; code?: unknown }
+
+    if (typeof entity.name === 'string' && entity.name.trim().length > 0) return entity.name.trim()
+    if (typeof entity.code === 'string' && entity.code.trim().length > 0) return entity.code.trim()
+  }
+
+  return '—'
 }

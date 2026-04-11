@@ -25,9 +25,11 @@ export function adaptCampaignListItem(item: CampaignListItem, detail?: CampaignD
   const detailSuccessRate = detail?.successRate ?? null
 
   const regionName =
-    detail?.provinceRelation?.name ??
-    detail?.province ??
-    item.province ??
+    pickDisplayName(
+      detail?.provinceRelation?.name,
+      detail?.province,
+      item.province,
+    ) ??
     '—'
 
   return {
@@ -36,7 +38,7 @@ export function adaptCampaignListItem(item: CampaignListItem, detail?: CampaignD
     statusCode: item.status,
     name: item.name,
     code: item.code,
-    program: detail?.programRelation?.name ?? detail?.program ?? '—',
+    program: pickDisplayName(detail?.programRelation?.name, detail?.program) ?? '—',
     region: regionName,
     provinceId: detail?.provinceRelation?.id ?? detail?.provinceId ?? item.provinceId ?? null,
     startDate: item.startDate,
@@ -57,14 +59,14 @@ export function adaptCampaignDetail(detail: CampaignDetail, progress?: CampaignP
   const totalBeneficiariesCount = Number(detail.totalBeneficiariesCount ?? 0)
   const totalBeneficiaries = Math.max(totalBeneficiariesCount, progress?.total ?? pending + confirmed + failed)
 
-  const regionName = detail.provinceRelation?.name ?? detail.province ?? '—'
+  const regionName = pickDisplayName(detail.provinceRelation?.name, detail.province) ?? '—'
 
   return {
     id: detail.code ?? `CMP-${detail.id}`,
     numericId: detail.id,
     statusCode: detail.status,
     name: detail.name,
-    program: detail.programRelation?.name ?? detail.program ?? '—',
+    program: pickDisplayName(detail.programRelation?.name, detail.program) ?? '—',
     region: regionName,
     startDate: detail.startDate,
     endDate: detail.endDate,
@@ -93,4 +95,35 @@ export function adaptCampaignProgressSeries(detail: CampaignDetail) {
 function formatMonth(date: Date) {
   if (Number.isNaN(date.getTime())) return '—'
   return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date)
+}
+
+function pickDisplayName(...values: unknown[]) {
+  for (const value of values) {
+    const displayName = toDisplayName(value)
+    if (displayName) return displayName
+  }
+  return null
+}
+
+function toDisplayName(value: unknown) {
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed : null
+  }
+
+  if (!value || typeof value !== 'object') return null
+
+  const namedValue = value as { name?: unknown; code?: unknown }
+
+  if (typeof namedValue.name === 'string') {
+    const trimmedName = namedValue.name.trim()
+    if (trimmedName.length > 0) return trimmedName
+  }
+
+  if (typeof namedValue.code === 'string') {
+    const trimmedCode = namedValue.code.trim()
+    if (trimmedCode.length > 0) return trimmedCode
+  }
+
+  return null
 }
