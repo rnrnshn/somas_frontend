@@ -8,7 +8,7 @@ export type CampaignListFilters = {
   code?: string
   name?: string
   status?: CampaignStatus
-  province?: string
+  provinceId?: number
 }
 
 export type CampaignListItem = {
@@ -16,7 +16,8 @@ export type CampaignListItem = {
   name: string
   code: string | null
   status: CampaignStatus
-  province: string
+  province?: string | null
+  provinceId?: number | null
   startDate: string
   endDate: string
   totalBeneficiariesCount?: number
@@ -33,7 +34,9 @@ export type CampaignDetail = {
   description: string | null
   program: string | null
   community: string | null
-  province: string
+  province?: string | null
+  provinceId?: number | null
+  districtId?: number | null
   status: CampaignStatus
   startDate: string
   endDate: string
@@ -49,6 +52,14 @@ export type CampaignDetail = {
     name: string
   } | null
   regionRelation?: {
+    id: number
+    name: string
+  } | null
+  provinceRelation?: {
+    id: number
+    name: string
+  } | null
+  districtRelation?: {
     id: number
     name: string
   } | null
@@ -172,7 +183,8 @@ export type CampaignMutationPayload = {
   program?: string
   programId?: number | null
   community?: string
-  province: string
+  provinceId: number
+  districtId?: number | null
   regionId?: number | null
   startDate: string
   endDate: string

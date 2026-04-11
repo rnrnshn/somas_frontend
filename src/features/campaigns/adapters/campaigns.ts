@@ -24,6 +24,12 @@ export function adaptCampaignListItem(item: CampaignListItem, detail?: CampaignD
   const detailTotalDisbursement = detail ? Number(detail.totalDisbursementAmount ?? 0) : null
   const detailSuccessRate = detail?.successRate ?? null
 
+  const regionName =
+    detail?.provinceRelation?.name ??
+    detail?.province ??
+    item.province ??
+    '—'
+
   return {
     id: String(item.id),
     numericId: item.id,
@@ -31,7 +37,8 @@ export function adaptCampaignListItem(item: CampaignListItem, detail?: CampaignD
     name: item.name,
     code: item.code,
     program: detail?.programRelation?.name ?? detail?.program ?? '—',
-    region: item.province,
+    region: regionName,
+    provinceId: detail?.provinceRelation?.id ?? detail?.provinceId ?? item.provinceId ?? null,
     startDate: item.startDate,
     endDate: item.endDate,
     beneficiaries: detailTotalBeneficiaries ?? Number(item.totalBeneficiariesCount ?? 0),
@@ -50,13 +57,15 @@ export function adaptCampaignDetail(detail: CampaignDetail, progress?: CampaignP
   const totalBeneficiariesCount = Number(detail.totalBeneficiariesCount ?? 0)
   const totalBeneficiaries = Math.max(totalBeneficiariesCount, progress?.total ?? pending + confirmed + failed)
 
+  const regionName = detail.provinceRelation?.name ?? detail.province ?? '—'
+
   return {
     id: detail.code ?? `CMP-${detail.id}`,
     numericId: detail.id,
     statusCode: detail.status,
     name: detail.name,
     program: detail.programRelation?.name ?? detail.program ?? '—',
-    region: detail.province,
+    region: regionName,
     startDate: detail.startDate,
     endDate: detail.endDate,
     status: adaptCampaignStatus(detail.status),

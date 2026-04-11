@@ -15,6 +15,8 @@ type Props = {
   setFormData: Dispatch<SetStateAction<CampaignFormData>>
   programs: Option[]
   regions: Option[]
+  provinces: Option[]
+  districts: Option[]
   submitError: string | null
   catalogsError: unknown
   campaignError: unknown
@@ -25,6 +27,8 @@ export function CampaignDetailsStep({
   setFormData,
   programs,
   regions,
+  provinces,
+  districts,
   submitError,
   catalogsError,
   campaignError,
@@ -93,6 +97,48 @@ export function CampaignDetailsStep({
               </SelectTrigger>
               <SelectContent>
                 {regions.map((option) => (
+                  <SelectItem key={option.id} value={String(option.id)}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="province">{t('createCampaignPage.province')}</Label>
+            <Select
+              value={formData.province}
+              onValueChange={(value) =>
+                setFormData((current) => ({ ...current, province: value, district: '' }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('createCampaignPage.province')} />
+              </SelectTrigger>
+              <SelectContent>
+                {provinces.map((option) => (
+                  <SelectItem key={option.id} value={String(option.id)}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="district">{t('createCampaignPage.district')}</Label>
+            <Select
+              value={formData.district}
+              onValueChange={(value) => setFormData((current) => ({ ...current, district: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('createCampaignPage.district')} />
+              </SelectTrigger>
+              <SelectContent>
+                {districts.map((option) => (
                   <SelectItem key={option.id} value={String(option.id)}>
                     {option.name}
                   </SelectItem>

@@ -7,6 +7,7 @@ import type {
   BeneficiaryMetric,
   BeneficiaryTransactionsResponse,
   BeneficiaryWithMetrics,
+  UpdateBeneficiaryPayload,
 } from '@/features/beneficiaries/types/beneficiary'
 
 function buildBeneficiariesQuery(filters: BeneficiaryListFilters) {
@@ -74,7 +75,7 @@ export function getBeneficiaryCampaigns(beneficiaryId: number, page = 1, pageSiz
   })
 }
 
-export function updateBeneficiary(beneficiaryId: number, payload: Partial<BeneficiaryDetail>) {
+export function updateBeneficiary(beneficiaryId: number, payload: UpdateBeneficiaryPayload) {
   return apiRequest<BeneficiaryDetail>(`/beneficiaries/${beneficiaryId}`, {
     method: 'PATCH',
     auth: true,

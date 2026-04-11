@@ -1,12 +1,29 @@
 import { apiRequest } from '@/lib/api/client'
 import type { CatalogOption } from '@/features/catalogs/types/catalog'
 
+export type ProvinceOption = CatalogOption & {
+  regionId?: number | null
+}
+
+export type DistrictOption = CatalogOption & {
+  provinceId?: number | null
+}
+
 export function getPrograms() {
   return apiRequest<CatalogOption[]>('/programs', { method: 'GET', auth: true })
 }
 
 export function getRegions() {
   return apiRequest<CatalogOption[]>('/regions', { method: 'GET', auth: true })
+}
+
+export function getProvinces(regionId?: number) {
+  const query = typeof regionId === 'number' && Number.isFinite(regionId) ? `?regionId=${regionId}` : ''
+  return apiRequest<ProvinceOption[]>(`/provinces${query}`, { method: 'GET', auth: true })
+}
+
+export function getDistricts(provinceId: number) {
+  return apiRequest<DistrictOption[]>(`/provinces/${provinceId}/districts`, { method: 'GET', auth: true })
 }
 
 export function getPaymentChannels() {

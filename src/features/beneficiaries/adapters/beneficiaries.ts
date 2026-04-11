@@ -17,8 +17,8 @@ export function adaptBeneficiaryListItem(
     beneficiaryCode: withMetrics?.code ?? `BEN-${String(item.id).padStart(6, '0')}`,
     fullName: withMetrics?.name ?? item.name,
     msisdn: item.msisdn,
-    province: withMetrics?.province ?? '—',
-    district: withMetrics?.district ?? '—',
+    province: getLocationName(withMetrics?.province) ?? '—',
+    district: getLocationName(withMetrics?.district) ?? '—',
     campaign: primaryCampaign?.campaign.name ?? '—',
     lastTransaction: formatDate(withMetrics?.metric?.lastTransactionAt ?? null),
     totalReceived: withMetrics?.metric?.totalReceived ?? 0,
@@ -41,8 +41,8 @@ export function adaptBeneficiaryProfile(withMetrics: BeneficiaryWithMetrics, met
     nationalId: withMetrics.documentIdNumber ?? '—',
     idType: withMetrics.documentIdType ?? '—',
     nationalIdVerified: Boolean(withMetrics.documentIdNumber),
-    province: withMetrics.province ?? '—',
-    district: withMetrics.district ?? '—',
+    province: getLocationName(withMetrics.province) ?? '—',
+    district: getLocationName(withMetrics.district) ?? '—',
     community: withMetrics.community ?? '—',
     mobileMoneyProvider: withMetrics.mobileMoneyProvider ?? '—',
     mobileMoneyName: withMetrics.mobileMoneyAccountName ?? withMetrics.name,
@@ -111,4 +111,18 @@ function formatDate(value: string | null | undefined) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return new Intl.DateTimeFormat('en-CA').format(date)
+}
+
+function getLocationName(
+  value:
+    | string
+    | {
+        id: number
+        name: string
+      }
+    | null
+    | undefined
+) {
+  if (!value) return null
+  return typeof value === 'string' ? value : value.name
 }

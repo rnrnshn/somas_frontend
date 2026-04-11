@@ -25,7 +25,9 @@ function buildCampaignListQuery(filters: CampaignListFilters) {
   if (filters.code?.trim()) params.set('code', filters.code.trim())
   if (filters.name?.trim()) params.set('name', filters.name.trim())
   if (filters.status) params.set('status', filters.status)
-  if (filters.province?.trim()) params.set('province', filters.province.trim())
+  if (typeof filters.provinceId === 'number' && Number.isFinite(filters.provinceId)) {
+    params.set('provinceId', String(filters.provinceId))
+  }
 
   return `?${params.toString()}`
 }

@@ -18,6 +18,8 @@ const EMPTY_FORM: CampaignFormData = {
   name: '',
   program: '',
   region: '',
+  province: '',
+  district: '',
   startDate: '',
   endDate: '',
   description: '',
@@ -62,6 +64,14 @@ export function useCreateCampaignForm({
       name: campaignData.name ?? current.name,
       program: campaignData.programRelation?.id ? String(campaignData.programRelation.id) : current.program,
       region: campaignData.regionRelation?.id ? String(campaignData.regionRelation.id) : current.region,
+      province:
+        campaignData.provinceRelation?.id || campaignData.province?.id
+          ? String(campaignData.provinceRelation?.id ?? campaignData.province?.id)
+          : current.province,
+      district:
+        campaignData.districtRelation?.id || campaignData.district?.id
+          ? String(campaignData.districtRelation?.id ?? campaignData.district?.id)
+          : current.district,
       startDate: campaignData.startDate ?? current.startDate,
       endDate: campaignData.endDate ?? current.endDate,
       description: campaignData.description ?? '',

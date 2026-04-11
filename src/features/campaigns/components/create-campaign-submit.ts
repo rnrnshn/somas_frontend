@@ -18,15 +18,15 @@ export function getCatalogLabel(options: Array<{ id: number; name: string }>, va
 }
 
 export function buildCampaignPayload(
-  formData: CampaignFormData,
-  regions: Array<{ id: number; name: string }>
+  formData: CampaignFormData
 ) {
   return {
     name: formData.name,
     description: formData.description || undefined,
     programId: formData.program ? Number(formData.program) : undefined,
     regionId: formData.region ? Number(formData.region) : undefined,
-    province: getCatalogLabel(regions, formData.region) || 'Unknown',
+    provinceId: Number(formData.province),
+    districtId: formData.district ? Number(formData.district) : undefined,
     community: undefined,
     startDate: formData.startDate,
     endDate: formData.endDate,
@@ -39,20 +39,18 @@ export function buildCampaignPayload(
 
 export async function submitCampaign({
   formData,
-  catalogsRegions,
   isEditMode,
   uploadedFile,
   createCampaign,
   updateCampaign,
 }: {
   formData: CampaignFormData
-  catalogsRegions: Array<{ id: number; name: string }>
   isEditMode: boolean
   uploadedFile: File | null
   createCampaign: (payload: ReturnType<typeof buildCampaignPayload>) => Promise<{ id: number }>
   updateCampaign: (payload: ReturnType<typeof buildCampaignPayload>) => Promise<{ id: number }>
 }) {
-  const payload = buildCampaignPayload(formData, catalogsRegions)
+  const payload = buildCampaignPayload(formData)
   const savedCampaign = isEditMode ? await updateCampaign(payload) : await createCampaign(payload)
   const validRows = formData.beneficiaries
     .filter((row) => row.status === 'valid' && typeof row.disbursementAmount === 'number')

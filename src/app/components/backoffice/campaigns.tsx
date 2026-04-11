@@ -7,6 +7,7 @@ import { useCampaignDetailsQueries, useCampaignsQuery, useCampaignTableSummaryQu
 import { adaptCampaignListItem } from "@/features/campaigns/adapters/campaigns";
 import { useUpdateCampaignStatusMutation } from "@/features/campaigns/hooks/use-campaign-mutations";
 import type { CampaignListFilters, CampaignStatus } from "@/features/campaigns/types/campaign";
+import { useCampaignCatalogs } from "@/features/catalogs/hooks/use-catalog-queries";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -50,6 +51,7 @@ export function BackofficeCampaigns() {
   const [programFilter, setProgramFilter] = useState("all");
   const { t } = useTranslation();
   const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics';
+  const catalogs = useCampaignCatalogs();
 
   const filters: CampaignListFilters = {
     page: 1,
@@ -57,7 +59,7 @@ export function BackofficeCampaigns() {
     name: searchQuery.trim() || undefined,
     code: searchQuery.trim() || undefined,
     status: mapStatusFilter(statusFilter),
-    province: regionFilter === 'all' ? undefined : regionFilter,
+    provinceId: regionFilter === 'all' ? undefined : Number(regionFilter),
   };
   const campaignsQuery = useCampaignsQuery(filters);
   const updateCampaignStatusMutation = useUpdateCampaignStatusMutation();
@@ -126,7 +128,7 @@ export function BackofficeCampaigns() {
     const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          campaign.id.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
-    const matchesRegion = regionFilter === "all" || campaign.region === regionFilter;
+    const matchesRegion = regionFilter === "all" || String(campaign.provinceId ?? '') === regionFilter;
     const matchesProgram = programFilter === "all" || campaign.program === programFilter;
     
     return matchesSearch && matchesStatus && matchesRegion && matchesProgram;
@@ -186,8 +188,8 @@ export function BackofficeCampaigns() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t('campaignsPage.allRegions')}</SelectItem>
-                {Array.from(new Set(campaigns.map((item) => item.region))).filter(Boolean).map((region) => (
-                  <SelectItem key={region} value={region}>{region}</SelectItem>
+                {(catalogs.provinces.data ?? []).map((province) => (
+                  <SelectItem key={province.id} value={String(province.id)}>{province.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

@@ -11,7 +11,9 @@ function buildDashboardQuery(filters: DashboardFilters) {
   const params = new URLSearchParams()
 
   if (filters.period) params.set('period', filters.period)
-  if (filters.province?.trim()) params.set('province', filters.province.trim())
+  if (typeof filters.provinceId === 'number' && Number.isFinite(filters.provinceId)) {
+    params.set('provinceId', String(filters.provinceId))
+  }
   if (typeof filters.campaignId === 'number' && Number.isFinite(filters.campaignId)) {
     params.set('campaignId', String(filters.campaignId))
   }

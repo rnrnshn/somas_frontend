@@ -9,6 +9,8 @@ export type CampaignFormData = {
   name: string
   program: string
   region: string
+  province: string
+  district: string
   startDate: string
   endDate: string
   description: string

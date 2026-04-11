@@ -12,7 +12,7 @@ import {
 import { CreateCampaignHeader } from '@/features/campaigns/components/create-campaign-header'
 import { CreateCampaignSkeleton } from '@/features/campaigns/components/create-campaign-skeleton'
 import { CampaignUploadRowEditor } from '@/features/campaigns/components/campaign-upload-row-editor'
-import { useCampaignCatalogs } from '@/features/catalogs/hooks/use-catalog-queries'
+import { useCampaignCatalogs, useDistrictCatalog } from '@/features/catalogs/hooks/use-catalog-queries'
 import {
   useAllCampaignBeneficiariesQuery,
   useCampaignQuery,
@@ -56,6 +56,10 @@ export function CreateCampaign() {
     validateRows: (rows) => validateRowsMutation.mutateAsync(rows),
     fileValidationErrorMessage: t('createCampaignPage.fileValidationError'),
   })
+  const selectedProvinceId = Number(form.formData.province)
+  const districts = useDistrictCatalog(
+    Number.isFinite(selectedProvinceId) && selectedProvinceId > 0 ? selectedProvinceId : undefined
+  )
 
   const beneficiariesPreviewPagination = useTablePagination(form.formData.beneficiaries, undefined, [
     form.currentStep,
@@ -85,6 +89,8 @@ export function CreateCampaign() {
           setFormData={form.setFormData}
           programs={catalogs.programs.data ?? []}
           regions={catalogs.regions.data ?? []}
+          provinces={catalogs.provinces.data ?? []}
+          districts={districts.data ?? []}
           submitError={form.submitError}
           catalogsError={catalogs.error}
           campaignError={campaignQuery.error}
@@ -120,7 +126,7 @@ export function CreateCampaign() {
         <CampaignReviewStep
           name={form.formData.name}
           programLabel={getCatalogLabel(catalogs.programs.data ?? [], form.formData.program)}
-          regionLabel={getCatalogLabel(catalogs.regions.data ?? [], form.formData.region)}
+          regionLabel={getCatalogLabel(catalogs.provinces.data ?? [], form.formData.province)}
           paymentChannelLabel={getCatalogLabel(catalogs.paymentChannels.data ?? [], form.formData.paymentChannel)}
           validBeneficiaries={form.validationSummary.valid}
           totalDisbursementLabel={
@@ -168,11 +174,11 @@ export function CreateCampaign() {
             formData: form.formData,
             isEditMode,
             uploadedFile: form.uploadedFile,
-            catalogsRegions: catalogs.regions.data ?? [],
             createCampaign: createCampaignMutation.mutateAsync,
             updateCampaign: updateCampaignMutation.mutateAsync,
             createdSuccessMessage: t('createCampaignPage.createdSuccess'),
             updatedSuccessMessage: t('createCampaignPage.updatedSuccess'),
+            selectProvinceMessage: t('createCampaignPage.province'),
             selectPaymentMessage: t('createCampaignPage.selectPaymentBeforeSaving'),
             saveFailedMessage: t('createCampaignPage.saveFailed', {
               action: isEditMode ? 'updated' : 'created',
@@ -210,11 +216,11 @@ async function onConfirmCampaign({
   formData,
   isEditMode,
   uploadedFile,
-  catalogsRegions,
   createCampaign,
   updateCampaign,
   createdSuccessMessage,
   updatedSuccessMessage,
+  selectProvinceMessage,
   selectPaymentMessage,
   saveFailedMessage,
   onSubmitError,
@@ -224,17 +230,23 @@ async function onConfirmCampaign({
   formData: ReturnType<typeof useCreateCampaignForm>['formData']
   isEditMode: boolean
   uploadedFile: File | null
-  catalogsRegions: Array<{ id: number; name: string }>
   createCampaign: Parameters<typeof submitCampaign>[0]['createCampaign']
   updateCampaign: Parameters<typeof submitCampaign>[0]['updateCampaign']
   createdSuccessMessage: string
   updatedSuccessMessage: string
+  selectProvinceMessage: string
   selectPaymentMessage: string
   saveFailedMessage: string
   onSubmitError: (message: string) => void
   onClose: () => void
   onSuccessNavigate: (savedCampaignId: number) => void
 }) {
+  if (!formData.province) {
+    onSubmitError(`${selectProvinceMessage} is required.`)
+    onClose()
+    return
+  }
+
   if (!formData.paymentChannel) {
     onSubmitError(selectPaymentMessage)
     onClose()
@@ -244,7 +256,6 @@ async function onConfirmCampaign({
   try {
     const savedCampaignId = await submitCampaign({
       formData,
-      catalogsRegions,
       isEditMode,
       uploadedFile,
       createCampaign,

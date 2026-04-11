@@ -18,6 +18,13 @@ function buildTransactionListQuery(filters: TransactionListFilters) {
   if (filters.status?.trim()) params.set('status', filters.status.trim())
   if (filters.type?.trim()) params.set('type', filters.type.trim())
   if (Number.isFinite(filters.campaignId)) params.set('campaignId', String(filters.campaignId))
+  if (Number.isFinite(filters.beneficiaryId)) params.set('beneficiaryId', String(filters.beneficiaryId))
+  if (Number.isFinite(filters.paymentChannelId)) params.set('paymentChannelId', String(filters.paymentChannelId))
+  if (Number.isFinite(filters.disbursementBatchId)) params.set('disbursementBatchId', String(filters.disbursementBatchId))
+  if (filters.createdFrom?.trim()) params.set('createdFrom', filters.createdFrom)
+  if (filters.createdTo?.trim()) params.set('createdTo', filters.createdTo)
+  if (filters.executedFrom?.trim()) params.set('executedFrom', filters.executedFrom)
+  if (filters.executedTo?.trim()) params.set('executedTo', filters.executedTo)
 
   return `?${params.toString()}`
 }

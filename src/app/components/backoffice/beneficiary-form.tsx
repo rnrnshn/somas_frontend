@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "@/lib/router";
 import { useBeneficiaryDetailQueries } from "@/features/beneficiaries/hooks/use-beneficiary-queries";
 import { useUpdateBeneficiaryMutation } from "@/features/beneficiaries/hooks/use-beneficiary-mutations";
+import { useCampaignCatalogs, useDistrictCatalog } from "@/features/catalogs/hooks/use-catalog-queries";
 import { HttpError } from "@/lib/api/http-error";
 import { Card, CardHeader, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
@@ -18,6 +19,7 @@ export function BeneficiaryForm() {
   const beneficiaryId = Number(id);
   const isEdit = Number.isFinite(beneficiaryId);
   const queries = useBeneficiaryDetailQueries(beneficiaryId);
+  const catalogs = useCampaignCatalogs();
   const updateMutation = useUpdateBeneficiaryMutation(beneficiaryId);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -25,11 +27,16 @@ export function BeneficiaryForm() {
     fullName: "",
     phone: "",
     email: "",
-    province: "",
-    district: "",
+    provinceId: "",
+    districtId: "",
     community: "",
     notes: "",
   });
+
+  const selectedProvinceId = Number(formData.provinceId);
+  const districts = useDistrictCatalog(
+    Number.isFinite(selectedProvinceId) && selectedProvinceId > 0 ? selectedProvinceId : undefined
+  );
 
   useEffect(() => {
     if (!isEdit) {
@@ -44,8 +51,8 @@ export function BeneficiaryForm() {
       fullName: profile.name,
       phone: profile.msisdn,
       email: profile.email ?? '',
-      province: profile.province ?? '',
-      district: profile.district ?? '',
+      provinceId: getCatalogId(profile.province, profile.provinceId),
+      districtId: getCatalogId(profile.district, profile.districtId),
       community: profile.community ?? '',
       notes: profile.notes ?? '',
     });
@@ -59,8 +66,8 @@ export function BeneficiaryForm() {
         name: formData.fullName,
         msisdn: formData.phone,
         email: formData.email || null,
-        province: formData.province || null,
-        district: formData.district || null,
+        provinceId: formData.provinceId ? Number(formData.provinceId) : null,
+        districtId: formData.districtId ? Number(formData.districtId) : null,
         community: formData.community || null,
         notes: formData.notes || null,
       })
@@ -172,19 +179,18 @@ export function BeneficiaryForm() {
                   Province <span style={{ color: 'var(--destructive)' }}>*</span>
                 </Label>
                 <Select
-                  value={formData.province}
-                  onValueChange={(value) => handleChange("province", value)}
+                  value={formData.provinceId}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, provinceId: value, districtId: '' }))
+                  }
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select province" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Albay">Albay</SelectItem>
-                    <SelectItem value="Camarines Sur">Camarines Sur</SelectItem>
-                    <SelectItem value="Camarines Norte">Camarines Norte</SelectItem>
-                    <SelectItem value="Catanduanes">Catanduanes</SelectItem>
-                    <SelectItem value="Masbate">Masbate</SelectItem>
-                    <SelectItem value="Sorsogon">Sorsogon</SelectItem>
+                    {(catalogs.provinces.data ?? []).map((province) => (
+                      <SelectItem key={province.id} value={String(province.id)}>{province.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -194,14 +200,16 @@ export function BeneficiaryForm() {
                 <Label htmlFor="district" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
                   District <span style={{ color: 'var(--destructive)' }}>*</span>
                 </Label>
-                <Input
-                  id="district"
-                  value={formData.district}
-                  onChange={(e) => handleChange("district", e.target.value)}
-                  placeholder="Enter district or city"
-                  required
-                  className="mt-2"
-                />
+                <Select value={formData.districtId} onValueChange={(value) => handleChange("districtId", value)}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select district" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(districts.data ?? []).map((district) => (
+                      <SelectItem key={district.id} value={String(district.id)}>{district.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Community */}
@@ -253,4 +261,24 @@ export function BeneficiaryForm() {
       </form>
     </div>
   );
+}
+
+function getCatalogId(
+  value:
+    | string
+    | {
+        id: number
+        name: string
+      }
+    | null
+    | undefined,
+  fallback?: number | null
+) {
+  if (typeof value === 'object' && value !== null) {
+    return String(value.id)
+  }
+  if (typeof fallback === 'number' && Number.isFinite(fallback)) {
+    return String(fallback)
+  }
+  return ''
 }

@@ -7,6 +7,13 @@ export type TransactionListFilters = {
   status?: string
   type?: string
   campaignId?: number
+  beneficiaryId?: number
+  paymentChannelId?: number
+  disbursementBatchId?: number
+  createdFrom?: string
+  createdTo?: string
+  executedFrom?: string
+  executedTo?: string
 }
 
 export type TransactionListItem = {

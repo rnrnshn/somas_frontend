@@ -2,7 +2,7 @@ export type DashboardPeriod = 'today' | 'last_7_days' | 'last_30_days' | 'last_9
 
 export type DashboardFilters = {
   period?: DashboardPeriod
-  province?: string
+  provinceId?: number
   campaignId?: number
 }
 

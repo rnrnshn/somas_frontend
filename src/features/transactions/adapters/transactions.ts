@@ -21,6 +21,10 @@ export function adaptTransaction(item: TransactionListItem | TransactionDetail) 
     status: normalizeStatus(item.status),
     executedAt: formatDateTime(item.executedAt),
     createdAt: formatDateTime(item.createdAt),
+    attemptCount: 'attemptCount' in item ? (item.attemptCount ?? null) : null,
+    nextRetryAt: 'nextRetryAt' in item ? formatDateTime(item.nextRetryAt) : null,
+    lastAttemptAt: 'lastAttemptAt' in item ? formatDateTime(item.lastAttemptAt) : null,
+    failureCode: 'failureCode' in item ? (item.failureCode ?? null) : null,
     currency: 'MZN',
     errorMessage: 'errorMessage' in item ? (item.errorMessage ?? null) : null,
   }
@@ -59,6 +63,7 @@ export function adaptAnalytics(summary?: TransactionAnalyticsSummary) {
       { status: 'Successful', count: getStatusCount(summary?.byStatus, ['successful', 'confirmed', 'completed', 'success']), color: 'var(--success)' },
       { status: 'Pending', count: getStatusCount(summary?.byStatus, ['pending']), color: 'var(--warning)' },
       { status: 'Processing', count: getStatusCount(summary?.byStatus, ['processing']), color: 'var(--warning)' },
+      { status: 'Retry Scheduled', count: getStatusCount(summary?.byStatus, ['retry_scheduled']), color: 'var(--warning)' },
       { status: 'Failed', count: getStatusCount(summary?.byStatus, ['failed', 'error']), color: 'var(--destructive)' },
       { status: 'Reversed', count: getStatusCount(summary?.byStatus, ['reversed']), color: 'var(--destructive)' },
     ].filter((item) => item.count > 0),
@@ -83,6 +88,7 @@ function normalizeStatus(status: string) {
   if (['successful', 'confirmed', 'completed', 'success'].includes(value)) return 'Successful'
   if (value === 'pending') return 'Pending'
   if (value === 'processing') return 'Processing'
+  if (value === 'retry_scheduled') return 'Retry Scheduled'
   if (['failed', 'error'].includes(value)) return 'Failed'
   if (value === 'reversed') return 'Reversed'
   return status

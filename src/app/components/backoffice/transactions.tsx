@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import {
   useDisbursementBatchesQuery,
   useFailedTransactionsQuery,
+  useRetryTransactionsMutation,
   useTransactionAnalyticsSummaryQuery,
   useTransactionQuery,
   useTransactionsQuery,
 } from "@/features/transactions/hooks/use-transaction-queries";
+import { useCampaignCatalogs } from "@/features/catalogs/hooks/use-catalog-queries";
 import { adaptAnalytics, adaptBatch, adaptTransaction } from "@/features/transactions/adapters/transactions";
 import type { TransactionListFilters } from "@/features/transactions/types/transaction";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
@@ -22,6 +24,7 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { normalizeRole } from "@/lib/auth/roles";
 import { formatMetical } from "@/lib/format/currency";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 export function BackofficeTransactions() {
   const { user } = useAuth();
@@ -32,22 +35,48 @@ export function BackofficeTransactions() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [providerFilter, setProviderFilter] = useState("all");
+  const [paymentChannelFilter, setPaymentChannelFilter] = useState("all");
+  const [batchFilter, setBatchFilter] = useState("all");
+  const [createdFrom, setCreatedFrom] = useState("");
+  const [createdTo, setCreatedTo] = useState("");
+  const [executedFrom, setExecutedFrom] = useState("");
+  const [executedTo, setExecutedTo] = useState("");
+  const [selectedFailedTransactionIds, setSelectedFailedTransactionIds] = useState<number[]>([]);
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
   const [showTransactionDetail, setShowTransactionDetail] = useState(false);
   const { t } = useTranslation();
+  const catalogs = useCampaignCatalogs();
 
   const filters: TransactionListFilters = {
     page: 1,
     pageSize: 100,
     q: searchQuery.trim() || undefined,
-    status: statusFilter === 'all' ? undefined : statusFilter.toLowerCase(),
+    status: statusFilter === 'all' ? undefined : statusFilter.toLowerCase().replace(/\s+/g, '_'),
     type: typeFilter === 'all' ? undefined : typeFilter.toLowerCase(),
+    paymentChannelId: paymentChannelFilter === 'all' ? undefined : Number(paymentChannelFilter),
+    disbursementBatchId: batchFilter === 'all' ? undefined : Number(batchFilter),
+    createdFrom: createdFrom || undefined,
+    createdTo: createdTo || undefined,
+    executedFrom: executedFrom || undefined,
+    executedTo: executedTo || undefined,
   };
   const transactionsQuery = useTransactionsQuery(filters);
-  const failedTransactionsQuery = useFailedTransactionsQuery({ page: 1, pageSize: 100, q: searchQuery.trim() || undefined });
+  const failedTransactionsQuery = useFailedTransactionsQuery({
+    page: 1,
+    pageSize: 100,
+    q: searchQuery.trim() || undefined,
+    campaignId: filters.campaignId,
+    paymentChannelId: filters.paymentChannelId,
+    disbursementBatchId: filters.disbursementBatchId,
+    createdFrom: filters.createdFrom,
+    createdTo: filters.createdTo,
+    executedFrom: filters.executedFrom,
+    executedTo: filters.executedTo,
+  });
   const analyticsQuery = useTransactionAnalyticsSummaryQuery();
   const batchesQuery = useDisbursementBatchesQuery(1, 100);
   const selectedTransactionQuery = useTransactionQuery(selectedTransactionId ?? Number.NaN);
+  const retryTransactionsMutation = useRetryTransactionsMutation();
 
   const analytics = adaptAnalytics(analyticsQuery.data);
   const transactions = (transactionsQuery.data?.data ?? []).map(adaptTransaction).filter((txn) => {
@@ -61,9 +90,32 @@ export function BackofficeTransactions() {
     return matchesCampaign;
   });
   const selectedTransaction = selectedTransactionQuery.data ? adaptTransaction(selectedTransactionQuery.data) : transactions.find((txn) => txn.numericId === selectedTransactionId) ?? null;
-  const transactionsPagination = useTablePagination(transactions, undefined, [activeTab, searchQuery, statusFilter, typeFilter, campaignFilter, providerFilter]);
+  const transactionsPagination = useTablePagination(transactions, undefined, [
+    activeTab,
+    searchQuery,
+    statusFilter,
+    typeFilter,
+    campaignFilter,
+    providerFilter,
+    paymentChannelFilter,
+    batchFilter,
+    createdFrom,
+    createdTo,
+    executedFrom,
+    executedTo,
+  ]);
   const batchesPagination = useTablePagination(disbursementBatches, undefined, [activeTab]);
-  const failedTransactionsPagination = useTablePagination(failedTransactionsList, undefined, [activeTab, searchQuery, campaignFilter]);
+  const failedTransactionsPagination = useTablePagination(failedTransactionsList, undefined, [
+    activeTab,
+    searchQuery,
+    campaignFilter,
+    paymentChannelFilter,
+    batchFilter,
+    createdFrom,
+    createdTo,
+    executedFrom,
+    executedTo,
+  ]);
 
   useEffect(() => {
     if (isAnalyticsOnly && activeTab !== 'analytics') {
@@ -71,12 +123,18 @@ export function BackofficeTransactions() {
     }
   }, [activeTab, isAnalyticsOnly]);
 
+  useEffect(() => {
+    const failedIds = new Set(failedTransactionsList.map((item) => item.numericId));
+    setSelectedFailedTransactionIds((current) => current.filter((id) => failedIds.has(id)));
+  }, [failedTransactionsList]);
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
       Successful: { variant: "success" },
       Confirmed: { variant: "success" },
       Pending: { variant: "warning" },
       Processing: { variant: "warning" },
+      'Retry Scheduled': { variant: "outline" },
       Failed: { variant: "destructive" },
       Reversed: { variant: "destructive" },
       Completed: { variant: "success" },
@@ -95,6 +153,7 @@ export function BackofficeTransactions() {
         return <XCircle className="w-4 h-4" style={{ color: 'var(--destructive)' }} />;
       case 'Pending':
       case 'Processing':
+      case 'Retry Scheduled':
         return <Clock className="w-4 h-4" style={{ color: 'var(--warning)' }} />;
       default:
         return <Activity className="w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />;
@@ -114,6 +173,35 @@ export function BackofficeTransactions() {
   const handleViewTransaction = (txn: { numericId: number }) => {
     setSelectedTransactionId(txn.numericId);
     setShowTransactionDetail(true);
+  };
+
+  const toggleFailedTransaction = (transactionId: number, checked: boolean) => {
+    setSelectedFailedTransactionIds((current) => {
+      if (checked) return Array.from(new Set([...current, transactionId]));
+      return current.filter((id) => id !== transactionId);
+    });
+  };
+
+  const handleRetryTransactions = async (transactionIds: number[]) => {
+    if (transactionIds.length === 0) return;
+
+    try {
+      const result = await retryTransactionsMutation.mutateAsync(transactionIds);
+      const skipped = result.skipped?.length ?? 0;
+      const scheduled = result.scheduled ?? 0;
+      if (scheduled > 0) {
+        toast.success(
+          skipped > 0
+            ? `${scheduled} transaction${scheduled === 1 ? '' : 's'} scheduled. ${skipped} skipped.`
+            : `${scheduled} transaction${scheduled === 1 ? '' : 's'} scheduled for retry.`
+        );
+      } else {
+        toast.error('No transactions were scheduled for retry.');
+      }
+      setSelectedFailedTransactionIds([]);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Retry request failed.');
+    }
   };
 
   return (
@@ -177,8 +265,31 @@ export function BackofficeTransactions() {
                     <SelectItem value="Successful">Successful</SelectItem>
                     <SelectItem value="Pending">Pending</SelectItem>
                     <SelectItem value="Processing">Processing</SelectItem>
+                    <SelectItem value="Retry Scheduled">Retry Scheduled</SelectItem>
                     <SelectItem value="Failed">Failed</SelectItem>
                     <SelectItem value="Reversed">Reversed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={paymentChannelFilter} onValueChange={setPaymentChannelFilter}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder={t('transactionsPage.provider')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All payment channels</SelectItem>
+                    {(catalogs.paymentChannels.data ?? []).map((item) => (
+                      <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={batchFilter} onValueChange={setBatchFilter}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder={t('transactionsPage.batchId')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All batches</SelectItem>
+                    {(batchesQuery.data?.data ?? []).map((item) => (
+                      <SelectItem key={item.id} value={String(item.id)}>{item.code}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Select value={providerFilter} onValueChange={setProviderFilter}>
@@ -192,6 +303,10 @@ export function BackofficeTransactions() {
                     ))}
                   </SelectContent>
                 </Select>
+                <Input type="date" value={createdFrom} onChange={(e) => setCreatedFrom(e.target.value)} className="w-40" />
+                <Input type="date" value={createdTo} onChange={(e) => setCreatedTo(e.target.value)} className="w-40" />
+                <Input type="date" value={executedFrom} onChange={(e) => setExecutedFrom(e.target.value)} className="w-40" />
+                <Input type="date" value={executedTo} onChange={(e) => setExecutedTo(e.target.value)} className="w-40" />
                 <Button variant="outline">
                   <Download className="w-4 h-4 mr-2" />
                   {t('transactionsPage.export')}
@@ -436,7 +551,11 @@ export function BackofficeTransactions() {
                     <Download className="w-4 h-4 mr-2" />
                     {t('transactionsPage.export')}
                   </Button>
-                  <Button variant="default">
+                  <Button
+                    variant="default"
+                    disabled={selectedFailedTransactionIds.length === 0 || retryTransactionsMutation.isPending}
+                    onClick={() => void handleRetryTransactions(selectedFailedTransactionIds)}
+                  >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     {t('transactionsPage.retrySelected')}
                   </Button>
@@ -447,6 +566,25 @@ export function BackofficeTransactions() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">
+                      <input
+                        type="checkbox"
+                        checked={
+                          failedTransactionsPagination.paginatedItems.length > 0 &&
+                          failedTransactionsPagination.paginatedItems.every((item) =>
+                            selectedFailedTransactionIds.includes(item.numericId)
+                          )
+                        }
+                        onChange={(event) => {
+                          const pageIds = failedTransactionsPagination.paginatedItems.map((item) => item.numericId);
+                          if (event.target.checked) {
+                            setSelectedFailedTransactionIds((current) => Array.from(new Set([...current, ...pageIds])));
+                            return;
+                          }
+                          setSelectedFailedTransactionIds((current) => current.filter((id) => !pageIds.includes(id)));
+                        }}
+                      />
+                    </TableHead>
                     <TableHead>{t('transactionsPage.transactionRef')}</TableHead>
                     <TableHead>{t('transactionsPage.beneficiary')}</TableHead>
                     <TableHead>{t('transactionsPage.campaign')}</TableHead>
@@ -459,7 +597,7 @@ export function BackofficeTransactions() {
                 <TableBody>
                   {failedTransactionsList.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="py-12 text-center">
+                      <TableCell colSpan={8} className="py-12 text-center">
                         <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
                           {failedTransactionsQuery.isPending ? t('transactionsPage.loadingFailed') : t('transactionsPage.noFailed')}
                         </p>
@@ -467,6 +605,13 @@ export function BackofficeTransactions() {
                     </TableRow>
                   ) : failedTransactionsPagination.paginatedItems.map((txn) => (
                     <TableRow key={txn.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selectedFailedTransactionIds.includes(txn.numericId)}
+                          onChange={(event) => toggleFailedTransaction(txn.numericId, event.target.checked)}
+                        />
+                      </TableCell>
                       <TableCell>
                         <span style={{ fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace', fontSize: 'var(--text-12)' }}>
                           {txn.reference}
@@ -498,7 +643,12 @@ export function BackofficeTransactions() {
                         {txn.createdAt}
                       </TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={retryTransactionsMutation.isPending}
+                          onClick={() => void handleRetryTransactions([txn.numericId])}
+                        >
                           <RefreshCw className="w-3 h-3 mr-1" />
                           {t('transactionsPage.retry')}
                         </Button>
@@ -764,6 +914,42 @@ export function BackofficeTransactions() {
                   </p>
                   <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace' }}>
                     {selectedTransaction.externalTxnId || '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Attempt Count
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.attemptCount ?? '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Next Retry At
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.nextRetryAt || '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Last Attempt At
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {selectedTransaction.lastAttemptAt || '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '6px' }}>
+                    Failure Code
+                  </p>
+                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'monospace' }}>
+                    {selectedTransaction.failureCode || '—'}
                   </p>
                 </div>
 

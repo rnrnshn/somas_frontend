@@ -5,6 +5,7 @@ import { normalizeRole } from "@/lib/auth/roles";
 import { formatCompactMetical, formatMetical } from "@/lib/format/currency";
 import { useBackofficeDashboardQueries } from "@/features/dashboard/hooks/use-dashboard-queries";
 import { useCampaignTableSummaryQueries } from "@/features/campaigns/hooks/use-campaign-queries";
+import { useCampaignCatalogs } from "@/features/catalogs/hooks/use-catalog-queries";
 import {
   adaptBeneficiaryGrowth,
   adaptCampaignPerformance,
@@ -67,10 +68,11 @@ export function BackofficeDashboard() {
   const [campaign, setCampaign] = useState("all");
   const { t } = useTranslation();
   const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics';
+  const catalogs = useCampaignCatalogs();
 
   const filters: DashboardFilters = {
     period: mapDateRange(dateRange),
-    province: region === 'all' ? undefined : region,
+    provinceId: region === 'all' ? undefined : Number(region),
     campaignId: campaign === 'all' ? undefined : Number(campaign),
   };
 
@@ -120,7 +122,7 @@ export function BackofficeDashboard() {
     withSavings: 0,
   };
   const availableCampaigns = campaignPerformance;
-  const availableRegions = Array.from(new Set((dashboard.beneficiaries.data?.byProvince ?? []).map((item) => item.province)));
+  const availableRegions = catalogs.provinces.data ?? [];
   const dashboardError = dashboard.error instanceof Error ? dashboard.error.message : null;
   const campaignPerformancePagination = useTablePagination(campaignPerformance, undefined, [activeTab, dateRange, region, campaign]);
   const recentTransactionsPagination = useTablePagination(recentTransactions, undefined, [activeTab, dateRange, region, campaign]);
@@ -168,7 +170,7 @@ export function BackofficeDashboard() {
             <SelectContent>
               <SelectItem value="all">{t('dashboardPage.allProvinces')}</SelectItem>
               {availableRegions.map((item) => (
-                <SelectItem key={item} value={item}>{item}</SelectItem>
+                <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>

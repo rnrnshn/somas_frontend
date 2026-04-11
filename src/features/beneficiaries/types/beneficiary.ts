@@ -31,8 +31,22 @@ export type BeneficiaryDetail = {
   gender: string | null
   dateOfBirth: string | null
   location: string | null
-  province: string | null
-  district: string | null
+  province:
+    | string
+    | {
+        id: number
+        name: string
+      }
+    | null
+  district:
+    | string
+    | {
+        id: number
+        name: string
+      }
+    | null
+  provinceId?: number | null
+  districtId?: number | null
   community: string | null
   documentIdType: string | null
   documentIdNumber: string | null
@@ -51,6 +65,24 @@ export type BeneficiaryWithMetrics = BeneficiaryDetail & {
     totalSaved: number
     lastTransactionAt: string | null
   } | null
+}
+
+export type UpdateBeneficiaryPayload = {
+  name?: string
+  msisdn?: string
+  gender?: string | null
+  dateOfBirth?: string | null
+  email?: string | null
+  location?: string | null
+  provinceId?: number | null
+  districtId?: number | null
+  community?: string | null
+  documentIdType?: string | null
+  documentIdNumber?: string | null
+  mobileMoneyProvider?: string | null
+  mobileMoneyAccountName?: string | null
+  mobileMoneyAccountNumber?: string | null
+  notes?: string | null
 }
 
 export type BeneficiaryTransactionItem = {

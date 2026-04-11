@@ -20,6 +20,7 @@ import { Button } from '../ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { useCampaignsQuery } from '@/features/campaigns/hooks/use-campaign-queries'
+import { useCampaignCatalogs } from '@/features/catalogs/hooks/use-catalog-queries'
 import { adaptBeneficiaries, adaptFinancial, adaptOverview } from '@/features/dashboard/adapters/insights'
 import { useInsightsBeneficiariesQuery, useInsightsFinancialQuery, useInsightsSummaryQuery } from '@/features/dashboard/hooks/use-insights-queries'
 import type { DashboardFilters } from '@/features/dashboard/types/dashboard'
@@ -37,8 +38,12 @@ export function Insights() {
   const [campaignFilter, setCampaignFilter] = useState('all')
   const [provinceFilter, setProvinceFilter] = useState('all')
   const campaignsQuery = useCampaignsQuery({ page: 1, pageSize: 100 })
+  const catalogs = useCampaignCatalogs()
   const filters: DashboardFilters = useMemo(
-    () => ({ campaignId: campaignFilter === 'all' ? undefined : Number(campaignFilter), province: provinceFilter === 'all' ? undefined : provinceFilter }),
+    () => ({
+      campaignId: campaignFilter === 'all' ? undefined : Number(campaignFilter),
+      provinceId: provinceFilter === 'all' ? undefined : Number(provinceFilter),
+    }),
     [campaignFilter, provinceFilter]
   )
 
@@ -66,7 +71,7 @@ export function Insights() {
             <SelectTrigger className="w-48"><SelectValue placeholder={t('insightsPage.province')} /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('insightsPage.allProvinces')}</SelectItem>
-              {beneficiaries.beneficiariesByProvince.map((item) => <SelectItem key={item.province} value={item.province}>{item.province}</SelectItem>)}
+              {(catalogs.provinces.data ?? []).map((item) => <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={campaignFilter} onValueChange={setCampaignFilter}>
