@@ -29,12 +29,11 @@ export function CampaignUploadPreviewTable({
   pagination,
   isRowValidationPending,
   onEditBeneficiary,
-  onRemoveBeneficiary,
-}: Props) {
+  onRemoveBeneficiary}: Props) {
   const { t } = useTranslation()
 
   return (
-    <div className="rounded-[--radius] border" style={{ borderColor: 'var(--border)' }}>
+    <div className="rounded-[var(--radius)] border" style={{ borderColor: 'var(--border)' }}>
       <Table>
         <TableHeader>
           <TableRow>
@@ -68,9 +67,8 @@ export function CampaignUploadPreviewTable({
               </TableCell>
               <TableCell
                 style={{
-                  fontSize: 'var(--text-12)',
-                  color: beneficiary.errors.length > 0 ? 'var(--error)' : 'var(--muted-foreground)',
-                }}
+                  
+                  color: beneficiary.errors.length > 0 ? 'var(--error)' : 'var(--muted-foreground)'}}
               >
                 {beneficiary.errors.length > 0 ? beneficiary.errors.join(' ') : '—'}
               </TableCell>
@@ -113,8 +111,7 @@ function StatusBadge({ status }: { status: string }) {
   const variants: Record<string, { variant?: 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive' }> = {
     valid: { variant: 'success' },
     duplicate: { variant: 'warning' },
-    invalid: { variant: 'destructive' },
-  }
+    invalid: { variant: 'destructive' }}
 
   return <Badge {...(variants[status] || {})}>{status}</Badge>
 }
@@ -132,8 +129,8 @@ function getStatusIcon(status: string) {
   }
 }
 
-const bodyTextStyle = { fontSize: 'var(--text-13)' }
-const mutedTextStyle = { fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }
-const mutedSmallTextStyle = { fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }
-const monoTextStyle = { fontSize: 'var(--text-13)', fontFamily: 'var(--font-mono)' }
-const amountTextStyle = { fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }
+const bodyTextStyle = { }
+const mutedTextStyle = {  color: 'var(--muted-foreground)' }
+const mutedSmallTextStyle = {  color: 'var(--muted-foreground)' }
+const monoTextStyle = {  fontFamily: 'var(--font-mono)' }
+const amountTextStyle = {  fontWeight: 'var(--font-weight-medium)' }

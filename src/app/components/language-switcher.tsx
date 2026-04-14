@@ -8,13 +8,20 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: 'pt', label: 'PT' },
 ]
 
-export function LanguageSwitcher() {
+type LanguageSwitcherProps = {
+  className?: string
+}
+
+export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { i18n: i18nInstance } = useTranslation()
   const activeLanguage = (i18nInstance.resolvedLanguage ?? i18n.language ?? 'en') as Language
 
   return (
     <div
-      className="inline-flex w-full items-center rounded-[calc(var(--radius)+2px)] bg-muted p-1"
+      className={cn(
+        "inline-flex items-center rounded-[calc(var(--radius)+2px)] bg-muted p-0.5",
+        className
+      )}
       role="group"
       aria-label="Language switcher"
     >
@@ -23,7 +30,7 @@ export function LanguageSwitcher() {
           key={option.value}
           type="button"
           className={cn(
-            'flex-1 rounded-[calc(var(--radius)-2px)] px-4 py-2 text-sm font-semibold tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--ring]',
+            'flex-1 rounded-[calc(var(--radius)-2px)] px-2.5 py-1 text-xs font-semibold tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--ring]',
             activeLanguage === option.value
               ? 'bg-primary text-primary-foreground shadow-sm'
               : 'text-muted-foreground hover:bg-background/80 hover:text-foreground'

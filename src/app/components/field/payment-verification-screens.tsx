@@ -58,10 +58,10 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
             <ChevronRight className="w-5 h-5 rotate-180" />
           </Button>
           <div>
-            <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {t('paymentVerificationPage.paymentVerification')}
             </p>
-            <p style={{ fontSize: "var(--text-12)", opacity: 0.8 }}>
+            <p style={{  opacity: 0.8 }}>
               {selectedBeneficiary.name}
             </p>
           </div>
@@ -72,7 +72,7 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
         {/* Payment Information Card */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {t('paymentVerificationPage.latestPayment')}
             </CardTitle>
           </CardHeader>
@@ -85,22 +85,22 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
               >
                 <DollarSign className="w-8 h-8" style={{ color: "var(--success)" }} />
               </div>
-              <p style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
                 {paymentData.currency} {paymentData.amount.toLocaleString('pt-MZ')}
               </p>
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+              <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                  {t('paymentVerificationPage.paymentAmount')}
               </p>
             </div>
 
             {/* Transaction Reference */}
             <div>
-              <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 {t('paymentVerificationPage.transactionReference')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <CreditCard className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                   {paymentData.transactionRef}
                 </p>
               </div>
@@ -108,22 +108,22 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
 
             {/* Campaign */}
             <div>
-              <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 {t('campaignsPage.program')}
               </p>
-              <p style={{ fontSize: "var(--text-14)", marginTop: "8px" }}>
+              <p style={{  marginTop: "8px" }}>
                 {paymentData.campaign}
               </p>
             </div>
 
             {/* Payment Date */}
             <div>
-              <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 {t('paymentVerificationPage.paymentDate')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Calendar className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                <p style={{ fontSize: "var(--text-14)" }}>
+                <p>
                   {new Date(paymentData.paymentDate).toLocaleDateString(i18n.language === 'pt' ? 'pt-MZ' : 'en-US', { 
                     day: 'numeric',
                     month: 'long',
@@ -135,12 +135,12 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
 
             {/* Mobile Money Provider */}
             <div>
-              <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 {t('paymentVerificationPage.mobileMoneyProvider')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Phone className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                <p style={{ fontSize: "var(--text-14)" }}>
+                <p>
                   {paymentData.provider}
                 </p>
               </div>
@@ -148,12 +148,12 @@ export function BeneficiaryPaymentScreen({ onBack, onNext, selectedBeneficiary }
 
             {/* Phone Number */}
             <div>
-              <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 {t('fieldBeneficiaryPage.phoneNumber')}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Phone className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                <p style={{ fontSize: "var(--text-14)" }}>
+                <p>
                   {paymentData.phone}
                 </p>
               </div>
@@ -202,10 +202,10 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
             <ChevronRight className="w-5 h-5 rotate-180" />
           </Button>
           <div>
-            <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {t('paymentVerificationPage.verificationForm')}
             </p>
-            <p style={{ fontSize: "var(--text-12)", opacity: 0.8 }}>
+            <p style={{  opacity: 0.8 }}>
               {selectedBeneficiary.name}
             </p>
           </div>
@@ -216,7 +216,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         {/* Payment Received */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                {t('paymentVerificationPage.paymentReceived')}
             </CardTitle>
           </CardHeader>
@@ -246,7 +246,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         {/* Phone Number Confirmed */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                {t('paymentVerificationPage.phoneConfirmed')}
             </CardTitle>
           </CardHeader>
@@ -276,7 +276,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         {/* Issue Reported */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                {t('paymentVerificationPage.issueReported')}
             </CardTitle>
           </CardHeader>
@@ -300,7 +300,7 @@ export function PaymentVerificationFormScreen({ onBack, onNext, selectedBenefici
         {/* Enumerator Notes */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                {t('paymentVerificationPage.enumeratorNotes')}
             </CardTitle>
           </CardHeader>
@@ -343,7 +343,7 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
             <ChevronRight className="w-5 h-5 rotate-180" />
           </Button>
           <div>
-            <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {t('paymentVerificationPage.captureEvidence')}
             </p>
           </div>
@@ -358,10 +358,10 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
         >
           <div className="text-center">
             <Camera className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--muted-foreground)" }} />
-            <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+            <p style={{  color: "var(--muted-foreground)" }}>
                {t('paymentVerificationPage.cameraPreview')}
             </p>
-            <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+            <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                {t('paymentVerificationPage.centerBeneficiary')}
             </p>
           </div>
@@ -375,33 +375,33 @@ export function PaymentSelfieScreen({ onBack, onNext, enumeratorData }: PaymentS
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                <p style={{  color: "var(--muted-foreground)" }}>
                    {t('paymentVerificationPage.timestamp')}
                 </p>
               </div>
-              <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+              <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                 2026-03-06 16:45:12
               </p>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                <p style={{  color: "var(--muted-foreground)" }}>
                    {t('paymentVerificationPage.gpsLocation')}
                 </p>
               </div>
-              <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+              <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                 -25.0392, 33.6349
               </p>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                <p style={{  color: "var(--muted-foreground)" }}>
                    {t('paymentVerificationPage.enumerator')}
                 </p>
               </div>
-              <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+              <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                 {enumeratorData.id}
               </p>
             </div>
@@ -440,7 +440,7 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
             <ChevronRight className="w-5 h-5 rotate-180" />
           </Button>
           <div>
-            <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {t('paymentVerificationPage.verificationResult')}
             </p>
           </div>
@@ -451,51 +451,51 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
         {/* Summary Card */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {t('paymentVerificationPage.paymentVerificationSummary')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                  {t('paymentVerificationPage.beneficiary')}
               </p>
-              <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)", marginTop: "4px" }}>
+              <p style={{  fontWeight: "var(--font-weight-medium)", marginTop: "4px" }}>
                 {selectedBeneficiary.name}
               </p>
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 {selectedBeneficiary.id}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   {t('paymentVerificationPage.payment')}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                  <p style={{ fontSize: "var(--text-13)" }}>{t('paymentVerificationPage.received')}</p>
+                  <p>{t('paymentVerificationPage.received')}</p>
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   {t('paymentVerificationPage.phone')}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                  <p style={{ fontSize: "var(--text-13)" }}>{t('paymentVerificationPage.confirmed')}</p>
+                  <p>{t('paymentVerificationPage.confirmed')}</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em)" }}>
+              <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em)" }}>
                 {t('paymentVerificationPage.photoEvidence')}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                <p style={{ fontSize: "var(--text-13)" }}>{t('paymentVerificationPage.capturedWithGps')}</p>
+                <p>{t('paymentVerificationPage.capturedWithGps')}</p>
               </div>
             </div>
           </CardContent>
@@ -504,7 +504,7 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
         {/* Verification Status */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {t('paymentVerificationPage.verificationStatus')}
             </CardTitle>
           </CardHeader>
@@ -542,10 +542,10 @@ export function PaymentVerificationResultScreen({ onBack, selectedBeneficiary }:
           <div className="flex items-start gap-3">
             <Clock className="w-5 h-5 mt-0.5" style={{ color: "var(--warning)" }} />
             <div>
-              <p style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+              <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                 {t('paymentVerificationPage.pendingSyncStatus')}
               </p>
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+              <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                 {t('paymentVerificationPage.pendingSyncHelp')}
               </p>
             </div>

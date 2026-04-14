@@ -30,8 +30,7 @@ export function BeneficiaryForm() {
     provinceId: "",
     districtId: "",
     community: "",
-    notes: "",
-  });
+    notes: ""});
 
   const selectedProvinceId = Number(formData.provinceId);
   const districts = useDistrictCatalog(
@@ -54,8 +53,7 @@ export function BeneficiaryForm() {
       provinceId: getCatalogId(profile.province, profile.provinceId),
       districtId: getCatalogId(profile.district, profile.districtId),
       community: profile.community ?? '',
-      notes: profile.notes ?? '',
-    });
+      notes: profile.notes ?? ''});
   }, [isEdit, navigate, queries.profile.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,8 +67,7 @@ export function BeneficiaryForm() {
         provinceId: formData.provinceId ? Number(formData.provinceId) : null,
         districtId: formData.districtId ? Number(formData.districtId) : null,
         community: formData.community || null,
-        notes: formData.notes || null,
-      })
+        notes: formData.notes || null})
       .then((beneficiary) => {
         toast.success('Beneficiary updated successfully.');
         navigate(`/backoffice/beneficiaries/profile/${beneficiary.id}`);
@@ -97,14 +94,14 @@ export function BeneficiaryForm() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Beneficiaries
         </Button>
-        <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+        <h1 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
           {isEdit ? "Edit Beneficiary" : "Create New Beneficiary"}
         </h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
+        <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>
           {isEdit ? "Update beneficiary information" : "Add a new beneficiary to the system"}
         </p>
         {isEdit && queries.profile.isPending ? (
-          <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginTop: '8px' }}>Loading beneficiary...</p>
+          <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>Loading beneficiary...</p>
         ) : null}
       </div>
 
@@ -112,28 +109,28 @@ export function BeneficiaryForm() {
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <h3 style={{ fontSize: 'var(--text-18)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+            <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
               Beneficiary Information
             </h3>
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
               Enter the required information for the beneficiary
             </p>
           </CardHeader>
           <CardContent>
             {submitError ? (
-              <p style={{ fontSize: 'var(--text-13)', color: 'var(--error)', marginBottom: '16px' }}>{submitError}</p>
+              <p style={{  color: 'var(--error)', marginBottom: '16px' }}>{submitError}</p>
             ) : null}
             <div className="grid grid-cols-2 gap-6">
               {/* Full Name */}
               <div className="col-span-2">
-                <Label htmlFor="fullName" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                <Label htmlFor="fullName" style={{  fontWeight: 'var(--font-weight-medium)' }}>
                   Full Name <span style={{ color: 'var(--destructive)' }}>*</span>
                 </Label>
                 <Input
                   id="fullName"
                   value={formData.fullName}
                   onChange={(e) => handleChange("fullName", e.target.value)}
-                  placeholder="Enter full name"
+                  placeholder={"Enter full name"}
                   required
                   className="mt-2"
                 />
@@ -141,7 +138,7 @@ export function BeneficiaryForm() {
 
               {/* Phone Number */}
               <div>
-                <Label htmlFor="phone" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                <Label htmlFor="phone" style={{  fontWeight: 'var(--font-weight-medium)' }}>
                   Phone Number <span style={{ color: 'var(--destructive)' }}>*</span>
                 </Label>
                 <Input
@@ -149,33 +146,33 @@ export function BeneficiaryForm() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
-                  placeholder="+63 XXX XXX XXXX"
+                  placeholder={"+63 XXX XXX XXXX"}
                   required
                   className="mt-2"
                 />
-                <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
+                <p style={{  color: 'var(--muted-foreground)', marginTop: '4px' }}>
                   Include country code (e.g., +63 for Philippines)
                 </p>
               </div>
 
               {/* Email */}
               <div>
-                <Label htmlFor="email" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
-                  Email <span style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>(optional)</span>
+                <Label htmlFor="email" style={{  fontWeight: 'var(--font-weight-medium)' }}>
+                  Email <span style={{  color: 'var(--muted-foreground)' }}>(optional)</span>
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleChange("email", e.target.value)}
-                  placeholder="email@example.com"
+                  placeholder={"email@example.com"}
                   className="mt-2"
                 />
               </div>
 
               {/* Province */}
               <div>
-                <Label htmlFor="province" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                <Label htmlFor="province" style={{  fontWeight: 'var(--font-weight-medium)' }}>
                   Province <span style={{ color: 'var(--destructive)' }}>*</span>
                 </Label>
                 <Select
@@ -185,7 +182,7 @@ export function BeneficiaryForm() {
                   }
                 >
                   <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select province" />
+                    <SelectValue placeholder={"Select province"} />
                   </SelectTrigger>
                   <SelectContent>
                     {(catalogs.provinces.data ?? []).map((province) => (
@@ -197,12 +194,12 @@ export function BeneficiaryForm() {
 
               {/* District */}
               <div>
-                <Label htmlFor="district" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                <Label htmlFor="district" style={{  fontWeight: 'var(--font-weight-medium)' }}>
                   District <span style={{ color: 'var(--destructive)' }}>*</span>
                 </Label>
                 <Select value={formData.districtId} onValueChange={(value) => handleChange("districtId", value)}>
                   <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select district" />
+                    <SelectValue placeholder={"Select district"} />
                   </SelectTrigger>
                   <SelectContent>
                     {(districts.data ?? []).map((district) => (
@@ -214,14 +211,14 @@ export function BeneficiaryForm() {
 
               {/* Community */}
               <div className="col-span-2">
-                <Label htmlFor="community" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                <Label htmlFor="community" style={{  fontWeight: 'var(--font-weight-medium)' }}>
                   Community <span style={{ color: 'var(--destructive)' }}>*</span>
                 </Label>
                 <Input
                   id="community"
                   value={formData.community}
                   onChange={(e) => handleChange("community", e.target.value)}
-                  placeholder="Enter barangay or community"
+                  placeholder={"Enter barangay or community"}
                   required
                   className="mt-2"
                 />
@@ -229,14 +226,14 @@ export function BeneficiaryForm() {
 
               {/* Notes */}
               <div className="col-span-2">
-                <Label htmlFor="notes" style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
-                  Notes <span style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>(optional)</span>
+                <Label htmlFor="notes" style={{  fontWeight: 'var(--font-weight-medium)' }}>
+                  Notes <span style={{  color: 'var(--muted-foreground)' }}>(optional)</span>
                 </Label>
                 <Textarea
                   id="notes"
                   value={formData.notes}
                   onChange={(e) => handleChange("notes", e.target.value)}
-                  placeholder="Enter any additional notes or information"
+                  placeholder={"Enter any additional notes or information"}
                   rows={4}
                   className="mt-2"
                 />

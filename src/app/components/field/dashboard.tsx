@@ -28,8 +28,8 @@ export function FieldDashboard() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 style={{ fontSize: 'var(--text-24)' }}>{t('fieldDashboardPage.title')}</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-1">
+        <h1>{t('fieldDashboardPage.title')}</h1>
+        <p style={{  color: 'var(--muted-foreground)' }} className="mt-1">
           Monday, March 2, 2026
         </p>
       </div>
@@ -42,10 +42,10 @@ export function FieldDashboard() {
             <Card key={stat.label}>
               <CardContent className="p-4">
                 <Icon className={`w-5 h-5 ${stat.color} mb-2`} />
-                <div style={{ fontSize: 'var(--text-24)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                <div style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                   {stat.value}
                 </div>
-                <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                <p style={{  color: 'var(--muted-foreground)' }}>
                   {stat.label}
                 </p>
               </CardContent>
@@ -57,21 +57,21 @@ export function FieldDashboard() {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldDashboardPage.recentActivity')}</CardTitle>
+          <CardTitle>{t('fieldDashboardPage.recentActivity')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {recentActivity.length === 0 ? (
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
                {t('fieldDashboardPage.noActivity')}
              </p>
           ) : recentActivity.map((activity) => (
             <div
               key={activity.id}
-              className="flex items-start justify-between p-3 border border-border rounded-[--radius]"
+              className="flex items-start justify-between p-3 border border-border rounded-[var(--radius)]"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                  <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                     {activity.name}
                   </p>
                   <Badge
@@ -88,7 +88,7 @@ export function FieldDashboard() {
                     {activity.action}
                   </Badge>
                 </div>
-                <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                <p style={{  color: 'var(--muted-foreground)' }}>
                   {activity.id} • {activity.time}
                 </p>
               </div>

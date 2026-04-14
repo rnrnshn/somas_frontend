@@ -14,7 +14,7 @@ export function CampaignReportsTab({ showSavingsExport }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle style={{ fontSize: 'var(--text-16)' }}>{t('campaignDetailPage.exportReports')}</CardTitle>
+        <CardTitle>{t('campaignDetailPage.exportReports')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <ReportRow
@@ -46,12 +46,12 @@ export function CampaignReportsTab({ showSavingsExport }: Props) {
 
 function ReportRow({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
   return (
-    <div className="flex items-center justify-between rounded-[--radius] border p-4" style={{ borderColor: 'var(--border)' }}>
+    <div className="flex items-center justify-between rounded-[var(--radius)] border p-4" style={{ borderColor: 'var(--border)' }}>
       <div className="flex items-center gap-3">
         {icon}
         <div>
-          <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>{title}</p>
-          <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>{description}</p>
+          <p style={{  fontWeight: 'var(--font-weight-medium)' }}>{title}</p>
+          <p style={{  color: 'var(--muted-foreground)' }}>{description}</p>
         </div>
       </div>
       <div className="flex items-center gap-2">

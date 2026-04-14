@@ -18,8 +18,7 @@ export function FieldSearch() {
   const searchFilters = useMemo(() => ({
     campaignId: selectedCampaignId ? Number(selectedCampaignId) : undefined,
     name: searchQuery.trim() || undefined,
-    msisdn: searchQuery.trim() || undefined,
-  }), [searchQuery, selectedCampaignId]);
+    msisdn: searchQuery.trim() || undefined}), [searchQuery, selectedCampaignId]);
   const searchQueryResult = useFieldSearchQuery(searchFilters, Boolean(selectedCampaignId && searchQuery.trim()));
 
   const filteredResults = searchQueryResult.data ?? [];
@@ -27,8 +26,8 @@ export function FieldSearch() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 style={{ fontSize: 'var(--text-24)' }}>{t('fieldSearchPage.title')}</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-1">
+        <h1>{t('fieldSearchPage.title')}</h1>
+        <p style={{  color: 'var(--muted-foreground)' }} className="mt-1">
           {t('fieldSearchPage.subtitle')}
         </p>
       </div>
@@ -54,7 +53,6 @@ export function FieldSearch() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10 h-12"
-          style={{ fontSize: 'var(--text-16)' }}
         />
       </div>
 
@@ -63,7 +61,7 @@ export function FieldSearch() {
         <Card>
           <CardContent className="p-8 text-center">
             <SearchIcon className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
                {t('fieldSearchPage.selectCampaignFirst')}
             </p>
           </CardContent>
@@ -72,7 +70,7 @@ export function FieldSearch() {
         <Card>
           <CardContent className="p-8 text-center">
             <SearchIcon className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
                {t('fieldSearchPage.enterSearchTerm')}
             </p>
           </CardContent>
@@ -80,7 +78,7 @@ export function FieldSearch() {
       ) : searchQueryResult.isPending ? (
         <Card>
           <CardContent className="p-8 text-center">
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
                {t('fieldSearchPage.searching')}
             </p>
           </CardContent>
@@ -88,7 +86,7 @@ export function FieldSearch() {
       ) : searchQueryResult.error ? (
         <Card>
           <CardContent className="p-8 text-center">
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--error)' }}>
+            <p style={{  color: 'var(--error)' }}>
                {searchQueryResult.error instanceof Error ? searchQueryResult.error.message : t('fieldSearchPage.searchFailed')}
             </p>
           </CardContent>
@@ -96,7 +94,7 @@ export function FieldSearch() {
       ) : filteredResults.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center">
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
                {t('fieldSearchPage.noResults', { query: searchQuery })}
             </p>
           </CardContent>
@@ -116,10 +114,10 @@ export function FieldSearch() {
                       <User className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {result.beneficiary?.name ?? t('fieldSearchPage.beneficiary')}
                       </p>
-                      <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <p style={{  color: 'var(--muted-foreground)' }}>
                         CB-{result.id}
                       </p>
                     </div>
@@ -135,10 +133,10 @@ export function FieldSearch() {
                   </Badge>
                 </div>
                 <div className="space-y-1 ml-13">
-                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <p style={{  color: 'var(--muted-foreground)' }}>
                     {result.campaign?.name ?? t('fieldSearchPage.campaignUnavailable')}
                   </p>
-                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <p style={{  color: 'var(--muted-foreground)' }}>
                     {result.beneficiary?.msisdn ?? t('fieldSearchPage.noPhoneNumber')}
                   </p>
                 </div>

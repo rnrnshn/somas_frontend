@@ -7,8 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+  DropdownMenuTrigger} from "../ui/dropdown-menu";
 import { cn } from "../../../lib/utils";
 
 interface Tenant {
@@ -41,7 +40,7 @@ export function TenantSwitcher() {
         
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[240px]" align="end">
-        <DropdownMenuLabel style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+        <DropdownMenuLabel style={{  color: 'var(--muted-foreground)' }}>
           Switch Tenant
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -53,7 +52,7 @@ export function TenantSwitcher() {
           >
             <div className="flex items-center gap-2 w-full">
               <div 
-                className="w-6 h-6 rounded-[--radius] bg-primary/10 flex items-center justify-center flex-shrink-0"
+                className="w-6 h-6 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center flex-shrink-0"
               >
                 <Building2 className="w-3.5 h-3.5 text-primary" />
               </div>

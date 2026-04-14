@@ -60,6 +60,7 @@ export function CreateCampaign() {
   const districts = useDistrictCatalog(
     Number.isFinite(selectedProvinceId) && selectedProvinceId > 0 ? selectedProvinceId : undefined
   )
+  const districtsLoading = districts.isFetching && Number.isFinite(selectedProvinceId) && selectedProvinceId > 0
 
   const beneficiariesPreviewPagination = useTablePagination(form.formData.beneficiaries, undefined, [
     form.currentStep,
@@ -91,6 +92,10 @@ export function CreateCampaign() {
           regions={catalogs.regions.data ?? []}
           provinces={catalogs.provinces.data ?? []}
           districts={districts.data ?? []}
+          programsLoading={catalogs.programs.isPending}
+          regionsLoading={catalogs.regions.isPending}
+          provincesLoading={catalogs.provinces.isPending}
+          districtsLoading={districtsLoading}
           submitError={form.submitError}
           catalogsError={catalogs.error}
           campaignError={campaignQuery.error}
@@ -119,6 +124,8 @@ export function CreateCampaign() {
           setFormData={form.setFormData}
           paymentChannels={catalogs.paymentChannels.data ?? []}
           disbursementTypes={catalogs.disbursementTypes.data ?? []}
+          paymentChannelsLoading={catalogs.paymentChannels.isPending}
+          disbursementTypesLoading={catalogs.disbursementTypes.isPending}
         />
       ) : null}
 
@@ -126,14 +133,15 @@ export function CreateCampaign() {
         <CampaignReviewStep
           name={form.formData.name}
           programLabel={getCatalogLabel(catalogs.programs.data ?? [], form.formData.program)}
-          regionLabel={getCatalogLabel(catalogs.provinces.data ?? [], form.formData.province)}
+          regionLabel={getCatalogLabel(catalogs.regions.data ?? [], form.formData.region)}
+          provinceLabel={getCatalogLabel(catalogs.provinces.data ?? [], form.formData.province)}
+          districtLabel={getCatalogLabel(districts.data ?? [], form.formData.district)}
           paymentChannelLabel={getCatalogLabel(catalogs.paymentChannels.data ?? [], form.formData.paymentChannel)}
           validBeneficiaries={form.validationSummary.valid}
           totalDisbursementLabel={
             form.hasKnownDisbursementAmounts ? formatMetical(form.totalDisbursement) : '—'
           }
           executionDate={form.formData.executionDate}
-          savingsEnabled={form.formData.enableSavings}
         />
       ) : null}
 

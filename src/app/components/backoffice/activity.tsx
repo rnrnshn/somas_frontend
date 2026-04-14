@@ -60,8 +60,8 @@ export function BackofficeActivity() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 style={{ fontSize: 'var(--text-32)' }}>User Activity</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-2">
+        <h1>User Activity</h1>
+        <p style={{  color: 'var(--muted-foreground)' }} className="mt-2">
           Monitor user sessions, logins, and system activity
         </p>
       </div>
@@ -73,13 +73,13 @@ export function BackofficeActivity() {
           return (
             <Card key={stat.label}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)', color: 'var(--muted-foreground)' }}>
+                <CardTitle style={{  fontWeight: 'var(--font-weight-medium)', color: 'var(--muted-foreground)' }}>
                   {stat.label}
                 </CardTitle>
                 <Icon className={`w-5 h-5 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                <div style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                   {stat.value}
                 </div>
               </CardContent>
@@ -98,7 +98,7 @@ export function BackofficeActivity() {
             {recentActivity.map((activity, index) => (
               <div
                 key={index}
-                className={`p-4 border rounded-[--radius] ${
+                className={`p-4 border rounded-[var(--radius)] ${
                   activity.failed ? 'border-[--error] bg-[--error]/5' : 'border-border'
                 }`}
               >
@@ -107,11 +107,11 @@ export function BackofficeActivity() {
                     <p style={{ fontWeight: 'var(--font-weight-medium)' }}>
                       {activity.action}
                     </p>
-                    <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {activity.user} • IP: {activity.ip}
                     </p>
                   </div>
-                  <span style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <span style={{  color: 'var(--muted-foreground)' }}>
                     {activity.timestamp}
                   </span>
                 </div>

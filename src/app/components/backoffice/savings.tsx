@@ -16,14 +16,12 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+  SelectValue} from "../ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+  DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {
   Plus,
   Search,
@@ -48,8 +46,7 @@ export function BackofficeSavings() {
   const filters: SavingsProgramListFilters = {
     search: searchQuery.trim() || undefined,
     status: mapSavingsStatusFilter(statusFilter),
-    campaignId: campaignFilter === 'all' ? undefined : Number(campaignFilter),
-  };
+    campaignId: campaignFilter === 'all' ? undefined : Number(campaignFilter)};
   const savingsProgramsQuery = useSavingsProgramsQuery(filters);
   const campaignQueries = useCampaignDetailsQueries((savingsProgramsQuery.data ?? []).map((program) => program.campaignId));
   const campaignMap = new Map(
@@ -109,10 +106,10 @@ export function BackofficeSavings() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
+          <h1 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
             Savings Campaigns
           </h1>
-          <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
+          <p style={{  color: "var(--muted-foreground)", marginTop: "8px" }}>
             Manage savings programs linked to social transfer campaigns
           </p>
         </div>
@@ -127,12 +124,12 @@ export function BackofficeSavings() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Total Savings
               </p>
               <DollarSign className="w-5 h-5" style={{ color: "var(--success)" }} />
             </div>
-            <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {formatCurrency(totalSavings)}
             </p>
           </CardContent>
@@ -141,12 +138,12 @@ export function BackofficeSavings() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Active Campaigns
               </p>
               <TrendingUp className="w-5 h-5" style={{ color: "var(--primary)" }} />
             </div>
-            <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {activeCampaigns}
             </p>
           </CardContent>
@@ -155,12 +152,12 @@ export function BackofficeSavings() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Total Participants
               </p>
               <Users className="w-5 h-5" style={{ color: "var(--primary)" }} />
             </div>
-            <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {totalParticipants.toLocaleString()}
             </p>
           </CardContent>
@@ -169,12 +166,12 @@ export function BackofficeSavings() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Avg Goal Progress
               </p>
               <Target className="w-5 h-5" style={{ color: "var(--primary)" }} />
             </div>
-            <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               {avgGoalProgress.toFixed(1)}%
             </p>
           </CardContent>
@@ -188,7 +185,7 @@ export function BackofficeSavings() {
             <div className="relative md:col-span-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
               <Input
-                placeholder="Search campaigns..."
+                placeholder={"Search campaigns..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -197,7 +194,7 @@ export function BackofficeSavings() {
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={"Status"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
@@ -210,7 +207,7 @@ export function BackofficeSavings() {
 
             <Select value={campaignFilter} onValueChange={setCampaignFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Linked Campaign" />
+                <SelectValue placeholder={"Linked Campaign"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Campaigns</SelectItem>
@@ -221,7 +218,7 @@ export function BackofficeSavings() {
             </Select>
           </div>
           {savingsProgramsQuery.error ? (
-            <p style={{ fontSize: "var(--text-13)", color: "var(--error)", marginTop: "12px" }}>
+            <p style={{  color: "var(--error)", marginTop: "12px" }}>
               {savingsProgramsQuery.error instanceof Error ? savingsProgramsQuery.error.message : 'Savings programs could not be loaded.'}
             </p>
           ) : null}
@@ -247,7 +244,7 @@ export function BackofficeSavings() {
               {filteredCampaigns.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-12">
-                    <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                    <p style={{  color: "var(--muted-foreground)" }}>
                       {savingsProgramsQuery.isPending ? 'Loading savings campaigns...' : 'No savings campaigns found'}
                     </p>
                   </TableCell>
@@ -261,42 +258,42 @@ export function BackofficeSavings() {
                   >
                     <TableCell>
                       <div>
-                        <p style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                        <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                           {campaign.name}
                         </p>
-                          <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                          <p style={{  color: "var(--muted-foreground)" }}>
                             SAV-{String(campaign.numericId).padStart(3, '0')}
                           </p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p style={{ fontSize: "var(--text-13)" }}>
+                        <p>
                           {campaign.linkedCampaign}
                         </p>
-                        <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                        <p style={{  color: "var(--muted-foreground)" }}>
                           {campaign.linkedCampaignId}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                      <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                         {campaign.participants.toLocaleString()}
                       </p>
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         of {campaign.totalBeneficiaries.toLocaleString()}
                       </p>
                     </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                    <TableCell style={{  fontWeight: "var(--font-weight-medium)" }}>
                       {formatCurrency(campaign.totalSaved)}
                     </TableCell>
                     <TableCell>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                          <span style={{  color: "var(--muted-foreground)" }}>
                             {formatCurrency(campaign.savingsGoal)}
                           </span>
-                          <span style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+                          <span style={{  fontWeight: "var(--font-weight-medium)" }}>
                             {getGoalProgress(campaign.totalSaved, campaign.savingsGoal).toFixed(1)}%
                           </span>
                         </div>

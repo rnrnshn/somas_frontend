@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
 import { Input } from "../ui/input";
@@ -77,19 +77,19 @@ export function BackofficeAudit() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 style={{ fontSize: 'var(--text-32)' }}>Audit Logs</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-2">
+        <h1>Audit Logs</h1>
+        <p style={{  color: 'var(--muted-foreground)' }} className="mt-2">
           Complete audit trail of all system actions and changes
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="mb-6">
+        <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search by user, entity, or ID..."
+                placeholder={"Search by user, entity, or ID..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
@@ -97,7 +97,7 @@ export function BackofficeAudit() {
             </div>
             <Select value={entityFilter} onValueChange={setEntityFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Entity" />
+                <SelectValue placeholder={"Entity"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Entities</SelectItem>
@@ -108,8 +108,11 @@ export function BackofficeAudit() {
               </SelectContent>
             </Select>
           </div>
-        </CardHeader>
-        <CardContent>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -124,7 +127,7 @@ export function BackofficeAudit() {
             <TableBody>
               {auditPagination.paginatedItems.map((log) => (
                 <TableRow key={log.id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell style={{ fontSize: 'var(--text-12)', fontFamily: 'monospace' }}>
+                  <TableCell style={{  fontFamily: 'monospace' }}>
                     {log.timestamp}
                   </TableCell>
                   <TableCell>
@@ -133,24 +136,24 @@ export function BackofficeAudit() {
                   <TableCell>{getActionBadge(log.action)}</TableCell>
                   <TableCell>{log.entity}</TableCell>
                   <TableCell>
-                    <span style={{ fontFamily: 'monospace', fontSize: 'var(--text-12)' }}>
+                    <span style={{ fontFamily: 'monospace'}}>
                       {log.entityId}
                     </span>
                   </TableCell>
                   <TableCell>
                     <div className="max-w-md">
                       {log.action === 'CREATE' && (
-                        <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        <p style={{  color: 'var(--muted-foreground)' }}>
                           Created new {log.entity.toLowerCase()}
                         </p>
                       )}
                       {log.action === 'DELETE' && (
-                        <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        <p style={{  color: 'var(--muted-foreground)' }}>
                           Deleted {log.entity.toLowerCase()}
                         </p>
                       )}
                       {log.action === 'UPDATE' && log.dataBefore && log.dataAfter && (
-                        <div style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        <div style={{  color: 'var(--muted-foreground)' }}>
                           {Object.keys(log.dataAfter).map((key) => (
                             <div key={key}>
                               <span className="font-medium">{key}:</span>{' '}

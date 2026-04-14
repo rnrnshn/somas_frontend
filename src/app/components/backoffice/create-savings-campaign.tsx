@@ -4,8 +4,7 @@ import { useCampaignsQuery } from "@/features/campaigns/hooks/use-campaign-queri
 import {
   useCreateSavingsProgramMutation,
   useSavingsProgramQuery,
-  useUpdateSavingsProgramMutation,
-} from "@/features/savings-programs/hooks/use-savings-program-queries";
+  useUpdateSavingsProgramMutation} from "@/features/savings-programs/hooks/use-savings-program-queries";
 import { HttpError } from "@/lib/api/http-error";
 import { formatMetical } from "@/lib/format/currency";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
@@ -20,16 +19,14 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+  SelectValue} from "../ui/select";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+  DialogTitle} from "../ui/dialog";
 import { ArrowLeft, Check, Info } from "lucide-react";
 import { toast } from "sonner";
 
@@ -65,8 +62,7 @@ export function CreateSavingsCampaign() {
     minimumContribution: "",
     matchingBonus: "",
     enableMatchingBonus: false,
-    description: "",
-  });
+    description: ""});
 
   useEffect(() => {
     if (!savingsProgramQuery.data) return;
@@ -79,8 +75,7 @@ export function CreateSavingsCampaign() {
       minimumContribution: String(savingsProgramQuery.data.minimumContribution),
       matchingBonus: String(savingsProgramQuery.data.matchingBonusPercentage ?? ''),
       enableMatchingBonus: savingsProgramQuery.data.matchingBonusEnabled,
-      description: savingsProgramQuery.data.description ?? '',
-    });
+      description: savingsProgramQuery.data.description ?? ''});
   }, [savingsProgramQuery.data]);
 
   const validateForm = () => {
@@ -141,8 +136,7 @@ export function CreateSavingsCampaign() {
         minimumContribution: Number(formData.minimumContribution),
         matchingBonusEnabled: formData.enableMatchingBonus,
         matchingBonusPercentage: formData.enableMatchingBonus ? Number(formData.matchingBonus || 0) : 0,
-        description: formData.description || undefined,
-      };
+        description: formData.description || undefined};
       const result = isEditMode
         ? await updateMutation.mutateAsync(payload)
         : await createMutation.mutateAsync(payload);
@@ -167,10 +161,10 @@ export function CreateSavingsCampaign() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Savings Campaigns
         </Button>
-        <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
+        <h1 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
           {isEditMode ? 'Edit Savings Campaign' : 'Create Savings Campaign'}
         </h1>
-        <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
+        <p style={{  color: "var(--muted-foreground)", marginTop: "8px" }}>
           {isEditMode ? 'Update the savings program linked to a social transfer campaign' : 'Set up a new savings program linked to a social transfer campaign'}
         </p>
       </div>
@@ -178,7 +172,7 @@ export function CreateSavingsCampaign() {
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontSize: "var(--text-20)" }}>Campaign Details</CardTitle>
+            <CardTitle>Campaign Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {savingsProgramQuery.error ? (
@@ -195,7 +189,7 @@ export function CreateSavingsCampaign() {
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Flood Relief Savings 2024"
+                placeholder={"e.g., Flood Relief Savings 2024"}
                 required
               />
             </div>
@@ -209,7 +203,7 @@ export function CreateSavingsCampaign() {
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a campaign" />
+                  <SelectValue placeholder={"Select a campaign"} />
                 </SelectTrigger>
                 <SelectContent>
                   {(campaignsQuery.data?.data ?? []).map((campaign) => (
@@ -217,7 +211,7 @@ export function CreateSavingsCampaign() {
                   ))}
                 </SelectContent>
               </Select>
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Select the campaign that this savings program will be linked to
               </p>
             </div>
@@ -253,7 +247,7 @@ export function CreateSavingsCampaign() {
               <div className="relative">
                 <span 
                   className="absolute left-3 top-1/2 transform -translate-y-1/2" 
-                  style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}
+                  style={{  color: "var(--muted-foreground)" }}
                 >
                   MZN
                 </span>
@@ -262,12 +256,12 @@ export function CreateSavingsCampaign() {
                   type="number"
                   value={formData.savingsGoal}
                   onChange={(e) => setFormData({ ...formData, savingsGoal: e.target.value })}
-                  placeholder="0.00"
+                  placeholder={"0.00"}
                   className="pl-7"
                   required
                 />
               </div>
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Total target amount for this savings campaign
               </p>
             </div>
@@ -278,7 +272,7 @@ export function CreateSavingsCampaign() {
               <div className="relative">
                 <span 
                   className="absolute left-3 top-1/2 transform -translate-y-1/2" 
-                  style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}
+                  style={{  color: "var(--muted-foreground)" }}
                 >
                   MZN
                 </span>
@@ -287,23 +281,23 @@ export function CreateSavingsCampaign() {
                   type="number"
                   value={formData.minimumContribution}
                   onChange={(e) => setFormData({ ...formData, minimumContribution: e.target.value })}
-                  placeholder="0.00"
+                  placeholder={"0.00"}
                   className="pl-7"
                   required
                 />
               </div>
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Minimum amount beneficiaries can save per deposit
               </p>
             </div>
 
             {/* Matching Bonus Toggle */}
-            <div className="flex items-center justify-between p-4 border rounded-[--radius]" style={{ borderColor: "var(--border)" }}>
+            <div className="flex items-center justify-between p-4 border rounded-[var(--radius)]" style={{ borderColor: "var(--border)" }}>
               <div>
-                <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                   Enable Matching Bonus
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                <p style={{  color: "var(--muted-foreground)" }}>
                   Provide additional incentive by matching a percentage of savings
                 </p>
               </div>
@@ -323,20 +317,20 @@ export function CreateSavingsCampaign() {
                     type="number"
                     value={formData.matchingBonus}
                     onChange={(e) => setFormData({ ...formData, matchingBonus: e.target.value })}
-                    placeholder="0"
+                    placeholder={"0"}
                     min="0"
                     max="100"
                   />
                   <span 
                     className="absolute right-3 top-1/2 transform -translate-y-1/2" 
-                    style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}
+                    style={{  color: "var(--muted-foreground)" }}
                   >
                     %
                   </span>
                 </div>
                 <Alert>
                   <Info className="h-4 w-4" />
-                  <AlertDescription style={{ fontSize: "var(--text-13)" }}>
+                  <AlertDescription>
                     For example, a 50% matching bonus means if a beneficiary saves MZN 10, they will receive an additional MZN 5
                   </AlertDescription>
                 </Alert>
@@ -356,7 +350,7 @@ export function CreateSavingsCampaign() {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Provide additional details about this savings campaign..."
+                placeholder={"Provide additional details about this savings campaign..."}
                 rows={4}
               />
             </div>
@@ -384,36 +378,36 @@ export function CreateSavingsCampaign() {
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle style={{ fontSize: "var(--text-20)" }}>
+            <DialogTitle>
               {isEditMode ? 'Confirm Savings Campaign Update' : 'Confirm Savings Campaign Creation'}
             </DialogTitle>
-            <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+            <DialogDescription style={{  color: "var(--muted-foreground)" }}>
               {isEditMode ? 'Are you sure you want to update this savings campaign?' : 'Are you sure you want to create this savings campaign?'}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b" style={{ borderColor: "var(--border)" }}>
-                <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>Campaign Name</span>
-                <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                <span style={{  color: "var(--muted-foreground)" }}>Campaign Name</span>
+                <span style={{  fontWeight: "var(--font-weight-medium)" }}>
                   {formData.name || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b" style={{ borderColor: "var(--border)" }}>
-                <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>Linked Campaign</span>
-                <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                <span style={{  color: "var(--muted-foreground)" }}>Linked Campaign</span>
+                <span style={{  fontWeight: "var(--font-weight-medium)" }}>
                   {formData.linkedCampaign || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b" style={{ borderColor: "var(--border)" }}>
-                <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>Savings Goal</span>
-                <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                <span style={{  color: "var(--muted-foreground)" }}>Savings Goal</span>
+                <span style={{  fontWeight: "var(--font-weight-medium)" }}>
                   {formatMetical(formData.savingsGoal ? parseFloat(formData.savingsGoal) : 0)}
                 </span>
               </div>
               <div className="flex justify-between py-2">
-                <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>Matching Bonus</span>
-                <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                <span style={{  color: "var(--muted-foreground)" }}>Matching Bonus</span>
+                <span style={{  fontWeight: "var(--font-weight-medium)" }}>
                   {formData.enableMatchingBonus ? `${formData.matchingBonus}%` : "Disabled"}
                 </span>
               </div>

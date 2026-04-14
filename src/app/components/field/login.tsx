@@ -29,8 +29,7 @@ export function FieldLogin() {
     try {
       const response = await loginMutation.mutateAsync({
         email: username,
-        password: pin,
-      });
+        password: pin});
       const normalizedUser = normalizeAuthUser(response.user);
       const normalizedRole = normalizedUser?.role;
 
@@ -59,11 +58,11 @@ export function FieldLogin() {
     <div className="min-h-screen flex items-center justify-center p-6 max-w-md mx-auto">
       <div className="w-full">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-[--radius-card] bg-accent/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-[var(--radius-card)] bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <Smartphone className="w-8 h-8 text-accent" />
           </div>
           <h2 className="mb-2">{t('auth.fieldTitle')}</h2>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <p style={{  color: 'var(--muted-foreground)' }}>
             {t('auth.fieldSubtitle')}
           </p>
         </div>
@@ -89,7 +88,7 @@ export function FieldLogin() {
                 <Input
                   id="username"
                   type="email"
-                  placeholder="inquirer@somas.app"
+                  placeholder={"inquirer@somas.app"}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
@@ -101,7 +100,7 @@ export function FieldLogin() {
                 <Input
                   id="pin"
                   type="password"
-                  placeholder="••••••••••"
+                  placeholder={"••••••••••"}
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   disabled={isLoading}
@@ -120,7 +119,7 @@ export function FieldLogin() {
                   t('auth.signIn')
                 )}
               </Button>
-              <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', textAlign: 'center' }}>
+              <p style={{  color: 'var(--muted-foreground)', textAlign: 'center' }}>
                 {t('auth.accessMonitored')}
               </p>
               <Button

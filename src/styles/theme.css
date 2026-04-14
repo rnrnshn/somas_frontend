@@ -80,11 +80,11 @@
   /* The color for another chart element, such as a bar or line in a chart. */
   --chart-5: rgba(220, 38, 38, 1.00);
   /* The default border radius for elements such as buttons, tooltip, and other containers. */
-  --radius: 6px;
+  --radius: 8px;
   /* The border radius for cards and larger container elements. */
-  --radius-card: 8px;
+  --radius-card: 12px;
   /* The border radius for small interactive elements like checkboxes. */
-  --radius-checkbox: 2px;
+  --radius-checkbox: 4px;
   /* The background color for sidebars, navigation menus, and other persistent elements. */
   --sidebar: rgba(44, 95, 79, 1.00);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
@@ -152,6 +152,24 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="menuitem"]:not([aria-disabled="true"]),
+  [role="tab"]:not([aria-disabled="true"]),
+  [role="option"]:not([aria-disabled="true"]),
+  a[href] {
+    cursor: pointer;
+  }
+}
+
+@layer base {
+  .rdp-dropdown_label,
+  .rdp-caption_label,
+  .rdp-vhidden {
+    display: none !important;
   }
 }
 

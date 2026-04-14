@@ -16,10 +16,8 @@ import { adaptCampaignDetail, adaptCampaignProgressSeries } from '@/features/cam
 import {
   buildDisbursementProgressFromTransactions,
   formatCampaignCurrency,
-  formatCampaignDate,
   formatDisbursementStatus,
   type CampaignBeneficiaryItem,
-  type CampaignSavingsItem,
   type CampaignTransactionItem,
 } from '@/features/campaigns/components/campaign-detail-shared'
 import { CampaignBeneficiariesTab } from '@/features/campaigns/components/campaign-beneficiaries-tab'
@@ -29,7 +27,6 @@ import { CampaignDetailHeader } from '@/features/campaigns/components/campaign-d
 import { CampaignDetailSkeleton } from '@/features/campaigns/components/campaign-detail-skeleton'
 import { CampaignOverviewTab } from '@/features/campaigns/components/campaign-overview-tab'
 import { CampaignReportsTab } from '@/features/campaigns/components/campaign-reports-tab'
-import { CampaignSavingsTab } from '@/features/campaigns/components/campaign-savings-tab'
 import { CampaignTransactionsTab } from '@/features/campaigns/components/campaign-transactions-tab'
 import { useFieldSearchQuery } from '@/features/field/hooks/use-field-queries'
 import { adaptTransaction } from '@/features/transactions/adapters/transactions'
@@ -74,7 +71,6 @@ export function CampaignDetail() {
   const searchedBeneficiaries = mapSearchedBeneficiaries(campaignBeneficiariesQuery.data ?? [])
   const beneficiaries = beneficiarySearch.length > 0 ? searchedBeneficiaries : listedBeneficiaries
   const transactions = mapTransactions(campaignTransactionsQuery.data?.data ?? [])
-  const savingsData: CampaignSavingsItem[] = []
 
   const beneficiaryBudget = listedBeneficiaries.reduce((sum, beneficiary) => sum + beneficiary.amount, 0)
   const fallbackBudget = Math.max(
@@ -109,19 +105,8 @@ export function CampaignDetail() {
       : campaignQuery.data
         ? adaptCampaignProgressSeries(campaignQuery.data)
         : []
-  const savingsParticipation = campaign
-    ? [
-        { category: 'Participating', count: Math.round(campaign.totalBeneficiaries * (successRate / 100)) },
-        {
-          category: 'Not Participating',
-          count: Math.max(campaign.totalBeneficiaries - Math.round(campaign.totalBeneficiaries * (successRate / 100)), 0),
-        },
-      ]
-    : []
-
   const beneficiariesPagination = useTablePagination(beneficiaries, undefined, [activeTab, searchQuery])
   const transactionsPagination = useTablePagination(transactions, undefined, [activeTab])
-  const savingsPagination = useTablePagination(savingsData, undefined, [activeTab])
 
   const errorMessage =
     campaignQuery.error instanceof Error
@@ -230,9 +215,6 @@ export function CampaignDetail() {
             <TabsTrigger value="overview">{t('campaignDetailPage.overview')}</TabsTrigger>
             <TabsTrigger value="beneficiaries">{t('campaignDetailPage.beneficiaries')}</TabsTrigger>
             <TabsTrigger value="transactions">{t('campaignDetailPage.transactions')}</TabsTrigger>
-            {campaign.enabledSavings && !isAnalyticsOnly ? (
-              <TabsTrigger value="savings">{t('campaignDetailPage.savings')}</TabsTrigger>
-            ) : null}
             <TabsTrigger value="reports">{t('campaignDetailPage.reports')}</TabsTrigger>
           </TabsList>
 
@@ -278,21 +260,8 @@ export function CampaignDetail() {
             />
           </TabsContent>
 
-          {campaign.enabledSavings && !isAnalyticsOnly ? (
-            <TabsContent value="savings">
-              <CampaignSavingsTab
-                amountDisbursed={amountDisbursed}
-                savingsParticipation={savingsParticipation}
-                savingsData={savingsData}
-                savingsPagination={savingsPagination}
-                formatCurrency={formatCampaignCurrency}
-                formatDate={formatCampaignDate}
-              />
-            </TabsContent>
-          ) : null}
-
           <TabsContent value="reports">
-            <CampaignReportsTab showSavingsExport={campaign.enabledSavings && !isAnalyticsOnly} />
+            <CampaignReportsTab showSavingsExport={false} />
           </TabsContent>
         </Tabs>
       ) : null}

@@ -7,8 +7,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/app/components/ui/dialog'
+  DialogTitle} from '@/app/components/ui/dialog'
 import { useTranslation } from 'react-i18next'
 
 type Props = {
@@ -34,8 +33,7 @@ export function CampaignDetailDialogs({
   executePendingCount,
   canExecuteDisbursement,
   isExecuting,
-  onExecuteDisbursement,
-}: Props) {
+  onExecuteDisbursement}: Props) {
   const { t } = useTranslation()
 
   return (
@@ -43,14 +41,14 @@ export function CampaignDetailDialogs({
       <Dialog open={showExecuteDialog} onOpenChange={setShowExecuteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle style={{ fontSize: 'var(--text-20)' }}>{t('campaignDetailPage.executeTitle')}</DialogTitle>
-            <DialogDescription style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <DialogTitle>{t('campaignDetailPage.executeTitle')}</DialogTitle>
+            <DialogDescription style={{  color: 'var(--muted-foreground)' }}>
               {t('campaignDetailPage.executeDescription')}
             </DialogDescription>
           </DialogHeader>
           <Alert>
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription style={{ fontSize: 'var(--text-13)' }}>
+            <AlertDescription>
               {typeof executePendingCount === 'number'
                 ? executePendingCount === 1
                   ? t('campaignDetailPage.executePending', { count: executePendingCount })
@@ -93,8 +91,7 @@ function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  warning,
-}: {
+  warning}: {
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
@@ -107,14 +104,14 @@ function ConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle style={{ fontSize: 'var(--text-20)' }}>{title}</DialogTitle>
-          <DialogDescription style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription style={{  color: 'var(--muted-foreground)' }}>
             {description}
           </DialogDescription>
         </DialogHeader>
         <Alert>
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription style={{ fontSize: 'var(--text-13)' }}>{warning}</AlertDescription>
+          <AlertDescription>{warning}</AlertDescription>
         </Alert>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

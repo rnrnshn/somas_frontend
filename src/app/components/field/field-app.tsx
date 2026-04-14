@@ -160,10 +160,10 @@ export function FieldApp() {
             >
               <User className="w-10 h-10" style={{ color: "var(--primary-foreground)" }} />
             </div>
-            <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <h1 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               SOMAS Field
             </h1>
-            <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
+            <p style={{  color: "var(--muted-foreground)", marginTop: "8px" }}>
               Aplicativo de Verificação de Beneficiários
             </p>
           </div>
@@ -172,16 +172,16 @@ export function FieldApp() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                  <label style={{  fontWeight: "var(--font-weight-medium)" }}>
                     Email
                   </label>
-                  <Input type="email" placeholder="seu.email@somas.gov" />
+                  <Input type="email" placeholder={"seu.email@somas.gov"} />
                 </div>
                 <div className="space-y-2">
-                  <label style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                  <label style={{  fontWeight: "var(--font-weight-medium)" }}>
                     Senha
                   </label>
-                  <Input type="password" placeholder="••••••••" />
+                  <Input type="password" placeholder={"••••••••"} />
                 </div>
                 <Button 
                   className="w-full"
@@ -193,7 +193,7 @@ export function FieldApp() {
             </CardContent>
           </Card>
 
-          <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", textAlign: "center", marginTop: "16px" }}>
+          <p style={{  color: "var(--muted-foreground)", textAlign: "center", marginTop: "16px" }}>
             Versão 1.0.0 • SOMAS Field Operations
           </p>
         </div>
@@ -209,10 +209,10 @@ export function FieldApp() {
         <div className="p-4" style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
           <div className="flex items-center justify-between mb-2">
             <div>
-              <p style={{ fontSize: "var(--text-12)", opacity: 0.9 }}>
+              <p style={{  opacity: 0.9 }}>
                 Bem-vindo,
               </p>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 {enumeratorData.name}
               </p>
             </div>
@@ -225,7 +225,7 @@ export function FieldApp() {
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
-          <p style={{ fontSize: "var(--text-12)", opacity: 0.8 }}>
+          <p style={{  opacity: 0.8 }}>
             ID: {enumeratorData.id}
           </p>
         </div>
@@ -235,10 +235,10 @@ export function FieldApp() {
           <div className="grid grid-cols-3 gap-3">
             <Card>
               <CardContent className="p-4 text-center">
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--primary)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--primary)" }}>
                   {enumeratorData.assignedBeneficiaries}
                 </p>
-                <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Atribuídos
                 </p>
               </CardContent>
@@ -246,10 +246,10 @@ export function FieldApp() {
 
             <Card>
               <CardContent className="p-4 text-center">
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
                   {enumeratorData.verificationsToday}
                 </p>
-                <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Verificados Hoje
                 </p>
               </CardContent>
@@ -257,10 +257,10 @@ export function FieldApp() {
 
             <Card>
               <CardContent className="p-4 text-center">
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--warning)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--warning)" }}>
                   {enumeratorData.pendingSync}
                 </p>
-                <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Pendentes
                 </p>
               </CardContent>
@@ -269,7 +269,7 @@ export function FieldApp() {
 
           {/* Quick Actions */}
           <div className="space-y-3">
-            <h3 style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <h3 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               Ações Rápidas
             </h3>
 
@@ -284,10 +284,10 @@ export function FieldApp() {
                       <Search className="w-5 h-5" style={{ color: "var(--primary)" }} />
                     </div>
                     <div>
-                      <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                      <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                         Buscar Beneficiário
                       </p>
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         Pesquisar por nome, telefone ou código
                       </p>
                     </div>
@@ -308,10 +308,10 @@ export function FieldApp() {
                       <BarChart3 className="w-5 h-5" style={{ color: "var(--success)" }} />
                     </div>
                     <div>
-                      <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                      <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                         Minhas Verificações
                       </p>
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         Ver resumo diário
                       </p>
                     </div>
@@ -332,10 +332,10 @@ export function FieldApp() {
                       <RefreshCw className="w-5 h-5" style={{ color: "var(--warning)" }} />
                     </div>
                     <div>
-                      <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                      <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                         Sincronizar Dados
                       </p>
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         {enumeratorData.pendingSync} registros pendentes
                       </p>
                     </div>
@@ -366,7 +366,7 @@ export function FieldApp() {
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
             <div>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Buscar Beneficiário
               </p>
             </div>
@@ -375,7 +375,7 @@ export function FieldApp() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
             <Input
-              placeholder="Nome, telefone ou código..."
+              placeholder={"Nome, telefone ou código..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -388,7 +388,7 @@ export function FieldApp() {
           {filteredBeneficiaries.length === 0 ? (
             <div className="text-center py-12">
               <AlertCircle className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--muted-foreground)", opacity: 0.5 }} />
-              <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Nenhum beneficiário encontrado
               </p>
             </div>
@@ -405,10 +405,10 @@ export function FieldApp() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                      <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                         {beneficiary.name}
                       </p>
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         {beneficiary.id}
                       </p>
                     </div>
@@ -419,13 +419,13 @@ export function FieldApp() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-3 h-3" style={{ color: "var(--muted-foreground)" }} />
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         {beneficiary.province} • {beneficiary.district}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <FileText className="w-3 h-3" style={{ color: "var(--muted-foreground)" }} />
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         {beneficiary.campaign}
                       </p>
                     </div>
@@ -455,7 +455,7 @@ export function FieldApp() {
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
             <div>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Perfil do Beneficiário
               </p>
             </div>
@@ -473,10 +473,10 @@ export function FieldApp() {
                 >
                   <User className="w-10 h-10" style={{ color: "var(--muted-foreground)" }} />
                 </div>
-                <p style={{ fontSize: "var(--text-20)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                   {selectedBeneficiary.name}
                 </p>
-                <p style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   {selectedBeneficiary.id}
                 </p>
                 <div className="mt-3">
@@ -488,31 +488,31 @@ export function FieldApp() {
 
               <div className="space-y-4">
                 <div>
-                  <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     Contacto
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <Phone className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                    <p style={{ fontSize: "var(--text-14)" }}>
+                    <p>
                       {selectedBeneficiary.phone}
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     Localização
                   </p>
                   <div className="flex items-start gap-2 mt-2">
                     <MapPin className="w-4 h-4 mt-0.5" style={{ color: "var(--muted-foreground)" }} />
                     <div>
-                      <p style={{ fontSize: "var(--text-14)" }}>
+                      <p>
                         {selectedBeneficiary.province}
                       </p>
-                      <p style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         Distrito: {selectedBeneficiary.district}
                       </p>
-                      <p style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         Comunidade: {selectedBeneficiary.community}
                       </p>
                     </div>
@@ -520,24 +520,24 @@ export function FieldApp() {
                 </div>
 
                 <div>
-                  <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     Programa
                   </p>
                   <div className="flex items-start gap-2 mt-2">
                     <FileText className="w-4 h-4 mt-0.5" style={{ color: "var(--muted-foreground)" }} />
-                    <p style={{ fontSize: "var(--text-14)" }}>
+                    <p>
                       {selectedBeneficiary.campaign}
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     Operador de Mobile Money
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <Phone className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                    <p style={{ fontSize: "var(--text-14)" }}>
+                    <p>
                       {selectedBeneficiary.mobileMoneyProvider}
                     </p>
                   </div>
@@ -583,10 +583,10 @@ export function FieldApp() {
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
             <div>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Verificação
               </p>
-              <p style={{ fontSize: "var(--text-12)", opacity: 0.8 }}>
+              <p style={{  opacity: 0.8 }}>
                 {selectedBeneficiary.name}
               </p>
             </div>
@@ -597,7 +597,7 @@ export function FieldApp() {
           {/* Confirmation Checklist */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Confirmar Detalhes
               </CardTitle>
             </CardHeader>
@@ -613,7 +613,7 @@ export function FieldApp() {
                   ) : (
                     <User className="w-5 h-5" style={{ color: "var(--foreground)" }} />
                   )}
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     Confirmar Identidade
                   </p>
                 </div>
@@ -636,7 +636,7 @@ export function FieldApp() {
                   ) : (
                     <Phone className="w-5 h-5" style={{ color: "var(--foreground)" }} />
                   )}
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     Confirmar Número de Telefone
                   </p>
                 </div>
@@ -653,13 +653,13 @@ export function FieldApp() {
           {/* Notes */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Notas do Enumerador
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
-                placeholder="Adicionar observações sobre a verificação..."
+                placeholder={"Adicionar observações sobre a verificação..."}
                 value={verificationNotes}
                 onChange={(e) => setVerificationNotes(e.target.value)}
                 rows={4}
@@ -670,7 +670,7 @@ export function FieldApp() {
           {/* Selfie Capture */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Evidência Fotográfica
               </CardTitle>
             </CardHeader>
@@ -687,10 +687,10 @@ export function FieldApp() {
               ) : (
                 <div className="text-center p-6 rounded-lg" style={{ backgroundColor: "var(--muted)" }}>
                   <CheckCircle className="w-12 h-12 mx-auto mb-2" style={{ color: "var(--success)" }} />
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     Foto Capturada
                   </p>
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                  <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                     Com localização GPS e timestamp
                   </p>
                   <Button 
@@ -735,7 +735,7 @@ export function FieldApp() {
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
             <div>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Capturar Selfie
               </p>
             </div>
@@ -750,10 +750,10 @@ export function FieldApp() {
           >
             <div className="text-center">
               <Camera className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--muted-foreground)" }} />
-              <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+              <p style={{  color: "var(--muted-foreground)" }}>
                 Visualização da câmera
               </p>
-              <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+              <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                 Posicione o beneficiário no centro
               </p>
             </div>
@@ -767,33 +767,33 @@ export function FieldApp() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                  <p style={{  color: "var(--muted-foreground)" }}>
                     Timestamp
                   </p>
                 </div>
-                <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+                <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                   2026-03-06 15:30:45
                 </p>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                  <p style={{  color: "var(--muted-foreground)" }}>
                     Localização GPS
                   </p>
                 </div>
-                <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+                <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                   -25.0392, 33.6349
                 </p>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                  <p style={{  color: "var(--muted-foreground)" }}>
                     Enumerador
                   </p>
                 </div>
-                <p style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+                <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                   {enumeratorData.id}
                 </p>
               </div>
@@ -831,7 +831,7 @@ export function FieldApp() {
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
             <div>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Submeter Verificação
               </p>
             </div>
@@ -842,60 +842,60 @@ export function FieldApp() {
           {/* Summary Card */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Resumo da Verificação
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Beneficiário
                 </p>
-                <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)", marginTop: "4px" }}>
+                <p style={{  fontWeight: "var(--font-weight-medium)", marginTop: "4px" }}>
                   {selectedBeneficiary.name}
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                <p style={{  color: "var(--muted-foreground)" }}>
                   {selectedBeneficiary.id}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     Identidade
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                    <p style={{ fontSize: "var(--text-13)" }}>Confirmada</p>
+                    <p>Confirmada</p>
                   </div>
                 </div>
                 <div>
-                  <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     Telefone
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                    <p style={{ fontSize: "var(--text-13)" }}>Confirmado</p>
+                    <p>Confirmado</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Evidência Fotográfica
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <CheckCircle className="w-4 h-4" style={{ color: "var(--success)" }} />
-                  <p style={{ fontSize: "var(--text-13)" }}>Capturada com GPS</p>
+                  <p>Capturada com GPS</p>
                 </div>
               </div>
 
               {verificationNotes && (
                 <div>
-                  <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <p style={{  color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     Notas
                   </p>
-                  <p style={{ fontSize: "var(--text-13)", marginTop: "4px" }}>
+                  <p style={{  marginTop: "4px" }}>
                     {verificationNotes}
                   </p>
                 </div>
@@ -906,7 +906,7 @@ export function FieldApp() {
           {/* Status Selection */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <CardTitle style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Estado da Verificação
               </CardTitle>
             </CardHeader>
@@ -971,7 +971,7 @@ export function FieldApp() {
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
             <div>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Sincronizar Dados
               </p>
             </div>
@@ -989,13 +989,13 @@ export function FieldApp() {
                 >
                   <RefreshCw className="w-8 h-8" style={{ color: "var(--warning)" }} />
                 </div>
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                   {pendingSyncRecords.length}
                 </p>
-                <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Registros Pendentes
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "8px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "8px" }}>
                   Última sincronização: 14:30
                 </p>
               </div>
@@ -1004,7 +1004,7 @@ export function FieldApp() {
 
           {/* Pending Records */}
           <div className="space-y-3">
-            <h3 style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <h3 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               Aguardando Sincronização
             </h3>
 
@@ -1013,15 +1013,15 @@ export function FieldApp() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                      <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                         {record.beneficiary}
                       </p>
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "2px" }}>
+                      <p style={{  color: "var(--muted-foreground)", marginTop: "2px" }}>
                         {record.type} • {record.id}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <Clock className="w-3 h-3" style={{ color: "var(--muted-foreground)" }} />
-                        <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)" }}>
+                        <p style={{  color: "var(--muted-foreground)" }}>
                           {record.timestamp}
                         </p>
                       </div>
@@ -1043,7 +1043,7 @@ export function FieldApp() {
             className="p-4 rounded-lg"
             style={{ backgroundColor: "var(--muted)" }}
           >
-            <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+            <p style={{  color: "var(--muted-foreground)" }}>
               ℹ️ Os dados serão sincronizados automaticamente quando houver conexão à internet.
             </p>
           </div>
@@ -1068,10 +1068,10 @@ export function FieldApp() {
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
             <div>
-              <p style={{ fontSize: "var(--text-18)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 Resumo Diário
               </p>
-              <p style={{ fontSize: "var(--text-12)", opacity: 0.8 }}>
+              <p style={{  opacity: 0.8 }}>
                 6 de Março de 2026
               </p>
             </div>
@@ -1083,10 +1083,10 @@ export function FieldApp() {
           <div className="grid grid-cols-2 gap-3">
             <Card>
               <CardContent className="p-4 text-center">
-                <p style={{ fontSize: "var(--text-28)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--primary)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--primary)" }}>
                   {verificationsToday.length}
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Total de Verificações
                 </p>
               </CardContent>
@@ -1094,10 +1094,10 @@ export function FieldApp() {
 
             <Card>
               <CardContent className="p-4 text-center">
-                <p style={{ fontSize: "var(--text-28)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--success)" }}>
                   {verificationsToday.filter(v => v.status === "Verificado").length}
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Verificações Bem Sucedidas
                 </p>
               </CardContent>
@@ -1105,10 +1105,10 @@ export function FieldApp() {
 
             <Card>
               <CardContent className="p-4 text-center">
-                <p style={{ fontSize: "var(--text-28)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--destructive)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--destructive)" }}>
                   {verificationsToday.filter(v => v.status === "Rejeitado").length}
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Rejeitadas
                 </p>
               </CardContent>
@@ -1116,10 +1116,10 @@ export function FieldApp() {
 
             <Card>
               <CardContent className="p-4 text-center">
-                <p style={{ fontSize: "var(--text-28)", fontWeight: "var(--font-weight-semi-bold)", color: "var(--warning)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)", color: "var(--warning)" }}>
                   {pendingSyncRecords.length}
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Registros Pendentes
                 </p>
               </CardContent>
@@ -1128,7 +1128,7 @@ export function FieldApp() {
 
           {/* Verification History */}
           <div className="space-y-3">
-            <h3 style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-semi-bold)" }}>
+            <h3 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
               Histórico de Hoje
             </h3>
 
@@ -1137,10 +1137,10 @@ export function FieldApp() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                      <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                         {verification.beneficiary}
                       </p>
-                      <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         {verification.id}
                       </p>
                     </div>
@@ -1151,13 +1151,13 @@ export function FieldApp() {
                   <div className="flex items-center gap-4 mt-2">
                     <div className="flex items-center gap-2">
                       <Clock className="w-3 h-3" style={{ color: "var(--muted-foreground)" }} />
-                      <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         {verification.time}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-3 h-3" style={{ color: "var(--muted-foreground)" }} />
-                      <p style={{ fontSize: "var(--text-11)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                         {verification.location}
                       </p>
                     </div>

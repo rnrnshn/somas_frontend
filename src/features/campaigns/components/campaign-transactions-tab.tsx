@@ -1,6 +1,6 @@
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import { Card, CardContent } from '@/app/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
 import { DataTablePagination } from '@/app/components/ui/table-pagination'
 import { CampaignStatusBadge, type CampaignTransactionItem } from '@/features/campaigns/components/campaign-detail-shared'
@@ -25,19 +25,21 @@ export function CampaignTransactionsTab({
   transactions,
   transactionsPagination,
   isPending,
-  error,
-}: Props) {
+  error}: Props) {
   const { t } = useTranslation()
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle style={{ fontSize: 'var(--text-16)' }}>{t('campaignDetailPage.transactions')}</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
+          {t('campaignDetailPage.transactions')}
+        </h3>
+      </div>
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
               <TableHead>{t('campaignDetailPage.transactionId')}</TableHead>
               <TableHead>Beneficiary</TableHead>
               <TableHead>Amount</TableHead>
@@ -45,10 +47,10 @@ export function CampaignTransactionsTab({
               <TableHead>{t('campaignDetailPage.errorMessage')}</TableHead>
               <TableHead>{t('campaignDetailPage.executionDate')}</TableHead>
               <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending ? (
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isPending ? (
               <EmptyRow message={t('transactionsPage.loadingTransactions')} tone="muted" />
             ) : error ? (
               <EmptyRow
@@ -60,11 +62,11 @@ export function CampaignTransactionsTab({
             ) : (
               transactionsPagination.paginatedItems.map((transaction) => (
                 <TableRow key={transaction.id}>
-                  <TableCell style={{ fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                  <TableCell style={{  fontFamily: 'var(--font-mono)' }}>
                     {transaction.id}
                   </TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-13)' }}>{transaction.beneficiary}</TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                  <TableCell>{transaction.beneficiary}</TableCell>
+                  <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                     {formatMetical(transaction.amount)}
                   </TableCell>
                   <TableCell>
@@ -72,14 +74,14 @@ export function CampaignTransactionsTab({
                   </TableCell>
                   <TableCell>
                     {transaction.errorMessage ? (
-                      <span style={{ fontSize: 'var(--text-12)', color: 'var(--error)' }}>
+                      <span style={{  color: 'var(--error)' }}>
                         {transaction.errorMessage}
                       </span>
                     ) : (
-                      <span style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>—</span>
+                      <span style={{  color: 'var(--muted-foreground)' }}>—</span>
                     )}
                   </TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <TableCell style={{  color: 'var(--muted-foreground)' }}>
                     {transaction.executionDate}
                   </TableCell>
                   <TableCell>
@@ -91,18 +93,19 @@ export function CampaignTransactionsTab({
                   </TableCell>
                 </TableRow>
               ))
-            )}
-          </TableBody>
-        </Table>
-        <DataTablePagination
-          page={transactionsPagination.page}
-          pageSize={transactionsPagination.pageSize}
-          totalItems={transactionsPagination.totalItems}
-          totalPages={transactionsPagination.totalPages}
-          onPageChange={transactionsPagination.setPage}
-        />
-      </CardContent>
-    </Card>
+              )}
+            </TableBody>
+          </Table>
+          <DataTablePagination
+            page={transactionsPagination.page}
+            pageSize={transactionsPagination.pageSize}
+            totalItems={transactionsPagination.totalItems}
+            totalPages={transactionsPagination.totalPages}
+            onPageChange={transactionsPagination.setPage}
+          />
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
@@ -110,7 +113,7 @@ function EmptyRow({ message, tone }: { message: string; tone: 'muted' | 'error' 
   return (
     <TableRow>
       <TableCell colSpan={7} className="py-12 text-center">
-        <p style={{ fontSize: 'var(--text-14)', color: tone === 'error' ? 'var(--error)' : 'var(--muted-foreground)' }}>
+        <p style={{  color: tone === 'error' ? 'var(--error)' : 'var(--muted-foreground)' }}>
           {message}
         </p>
       </TableCell>

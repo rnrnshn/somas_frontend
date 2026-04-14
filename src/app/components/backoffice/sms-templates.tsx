@@ -22,14 +22,6 @@ export function BackofficeSMSTemplates() {
       status: 'Active'
     },
     {
-      id: 'SMS-003',
-      name: 'Savings Update',
-      campaign: 'All Campaigns',
-      message: '{name}, your total savings is now MZN {savings}. Keep saving! Campaign: {campaign}',
-      usageCount: 34567,
-      status: 'Active'
-    },
-    {
       id: 'SMS-004',
       name: 'Welcome Message',
       campaign: 'All Campaigns',
@@ -43,8 +35,8 @@ export function BackofficeSMSTemplates() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: 'var(--text-32)' }}>SMS Templates</h1>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-2">
+          <h1>SMS Templates</h1>
+          <p style={{  color: 'var(--muted-foreground)' }} className="mt-2">
             Manage messaging templates for campaigns
           </p>
         </div>
@@ -61,12 +53,12 @@ export function BackofficeSMSTemplates() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 style={{ fontSize: 'var(--text-18)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                       {template.name}
                     </h3>
                     <Badge style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}>{template.status}</Badge>
                   </div>
-                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <p style={{  color: 'var(--muted-foreground)' }}>
                     {template.id} • {template.campaign} • {template.usageCount.toLocaleString()} sent
                   </p>
                 </div>
@@ -75,8 +67,8 @@ export function BackofficeSMSTemplates() {
                   Preview
                 </Button>
               </div>
-              <div className="p-4 bg-muted rounded-[--radius]">
-                <p style={{ fontSize: 'var(--text-14)' }}>{template.message}</p>
+              <div className="p-4 bg-muted rounded-[var(--radius)]">
+                <p>{template.message}</p>
               </div>
             </CardContent>
           </Card>

@@ -40,16 +40,16 @@ export function FieldLayout() {
       <header className="bg-card border-b border-border p-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div>
-            <h2 style={{ fontSize: 'var(--text-18)' }}>{t('fieldHeader')}</h2>
-            <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+            <h2>{t('fieldHeader')}</h2>
+            <p style={{  color: 'var(--muted-foreground)' }}>
               {t(`roles.${normalizedRole ?? 'fallback'}`)}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <LanguageSwitcher />
+            <LanguageSwitcher className="w-[88px]" />
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 hover:bg-accent rounded-[--radius]"
+              className="p-2 hover:bg-accent rounded-[var(--radius)] cursor-pointer"
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -69,12 +69,11 @@ export function FieldLayout() {
                     navigate(item.path);
                     setMenuOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-[--radius] transition-colors ${
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-[var(--radius)] transition-colors cursor-pointer ${
                     isActive
                       ? 'bg-primary text-primary-foreground'
                       : 'hover:bg-accent'
                   }`}
-                  style={{ fontSize: 'var(--text-16)' }}
                 >
                   <Icon className="w-5 h-5" />
                   {item.label}
@@ -113,14 +112,14 @@ export function FieldLayout() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-[--radius] transition-colors ${
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
                   isActive
                     ? 'text-primary'
                     : 'text-muted-foreground'
                 }`}
               >
                 <Icon className="w-6 h-6" />
-                <span style={{ fontSize: 'var(--text-12)' }}>{item.label}</span>
+                <span>{item.label}</span>
               </button>
             );
           })}

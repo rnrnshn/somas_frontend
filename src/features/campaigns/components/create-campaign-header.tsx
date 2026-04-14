@@ -14,8 +14,7 @@ export function CreateCampaignHeader({
   currentStep,
   totalSteps,
   isEditMode,
-  onBackToCampaigns,
-}: Props) {
+  onBackToCampaigns}: Props) {
   const { t } = useTranslation()
   const progressPercentage = (currentStep / totalSteps) * 100
   const steps = [
@@ -32,10 +31,10 @@ export function CreateCampaignHeader({
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t('createCampaignPage.backToCampaigns')}
         </Button>
-        <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+        <h1 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
           {isEditMode ? t('createCampaignPage.editCampaign') : t('createCampaignPage.createCampaign')}
         </h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
+        <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>
           {t('createCampaignPage.stepOf', { current: currentStep, total: totalSteps })}
         </p>
       </div>
@@ -52,14 +51,13 @@ export function CreateCampaignHeader({
                   color:
                     currentStep >= item.step
                       ? 'var(--primary-foreground)'
-                      : 'var(--muted-foreground)',
-                }}
+                      : 'var(--muted-foreground)'}}
               >
                 {currentStep > item.step ? (
                   <Check className="h-4 w-4" />
                 ) : (
                   <span
-                    style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}
+                    style={{  fontWeight: 'var(--font-weight-medium)' }}
                   >
                     {item.step}
                   </span>
@@ -67,13 +65,12 @@ export function CreateCampaignHeader({
               </div>
               <p
                 style={{
-                  fontSize: 'var(--text-12)',
+                  
                   color: currentStep >= item.step ? 'var(--foreground)' : 'var(--muted-foreground)',
                   fontWeight:
                     currentStep === item.step
                       ? 'var(--font-weight-medium)'
-                      : 'var(--font-weight-regular)',
-                }}
+                      : 'var(--font-weight-regular)'}}
               >
                 {item.label}
               </p>

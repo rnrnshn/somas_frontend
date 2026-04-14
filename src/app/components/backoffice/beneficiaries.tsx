@@ -5,7 +5,7 @@ import { useBeneficiariesQuery, useBeneficiaryRowQueries } from "@/features/bene
 import { adaptBeneficiaryListItem } from "@/features/beneficiaries/adapters/beneficiaries";
 import type { BeneficiaryListFilters } from "@/features/beneficiaries/types/beneficiary";
 import { getFieldDisbursement } from "@/features/field/api/field-api";
-import { Card, CardHeader, CardContent } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -29,8 +29,7 @@ export function BackofficeBeneficiaries() {
     page: 1,
     pageSize: 100,
     name: searchQuery.trim() || undefined,
-    msisdn: searchQuery.trim() || undefined,
-  };
+    msisdn: searchQuery.trim() || undefined};
   const beneficiariesQuery = useBeneficiariesQuery(filters);
   const rowQueries = useBeneficiaryRowQueries((beneficiariesQuery.data?.data ?? []).map((item) => item.id));
   const metricsMap = new Map<number, any>();
@@ -59,9 +58,7 @@ export function BackofficeBeneficiaries() {
       queryKey: ['field', 'verification-record', row.campaignId, row.id],
       queryFn: () => getFieldDisbursement(row.campaignId, row.id),
       enabled: activeTab === 'field-verification',
-      staleTime: 30_000,
-    })),
-  });
+      staleTime: 30_000}))});
 
   const beneficiaries = (beneficiariesQuery.data?.data ?? []).map((item) =>
     adaptBeneficiaryListItem(item, metricsMap.get(item.id), campaignsMap.get(item.id))
@@ -91,8 +88,7 @@ export function BackofficeBeneficiaries() {
             : t('beneficiariesPage.notCaptured'),
         date: formatDisplayDate(detail.verifiedAt ?? row.createdAt),
         status: mapVerificationStatus(detail.disbursementStatus),
-        notes: detail.testimony ?? buildEvidenceSummary(detail.signatureUrl, detail.photoUrl, t),
-      };
+        notes: detail.testimony ?? buildEvidenceSummary(detail.signatureUrl, detail.photoUrl, t)};
     })
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
@@ -135,8 +131,8 @@ export function BackofficeBeneficiaries() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>{t('beneficiariesPage.title')}</h1>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
+          <h1 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>{t('beneficiariesPage.title')}</h1>
+          <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>
             {t('beneficiariesPage.subtitle')}
           </p>
         </div>
@@ -162,8 +158,8 @@ export function BackofficeBeneficiaries() {
 
         {/* DIRECTORY TAB */}
         <TabsContent value="directory">
-          <Card>
-            <CardHeader>
+          <Card className="mb-6">
+            <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
@@ -234,12 +230,15 @@ export function BackofficeBeneficiaries() {
                   </Select>
                 </div>
                 {beneficiariesQuery.error ? (
-                  <p style={{ fontSize: 'var(--text-13)', color: 'var(--error)' }}>
+                  <p style={{  color: 'var(--error)' }}>
                     {beneficiariesQuery.error instanceof Error ? beneficiariesQuery.error.message : t('beneficiariesPage.loadError')}
                   </p>
                 ) : null}
               </div>
-            </CardHeader>
+            </CardContent>
+          </Card>
+
+          <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
@@ -257,7 +256,7 @@ export function BackofficeBeneficiaries() {
                   {beneficiaries.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
-                        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                        <p style={{  color: 'var(--muted-foreground)' }}>
                           {beneficiariesQuery.isPending ? t('beneficiariesPage.loadingBeneficiaries') : t('beneficiariesPage.noBeneficiaries')}
                         </p>
                       </TableCell>
@@ -265,22 +264,22 @@ export function BackofficeBeneficiaries() {
                   ) : beneficiariesPagination.paginatedItems.map((beneficiary) => (
                     <TableRow key={beneficiary.id} className="cursor-pointer">
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-13)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)'}}>
                           {beneficiary.beneficiaryCode}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)' }}>{beneficiary.fullName}</TableCell>
-                      <TableCell style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-13)' }}>
+                      <TableCell>{beneficiary.fullName}</TableCell>
+                      <TableCell style={{ color: 'var(--muted-foreground)'}}>
                         {beneficiary.msisdn}
                       </TableCell>
-                      <TableCell style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-13)' }}>
+                      <TableCell style={{ color: 'var(--muted-foreground)'}}>
                         {beneficiary.province}
                       </TableCell>
-                      <TableCell style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-13)' }}>
+                      <TableCell style={{ color: 'var(--muted-foreground)'}}>
                         {beneficiary.district}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)' }}>{beneficiary.campaign}</TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)' }}>{beneficiary.lastTransaction}</TableCell>
+                      <TableCell>{beneficiary.campaign}</TableCell>
+                      <TableCell>{beneficiary.lastTransaction}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -298,16 +297,16 @@ export function BackofficeBeneficiaries() {
 
         {/* FIELD VERIFICATION TAB */}
         <TabsContent value="field-verification">
-          <Card>
-            <CardHeader>
+          <Card className="mb-6">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <MapPin className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                       {t('beneficiariesPage.fieldVerificationRecords')}
                     </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('beneficiariesPage.fieldVerificationSubtitle')}
                     </p>
                   </div>
@@ -320,7 +319,10 @@ export function BackofficeBeneficiaries() {
                   />
                 </div>
               </div>
-            </CardHeader>
+            </CardContent>
+          </Card>
+
+          <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
@@ -338,7 +340,7 @@ export function BackofficeBeneficiaries() {
                   {activeTab === 'field-verification' && verificationQueries.some((query) => query.isPending) && filteredFieldVerifications.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
-                        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                        <p style={{  color: 'var(--muted-foreground)' }}>
                           {t('beneficiariesPage.loadingFieldVerification')}
                         </p>
                       </TableCell>
@@ -346,7 +348,7 @@ export function BackofficeBeneficiaries() {
                   ) : filteredFieldVerifications.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="py-12 text-center">
-                        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                        <p style={{  color: 'var(--muted-foreground)' }}>
                           {t('beneficiariesPage.noFieldVerification')}
                         </p>
                       </TableCell>
@@ -354,27 +356,27 @@ export function BackofficeBeneficiaries() {
                   ) : verificationPagination.paginatedItems.map((verification) => (
                     <TableRow key={verification.id} className="cursor-pointer">
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)',  fontFamily: 'var(--font-mono)' }}>
                           {verification.id}
                         </span>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                          <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                             {verification.beneficiary}
                           </p>
-                          <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                          <p style={{  color: 'var(--muted-foreground)' }}>
                             {verification.beneficiaryCode}
                           </p>
                         </div>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)' }}>
+                      <TableCell>
                         {verification.enumerator}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {verification.location}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {verification.date}
                       </TableCell>
                       <TableCell>
@@ -383,7 +385,7 @@ export function BackofficeBeneficiaries() {
                           {getStatusBadge(verification.status)}
                         </div>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {verification.notes}
                       </TableCell>
                     </TableRow>

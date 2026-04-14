@@ -27,8 +27,8 @@ export function FieldStatus() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 style={{ fontSize: 'var(--text-24)' }}>{t('fieldStatusPage.title')}</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-1">
+        <h1>{t('fieldStatusPage.title')}</h1>
+        <p style={{  color: 'var(--muted-foreground)' }} className="mt-1">
           {t('fieldStatusPage.subtitle')}
         </p>
       </div>
@@ -37,7 +37,7 @@ export function FieldStatus() {
       <Card className="mb-6">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldStatusPage.connection')}</CardTitle>
+            <CardTitle>{t('fieldStatusPage.connection')}</CardTitle>
             <Badge
               variant={isOnline ? 'default' : 'outline'}
               style={{
@@ -61,7 +61,7 @@ export function FieldStatus() {
           </div>
         </CardHeader>
         <CardContent>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <p style={{  color: 'var(--muted-foreground)' }}>
             {isOnline
                ? t('fieldStatusPage.onlineMessage')
                : t('fieldStatusPage.offlineMessage')}
@@ -72,39 +72,39 @@ export function FieldStatus() {
       {/* Local Data */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldStatusPage.localData')}</CardTitle>
+          <CardTitle>{t('fieldStatusPage.localData')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-3 border border-border rounded-[--radius]">
+          <div className="flex items-center justify-between p-3 border border-border rounded-[var(--radius)]">
             <div className="flex items-center gap-3">
               <Database className="w-5 h-5 text-primary" />
               <div>
-                <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                   {t('fieldStatusPage.cachedRecords')}
                 </p>
-                <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                <p style={{  color: 'var(--muted-foreground)' }}>
                   {t('fieldStatusPage.availableOffline')}
                 </p>
               </div>
             </div>
-            <span style={{ fontSize: 'var(--text-18)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+            <span style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                   {items.length}
             </span>
           </div>
 
-          <div className="flex items-center justify-between p-3 border border-border rounded-[--radius]">
+          <div className="flex items-center justify-between p-3 border border-border rounded-[var(--radius)]">
             <div className="flex items-center gap-3">
               <Upload className="w-5 h-5 text-accent" />
               <div>
-                <p style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                   {t('fieldStatusPage.pendingUpload')}
                 </p>
-                <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                <p style={{  color: 'var(--muted-foreground)' }}>
                   {t('fieldStatusPage.waitingToSync')}
                 </p>
               </div>
             </div>
-            <span style={{ fontSize: 'var(--text-18)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+            <span style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                   {items.length}
             </span>
           </div>
@@ -114,7 +114,7 @@ export function FieldStatus() {
       {/* Sync Actions */}
       <Card>
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldStatusPage.syncActions')}</CardTitle>
+          <CardTitle>{t('fieldStatusPage.syncActions')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Button className="w-full justify-start" size="lg" disabled={!isOnline}>
@@ -134,8 +134,7 @@ export function FieldStatus() {
                 longitude: item.longitude,
                 verifiedAt: item.verifiedAt,
                 signatureUrl: item.signatureUrl,
-                photoUrl: item.photoUrl,
-              })));
+                photoUrl: item.photoUrl})));
               if (result.processed > 0) {
                 clearOfflineConfirmations();
               }
@@ -144,16 +143,16 @@ export function FieldStatus() {
             <Upload className="w-5 h-5 mr-2" />
             {t('fieldStatusPage.uploadPending')}
           </Button>
-          <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }} className="text-center">
+          <p style={{  color: 'var(--muted-foreground)' }} className="text-center">
             {items.length > 0 ? t('fieldStatusPage.queuedCount', { count: items.length }) : t('fieldStatusPage.noQueued')}
           </p>
           {items.length > 0 ? (
             <div className="space-y-2 pt-2">
               {items.map((item) => (
-                <div key={item.localId} className="flex items-center justify-between rounded-[--radius] border border-border p-3">
+                <div key={item.localId} className="flex items-center justify-between rounded-[var(--radius)] border border-border p-3">
                   <div>
-                    <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>{item.beneficiaryName}</p>
-                    <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>{item.status} • {new Date(item.createdAt).toLocaleString()}</p>
+                    <p style={{  fontWeight: 'var(--font-weight-medium)' }}>{item.beneficiaryName}</p>
+                    <p style={{  color: 'var(--muted-foreground)' }}>{item.status} • {new Date(item.createdAt).toLocaleString()}</p>
                   </div>
                   <Button size="sm" variant="ghost" onClick={() => removeOfflineConfirmation(item.localId)}>{t('fieldStatusPage.remove')}</Button>
                 </div>

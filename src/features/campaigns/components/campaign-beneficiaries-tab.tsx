@@ -1,6 +1,6 @@
 import { Download, Eye, Flag, Plus, Search, Upload } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import { Card, CardContent, CardTitle } from '@/app/components/ui/card'
 import { Input } from '@/app/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
 import { DataTablePagination } from '@/app/components/ui/table-pagination'
@@ -46,44 +46,47 @@ export function CampaignBeneficiariesTab({
   onAddBeneficiary,
   onImportCsv,
   onExportCsv,
-  onViewBeneficiary,
-}: Props) {
+  onViewBeneficiary}: Props) {
   const { t } = useTranslation()
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle style={{ fontSize: 'var(--text-16)' }}>{t('campaignDetailPage.beneficiaries')}</CardTitle>
-          <div className="flex items-center gap-3">
-            {canAddBeneficiary ? (
-              <Button onClick={onAddBeneficiary}>
-                <Plus className="mr-2 h-4 w-4" />
-                {t('campaignDetailPage.addBeneficiary')}
+    <>
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <CardTitle>{t('campaignDetailPage.beneficiaries')}</CardTitle>
+            <div className="flex items-center gap-3">
+              {canAddBeneficiary ? (
+                <Button onClick={onAddBeneficiary}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t('campaignDetailPage.addBeneficiary')}
+                </Button>
+              ) : null}
+              <Button variant="outline" onClick={onImportCsv}>
+                <Upload className="mr-2 h-4 w-4" />
+                {t('campaignDetailPage.importCsv')}
               </Button>
-            ) : null}
-            <Button variant="outline" onClick={onImportCsv}>
-              <Upload className="mr-2 h-4 w-4" />
-              {t('campaignDetailPage.importCsv')}
-            </Button>
-            <Button variant="outline" onClick={onExportCsv}>
-              <Download className="mr-2 h-4 w-4" />
-              {t('campaignDetailPage.exportCsv')}
-            </Button>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" style={{ color: 'var(--muted-foreground)' }} />
-              <Input
-                placeholder={t('campaignDetailPage.searchBeneficiaries')}
-                value={searchQuery}
-                onChange={(event) => onSearchChange(event.target.value)}
-                className="pl-10"
-              />
+              <Button variant="outline" onClick={onExportCsv}>
+                <Download className="mr-2 h-4 w-4" />
+                {t('campaignDetailPage.exportCsv')}
+              </Button>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" style={{ color: 'var(--muted-foreground)' }} />
+                <Input
+                  placeholder={t('campaignDetailPage.searchBeneficiaries')}
+                  value={searchQuery}
+                  onChange={(event) => onSearchChange(event.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-0">
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead>{t('campaignDetailPage.beneficiaryTableName')}</TableHead>
@@ -125,27 +128,27 @@ export function CampaignBeneficiariesTab({
                 <TableRow key={beneficiary.id}>
                   <TableCell>
                     <div>
-                      <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {beneficiary.name}
                       </p>
-                      <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <p style={{  color: 'var(--muted-foreground)' }}>
                         {beneficiary.id}
                       </p>
                     </div>
                   </TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-13)', fontFamily: 'var(--font-mono)' }}>
+                  <TableCell style={{  fontFamily: 'var(--font-mono)' }}>
                     {beneficiary.msisdn}
                   </TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                  <TableCell style={{  color: 'var(--muted-foreground)' }}>
                     {beneficiary.location}
                   </TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                  <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                     {typeof beneficiary.amount === 'number' ? formatMetical(beneficiary.amount) : '—'}
                   </TableCell>
                   <TableCell>
                     <CampaignStatusBadge status={beneficiary.status} />
                   </TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <TableCell style={{  color: 'var(--muted-foreground)' }}>
                     {beneficiary.lastActivity}
                   </TableCell>
                   <TableCell>
@@ -170,8 +173,9 @@ export function CampaignBeneficiariesTab({
           totalPages={beneficiariesPagination.totalPages}
           onPageChange={beneficiariesPagination.setPage}
         />
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   )
 }
 
@@ -181,8 +185,7 @@ function getContentState({
   searchError,
   listPending,
   listError,
-  beneficiariesLength,
-}: {
+  beneficiariesLength}: {
   beneficiarySearch: string
   searchPending: boolean
   searchError: unknown
@@ -202,7 +205,7 @@ function EmptyRow({ colSpan, message, tone }: { colSpan: number; message: string
   return (
     <TableRow>
       <TableCell colSpan={colSpan} className="py-12 text-center">
-        <p style={{ fontSize: 'var(--text-14)', color: tone === 'error' ? 'var(--error)' : 'var(--muted-foreground)' }}>
+        <p style={{  color: tone === 'error' ? 'var(--error)' : 'var(--muted-foreground)' }}>
           {message}
         </p>
       </TableCell>

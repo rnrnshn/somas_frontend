@@ -34,8 +34,7 @@ export function CampaignDetailHeader({
   onEdit,
   onExecute,
   onSuspend,
-  onClose,
-}: Props) {
+  onClose}: Props) {
   const { t } = useTranslation()
 
   return (
@@ -47,7 +46,7 @@ export function CampaignDetailHeader({
       <div className="flex items-start justify-between">
         <div>
           <div className="mb-2 flex items-center gap-3">
-            <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+            <h1 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
               {campaign?.name ??
                 (isLoading
                   ? t('campaignDetailPage.loadingCampaign')
@@ -55,7 +54,7 @@ export function CampaignDetailHeader({
             </h1>
             {campaign ? <CampaignStatusBadge status={campaign.status} /> : null}
           </div>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <p style={{  color: 'var(--muted-foreground)' }}>
             {campaign
               ? `${campaign.id} • ${campaign.program} • ${campaign.region}`
               : t('campaignDetailPage.loadingDetails')}
