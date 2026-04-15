@@ -67,12 +67,11 @@ export function BackofficeLayout() {
              location.pathname.startsWith('/backoffice/field-verification');
     }
     if (path === '/backoffice/users') {
-      return location.pathname === path;
+      return location.pathname === path || location.pathname.startsWith('/backoffice/users/');
     }
     if (path === '/backoffice/settings') {
       return location.pathname === path || 
              location.pathname.startsWith('/backoffice/settings') ||
-             location.pathname.startsWith('/backoffice/users') ||
              location.pathname.startsWith('/backoffice/roles') ||
              location.pathname.startsWith('/backoffice/permissions') ||
              location.pathname.startsWith('/backoffice/audit') ||

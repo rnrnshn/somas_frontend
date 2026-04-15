@@ -5,8 +5,10 @@ import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
 import { Plus, Shield } from "lucide-react";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
+import { useTranslation } from "react-i18next";
 
 export function BackofficeUsers() {
+  const { t } = useTranslation();
   const users = [
     {
       id: 'USR-001',
@@ -61,36 +63,36 @@ export function BackofficeUsers() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1>Users & Permissions</h1>
+          <h1>{t('settingsPage.userManagementTitle')}</h1>
           <p style={{  color: 'var(--muted-foreground)' }} className="mt-2">
-            Manage system users, roles, and access control
+            {t('settingsPage.userManagementSubtitle')}
           </p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline">
             <Shield className="w-4 h-4 mr-2" />
-            Permission Matrix
+            {t('settingsPage.permissionMatrix')}
           </Button>
           <Button>
             <Plus className="w-4 h-4 mr-2" />
-            Add User
+            {t('settingsPage.addUser')}
           </Button>
         </div>
       </div>
 
       <div className="space-y-3">
-        <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>System Users</h3>
+        <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>{t('settingsPage.systemUsers')}</h3>
         <Card>
           <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Login</TableHead>
-                <TableHead>Failed Logins</TableHead>
-                <TableHead>Enabled</TableHead>
+                <TableHead>{t('settingsPage.users')}</TableHead>
+                <TableHead>{t('settingsPage.roleName')}</TableHead>
+                <TableHead>{t('status')}</TableHead>
+                <TableHead>{t('settingsPage.lastLogin')}</TableHead>
+                <TableHead>{t('settingsPage.failedLogins')}</TableHead>
+                <TableHead>{t('settingsPage.enabled')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -114,9 +116,9 @@ export function BackofficeUsers() {
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
                   <TableCell>
                     {user.enabled ? (
-                      <Badge style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}>Active</Badge>
+                      <Badge style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}>{t('settingsPage.active')}</Badge>
                     ) : (
-                      <Badge variant="outline">Inactive</Badge>
+                      <Badge variant="outline">{t('settingsPage.inactive')}</Badge>
                     )}
                   </TableCell>
                   <TableCell style={{  color: 'var(--muted-foreground)' }}>
