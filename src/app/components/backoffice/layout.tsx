@@ -85,7 +85,7 @@ export function BackofficeLayout() {
   };
 
   if (isBootstrapping) {
-    return null;
+    return <BackofficeRouteSkeleton />;
   }
 
   if (!isAuthenticated) {

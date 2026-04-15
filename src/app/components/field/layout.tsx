@@ -23,7 +23,7 @@ export function FieldLayout() {
   ];
 
   if (isBootstrapping) {
-    return null;
+    return <FieldRouteSkeleton />;
   }
 
   if (!isAuthenticated) {
