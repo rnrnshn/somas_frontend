@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
 import { Switch } from "../ui/switch";
@@ -51,8 +51,7 @@ export function BackofficeUsers() {
       admin: { style: { backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' } },
       content_manager: { style: { backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' } },
       analytics: { style: { backgroundColor: 'var(--chart-3)', color: 'var(--warning-foreground)' } },
-      inquirer: { variant: 'outline' as const },
-    };
+      inquirer: { variant: 'outline' as const }};
     const props = config[role] || {};
     return <Badge {...props}>{role.replace(/_/g, ' ')}</Badge>;
   };
@@ -62,8 +61,8 @@ export function BackofficeUsers() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: 'var(--text-32)' }}>Users & Permissions</h1>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-2">
+          <h1>Users & Permissions</h1>
+          <p style={{  color: 'var(--muted-foreground)' }} className="mt-2">
             Manage system users, roles, and access control
           </p>
         </div>
@@ -79,11 +78,10 @@ export function BackofficeUsers() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>System Users</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="space-y-3">
+        <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>System Users</h3>
+        <Card>
+          <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
@@ -101,13 +99,13 @@ export function BackofficeUsers() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--muted)' }}>
-                        <span style={{ fontSize: 'var(--text-12)', fontWeight: 'var(--font-weight-medium)' }}>
+                        <span style={{  fontWeight: 'var(--font-weight-medium)' }}>
                           {user.name.charAt(0)}
                         </span>
                       </div>
                       <div>
                         <p style={{ fontWeight: 'var(--font-weight-medium)' }}>{user.name}</p>
-                        <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                        <p style={{  color: 'var(--muted-foreground)' }}>
                           {user.email}
                         </p>
                       </div>
@@ -121,7 +119,7 @@ export function BackofficeUsers() {
                       <Badge variant="outline">Inactive</Badge>
                     )}
                   </TableCell>
-                  <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <TableCell style={{  color: 'var(--muted-foreground)' }}>
                     {user.lastLogin}
                   </TableCell>
                   <TableCell>
@@ -148,7 +146,8 @@ export function BackofficeUsers() {
             onPageChange={usersPagination.setPage}
           />
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

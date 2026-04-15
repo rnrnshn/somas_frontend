@@ -27,11 +27,11 @@ export function FieldBeneficiaryVerification() {
   const [feedback, setFeedback] = useState<string | null>(null)
 
   if (query.isPending) {
-    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>{t('fieldVerificationPage.loadingRecord')}</p></CardContent></Card></div>
+    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{  color: 'var(--muted-foreground)' }}>{t('fieldVerificationPage.loadingRecord')}</p></CardContent></Card></div>
   }
 
   if (query.error || !query.data) {
-    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{ fontSize: 'var(--text-14)', color: 'var(--error)' }}>{query.error instanceof Error ? query.error.message : t('fieldVerificationPage.loadError')}</p></CardContent></Card></div>
+    return <div className="p-6 pb-24"><Card><CardContent className="p-8 text-center"><p style={{  color: 'var(--error)' }}>{query.error instanceof Error ? query.error.message : t('fieldVerificationPage.loadError')}</p></CardContent></Card></div>
   }
 
   const beneficiaryName = query.data.beneficiary?.name ?? t('fieldVerificationPage.beneficiary')
@@ -54,8 +54,7 @@ export function FieldBeneficiaryVerification() {
       await mutation.mutateAsync({
         status: verificationStatus,
         verifiedAt: new Date().toISOString(),
-        ...coordinates,
-      })
+        ...coordinates})
       setFeedback(t('fieldVerificationPage.submittedSuccess'))
       navigate(`/field/beneficiary/${numericCampaignId}/${numericCampaignBeneficiaryId}`)
     } catch (error) {
@@ -71,8 +70,7 @@ export function FieldBeneficiaryVerification() {
       campaignBeneficiaryId: numericCampaignBeneficiaryId,
       status: verificationStatus,
       verifiedAt: new Date().toISOString(),
-      ...coordinates,
-    })
+      ...coordinates})
     setFeedback(t('fieldVerificationPage.savedOffline'))
     navigate('/field/status')
   }
@@ -84,15 +82,15 @@ export function FieldBeneficiaryVerification() {
           <ArrowLeft className="w-5 h-5 mr-2" />
           {t('fieldVerificationPage.back')}
         </Button>
-        <h1 style={{ fontSize: 'var(--text-24)' }}>{t('fieldVerificationPage.title')}</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-1">
+        <h1>{t('fieldVerificationPage.title')}</h1>
+        <p style={{  color: 'var(--muted-foreground)' }} className="mt-1">
           {beneficiaryName}
         </p>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldVerificationPage.recordSummary')}</CardTitle>
+          <CardTitle>{t('fieldVerificationPage.recordSummary')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <div className="flex items-center justify-between">
@@ -112,7 +110,7 @@ export function FieldBeneficiaryVerification() {
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-18)' }}>{t('fieldVerificationPage.verificationDecision')}</CardTitle>
+          <CardTitle>{t('fieldVerificationPage.verificationDecision')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Select value={verificationStatus} onValueChange={(value: VerificationStatus) => setVerificationStatus(value)}>
@@ -133,7 +131,7 @@ export function FieldBeneficiaryVerification() {
             onChange={(event) => setNotes(event.target.value)}
           />
 
-          <div className="rounded-[--radius] border border-border p-3 text-sm text-muted-foreground">
+          <div className="rounded-[var(--radius)] border border-border p-3 text-sm text-muted-foreground">
             <div className="flex items-center gap-2"><MapPin className="h-4 w-4" />{t('fieldVerificationPage.gpsCaptured')}</div>
             <div className="mt-2 flex items-center gap-2"><Clock className="h-4 w-4" />{t('fieldVerificationPage.timestampAttached')}</div>
           </div>

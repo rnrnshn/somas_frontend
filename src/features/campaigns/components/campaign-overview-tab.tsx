@@ -1,16 +1,15 @@
 import {
-  Bar,
   CartesianGrid,
   Line,
   LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis,
-} from 'recharts'
+  YAxis} from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { Progress } from '@/app/components/ui/progress'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 
 type Props = {
   totalBeneficiaries: number
@@ -33,8 +32,7 @@ export function CampaignOverviewTab({
   effectiveTotalBudget,
   completionPercentage,
   disbursementProgress,
-  formatCurrency,
-}: Props) {
+  formatCurrency}: Props) {
   const { t } = useTranslation()
 
   return (
@@ -42,24 +40,24 @@ export function CampaignOverviewTab({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
         <MetricCard label={t('campaignDetailPage.totalBeneficiaries')} value={totalBeneficiaries.toLocaleString()} />
         <MetricCard label={t('campaignDetailPage.amountDisbursed')} value={formatCurrency(amountDisbursed)} />
-        <MetricCard label={t('campaignDetailPage.successRate')} value={`${successRate}%`} color="var(--success)" />
-        <MetricCard label={t('campaignDetailPage.pendingPayments')} value={String(pendingPayments)} color="var(--warning)" />
-        <MetricCard label={t('campaignDetailPage.failedPayments')} value={String(failedPayments)} color="var(--error)" />
+        <MetricCard label={t('campaignDetailPage.successRate')} value={`${successRate}%`} accentClass="text-[var(--success)]" />
+        <MetricCard label={t('campaignDetailPage.pendingPayments')} value={String(pendingPayments)} accentClass="text-[var(--warning)]" />
+        <MetricCard label={t('campaignDetailPage.failedPayments')} value={String(failedPayments)} accentClass="text-[var(--error)]" />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-16)' }}>
+          <CardTitle>
             {t('campaignDetailPage.campaignCompletion')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+              <span style={{  color: 'var(--muted-foreground)' }}>
                 {formatCurrency(amountDisbursed)} of {formatCurrency(effectiveTotalBudget)}
               </span>
-              <span style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+              <span style={{  fontWeight: 'var(--font-weight-medium)' }}>
                 {completionPercentage.toFixed(1)}%
               </span>
             </div>
@@ -68,35 +66,53 @@ export function CampaignOverviewTab({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle style={{ fontSize: 'var(--text-16)' }}>
-            {t('campaignDetailPage.disbursementProgress')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={disbursementProgress}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="month" style={{ fontSize: 'var(--text-12)' }} />
-              <YAxis style={{ fontSize: 'var(--text-12)' }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={2} name="Disbursed (MZN)" />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <div className="space-y-3">
+        <h3 className="font-semibold">{t('campaignDetailPage.disbursementProgress')}</h3>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="h-[300px] rounded-xl bg-gradient-to-br from-muted/40 via-transparent to-transparent p-3 ring-1 ring-border/40">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={disbursementProgress} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.35} vertical={false} />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tickMargin={8} tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tickMargin={8} tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'var(--border)', strokeDasharray: '4 4' }} />
+                  <Line type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={2.5} strokeLinecap="round" dot={false} activeDot={{ r: 4 }} name="Disbursed (MZN)" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
 
-function MetricCard({ label, value, color }: { label: string; value: string; color?: string }) {
+function MetricCard({ label, value, accentClass }: { label: string; value: string; accentClass?: string }) {
   return (
     <Card>
       <CardContent className="p-6">
-        <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginBottom: '8px' }}>{label}</p>
-        <p style={{ fontSize: 'var(--text-24)', fontWeight: 'var(--font-weight-semi-bold)', ...(color ? { color } : {}) }}>{value}</p>
+        <p className="mb-2 text-muted-foreground">{label}</p>
+        <p className={cn('font-semibold', accentClass)}>{value}</p>
       </CardContent>
     </Card>
+  )
+}
+
+function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ name?: string; value?: number }>; label?: string }) {
+  if (!active || !payload || payload.length === 0) return null
+
+  return (
+    <div className="rounded-lg bg-card px-3 py-2 shadow-[0_6px_18px_rgba(15,23,42,0.12)]">
+      {label ? <p className="mb-1 text-xs text-muted-foreground">{label}</p> : null}
+      <div className="space-y-1">
+        {payload.map((item, index) => (
+          <div key={`${item.name ?? 'value'}-${index}`} className="flex items-center justify-between gap-3">
+            <span className="text-xs text-muted-foreground">{item.name ?? 'Value'}</span>
+            <span className="text-xs font-medium">{(item.value ?? 0).toLocaleString()}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

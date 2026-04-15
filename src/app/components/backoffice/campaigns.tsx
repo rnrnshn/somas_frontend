@@ -25,8 +25,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+  DropdownMenuTrigger} from "../ui/dropdown-menu";
 import { 
   Plus, 
   Search, 
@@ -36,8 +35,7 @@ import {
   Pause, 
   XCircle,
   Download,
-  LoaderCircle,
-} from "lucide-react";
+  LoaderCircle} from "lucide-react";
 import { toast } from "sonner";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 import { useTranslation } from "react-i18next";
@@ -59,8 +57,7 @@ export function BackofficeCampaigns() {
     name: searchQuery.trim() || undefined,
     code: searchQuery.trim() || undefined,
     status: mapStatusFilter(statusFilter),
-    provinceId: regionFilter === 'all' ? undefined : Number(regionFilter),
-  };
+    provinceId: regionFilter === 'all' ? undefined : Number(regionFilter)};
   const campaignsQuery = useCampaignsQuery(filters);
   const updateCampaignStatusMutation = useUpdateCampaignStatusMutation();
   const campaignIds = (campaignsQuery.data?.data ?? []).map((campaign) => campaign.id);
@@ -88,8 +85,7 @@ export function BackofficeCampaigns() {
       ...campaign,
       beneficiaries: summary.totalBeneficiaries,
       disbursementAmount: summary.amountDisbursed,
-      successRate: summary.successRate,
-    };
+      successRate: summary.successRate};
   });
   const summaryLoadingIds = new Set(
     campaignSummaryQueries.filter((query) => query.isPending).map((query, index) => campaignIds[index]).filter(Boolean)
@@ -144,10 +140,10 @@ export function BackofficeCampaigns() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
+          <h1 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
             {t('campaignsPage.title')}
           </h1>
-          <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)", marginTop: "8px" }}>
+          <p style={{  color: "var(--muted-foreground)", marginTop: "8px" }}>
             {t('campaignsPage.subtitle')}
           </p>
         </div>
@@ -211,7 +207,7 @@ export function BackofficeCampaigns() {
             </Select>
           </div>
           {campaignsQuery.error ? (
-            <p style={{ fontSize: "var(--text-13)", color: "var(--error)", marginTop: "12px" }}>
+            <p style={{  color: "var(--error)", marginTop: "12px" }}>
                {campaignsQuery.error instanceof Error ? campaignsQuery.error.message : t('campaignsPage.loadError')}
             </p>
           ) : null}
@@ -251,7 +247,7 @@ export function BackofficeCampaigns() {
                ) : filteredCampaigns.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-12">
-                      <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                      <p style={{  color: "var(--muted-foreground)" }}>
                          {t('campaignsPage.noCampaigns')}
                       </p>
                     </TableCell>
@@ -265,27 +261,27 @@ export function BackofficeCampaigns() {
                   >
                     <TableCell>
                       <div>
-                        <p style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                        <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                           {campaign.name}
                         </p>
-                        <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                        <p style={{  color: "var(--muted-foreground)" }}>
                           {campaign.id}
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)" }}>
+                    <TableCell>
                       {getDisplayText(campaign.program)}
                     </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)" }}>
+                    <TableCell>
                       {getDisplayText(campaign.region)}
                     </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
+                    <TableCell style={{  color: "var(--muted-foreground)" }}>
                       {formatDate(campaign.startDate)}
                     </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                    <TableCell style={{  fontWeight: "var(--font-weight-medium)" }}>
                       {summaryLoadingIds.has(campaign.numericId) ? <Skeleton className="h-5 w-12" /> : campaign.beneficiaries > 0 ? campaign.beneficiaries.toLocaleString() : '—'}
                     </TableCell>
-                    <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                    <TableCell style={{  fontWeight: "var(--font-weight-medium)" }}>
                       {summaryLoadingIds.has(campaign.numericId) ? <Skeleton className="h-5 w-20" /> : formatCurrency(campaign.disbursementAmount)}
                     </TableCell>
                     <TableCell>

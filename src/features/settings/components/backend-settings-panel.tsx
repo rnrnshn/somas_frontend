@@ -10,11 +10,12 @@ import {
   useAddMsisdnMutation,
   useConfirmMsisdnMutation,
   useResendConfirmationEmailMutation,
-  useResendConfirmationMsisdnMutation,
-} from '@/features/auth/hooks/use-auth-actions'
+  useResendConfirmationMsisdnMutation} from '@/features/auth/hooks/use-auth-actions'
 import { HttpError } from '@/lib/api/http-error'
+import { useTranslation } from 'react-i18next'
 
 export function BackendSettingsPanel() {
+  const { t } = useTranslation()
   const { programs, regions, paymentChannels, disbursementTypes, isPending, error } = useCampaignCatalogs()
   const mutations = useCatalogAdminMutations()
   const addMsisdnMutation = useAddMsisdnMutation()
@@ -39,12 +40,8 @@ export function BackendSettingsPanel() {
   return (
     <div className="space-y-6 mb-8">
       <div>
-        <h2 style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-semi-bold)' }}>Backend-supported settings</h2>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
-          These actions are connected to the live backend. Demo governance tabs remain below unchanged.
-        </p>
-        {feedback ? <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', marginTop: '8px' }}>{feedback}</p> : null}
-        {error ? <p style={{ fontSize: 'var(--text-13)', color: 'var(--error)', marginTop: '8px' }}>{error instanceof Error ? error.message : 'Settings could not be loaded.'}</p> : null}
+        {feedback ? <p className="text-muted-foreground">{feedback}</p> : null}
+        {error ? <p className="text-destructive">{error instanceof Error ? error.message : 'Settings could not be loaded.'}</p> : null}
       </div>
 
       <CurrentUserCard />
@@ -101,11 +98,11 @@ export function BackendSettingsPanel() {
               <p className="text-sm text-muted-foreground">
                 Payment channels are now backend-managed and exposed here as an active read-only list.
               </p>
-              <div className="space-y-2 rounded-[--radius] border border-border p-4">
+              <div className="space-y-2 rounded-[var(--radius)] border border-border p-4">
                 <p className="text-sm font-medium text-foreground">Current active entries</p>
                 <div className="space-y-2">
                   {(paymentChannels.data ?? []).map((item) => (
-                    <div className="rounded-[--radius] border border-border px-3 py-2" key={item.id}>
+                    <div className="rounded-[var(--radius)] border border-border px-3 py-2" key={item.id}>
                       <p className="font-medium text-foreground">{item.name}</p>
                       {item.code ? <p className="text-xs text-muted-foreground">Code: {item.code}</p> : null}
                       {item.description ? <p className="text-xs text-muted-foreground">{item.description}</p> : null}

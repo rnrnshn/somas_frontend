@@ -6,7 +6,68 @@
   min-height: 100%;
 }
 
-.app-language-shell__content :is(
+.app-language-shell__content :where(
+  p,
+  span,
+  label,
+  a,
+  button,
+  th,
+  td,
+  li,
+  strong,
+  em,
+  small,
+  [data-slot='card-description']
+) {
+  @apply text-sm;
+}
+
+
+.app-language-shell__content :where(.text-xs) {
+  font-size: var(--text-xs) !important;
+  line-height: var(--text-xs--line-height);
+}
+
+.app-language-shell__content :where(.text-sm) {
+  font-size: var(--text-sm) !important;
+  line-height: var(--text-sm--line-height);
+}
+
+.app-language-shell__content :where(.text-base) {
+  font-size: var(--text-base) !important;
+  line-height: var(--text-base--line-height);
+}
+
+.app-language-shell__content :where(.text-lg) {
+  font-size: var(--text-lg) !important;
+  line-height: var(--text-lg--line-height);
+}
+
+.app-language-shell__content :where(.text-xl) {
+  font-size: var(--text-xl) !important;
+  line-height: var(--text-xl--line-height);
+}
+
+.app-language-shell__content :where(.text-2xl) {
+  font-size: var(--text-2xl) !important;
+  line-height: var(--text-2xl--line-height);
+}
+
+.app-language-shell__content :where(.text-3xl) {
+  font-size: var(--text-3xl) !important;
+  line-height: var(--text-3xl--line-height);
+}
+
+
+.app-language-shell__content h1 { @apply text-3xl font-semibold; }
+.app-language-shell__content h2 { @apply text-2xl font-semibold; }
+.app-language-shell__content h3 { @apply text-xl font-semibold; }
+.app-language-shell__content h4 { @apply text-lg font-semibold; }
+.app-language-shell__content h5 { @apply text-base font-semibold; }
+.app-language-shell__content h6 { @apply text-sm font-semibold; }
+
+.app-language-shell__content :where(
   h1,
   h2,
   h3,
@@ -30,7 +91,7 @@
   transition: opacity 160ms ease, color 160ms ease;
 }
 
-.app-language-shell--transitioning .app-language-shell__content :is(
+.app-language-shell--transitioning .app-language-shell__content :where(
   h1,
   h2,
   h3,
@@ -55,7 +116,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-language-shell__content :is(
+  .app-language-shell__content :where(
     h1,
     h2,
     h3,
@@ -79,7 +140,7 @@
     transition: none;
   }
 
-  .app-language-shell--transitioning .app-language-shell__content :is(
+  .app-language-shell--transitioning .app-language-shell__content :where(
     h1,
     h2,
     h3,

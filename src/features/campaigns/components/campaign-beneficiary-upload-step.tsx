@@ -2,7 +2,7 @@ import type { ChangeEvent } from 'react'
 import { AlertTriangle, Upload } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Alert, AlertDescription } from '@/app/components/ui/alert'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import { Card, CardContent } from '@/app/components/ui/card'
 import { CampaignUploadPreviewTable } from '@/features/campaigns/components/campaign-upload-preview-table'
 import type { CampaignBeneficiaryRow } from '@/features/campaigns/components/create-campaign-shared'
 
@@ -40,34 +40,22 @@ export function CampaignBeneficiaryUploadStep({
   isRowValidationPending,
   onFileUpload,
   onEditBeneficiary,
-  onRemoveBeneficiary,
-}: Props) {
+  onRemoveBeneficiary}: Props) {
   const { t } = useTranslation()
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle style={{ fontSize: 'var(--text-20)' }}>
-          {t('createCampaignPage.beneficiaryUpload')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         <div
-          className="cursor-pointer rounded-[--radius] border-2 border-dashed p-12 text-center transition-colors hover:border-primary"
+          className="cursor-pointer rounded-[var(--radius)] border-2 border-dashed p-12 text-center transition-colors hover:border-primary"
           style={{ borderColor: 'var(--border)' }}
           onClick={() => document.getElementById(fileInputId)?.click()}
         >
           <Upload className="mx-auto mb-4 h-12 w-12" style={{ color: 'var(--muted-foreground)' }} />
-          <p
-            style={{
-              fontSize: 'var(--text-14)',
-              fontWeight: 'var(--font-weight-medium)',
-              marginBottom: '8px',
-            }}
-          >
+          <p className="font-medium mb-2">
             {uploadedFile ? uploadedFile.name : t('createCampaignPage.dropFile')}
           </p>
-          <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+          <p className="text-muted-foreground">
             {t('createCampaignPage.supportedFormats')}
           </p>
           <input
@@ -82,7 +70,7 @@ export function CampaignBeneficiaryUploadStep({
         {isEditMode && !uploadedFile && beneficiaries.length > 0 ? (
           <Alert>
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription style={{ fontSize: 'var(--text-13)' }}>
+            <AlertDescription>
               {t('createCampaignPage.existingBeneficiariesLoaded')}
             </AlertDescription>
           </Alert>
@@ -91,7 +79,7 @@ export function CampaignBeneficiaryUploadStep({
         {uploadParseErrors.length > 0 ? (
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription style={{ fontSize: 'var(--text-13)' }}>
+            <AlertDescription>
               <p style={{ fontWeight: 'var(--font-weight-medium)' }}>
                 {t('createCampaignPage.fileIssuesDetected')}
               </p>
@@ -123,7 +111,7 @@ export function CampaignBeneficiaryUploadStep({
             {validationSummary.errors > 0 ? (
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
-                <AlertDescription style={{ fontSize: 'var(--text-13)' }}>
+                <AlertDescription>
                   <p style={{ fontWeight: 'var(--font-weight-medium)' }}>
                     {t('createCampaignPage.errorsDetectedCount', { count: validationSummary.errors })}
                   </p>
@@ -137,10 +125,9 @@ export function CampaignBeneficiaryUploadStep({
             <div>
               <h3
                 style={{
-                  fontSize: 'var(--text-16)',
+                  
                   fontWeight: 'var(--font-weight-medium)',
-                  marginBottom: '12px',
-                }}
+                  marginBottom: '12px'}}
               >
                 {t('createCampaignPage.preview')}
               </h3>
@@ -168,11 +155,10 @@ function SummaryCard({ label, value, color }: { label: string; value: number; co
         <p style={mutedSmallTextStyle}>{label}</p>
         <p
           style={{
-            fontSize: 'var(--text-24)',
+            
             fontWeight: 'var(--font-weight-semi-bold)',
             marginTop: '4px',
-            ...(color ? { color } : {}),
-          }}
+            ...(color ? { color } : {})}}
         >
           {value}
         </p>
@@ -181,4 +167,4 @@ function SummaryCard({ label, value, color }: { label: string; value: number; co
   )
 }
 
-const mutedSmallTextStyle = { fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }
+const mutedSmallTextStyle = {  color: 'var(--muted-foreground)' }

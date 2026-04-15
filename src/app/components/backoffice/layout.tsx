@@ -9,22 +9,22 @@ import {
   Receipt, 
   BarChart3,
   Settings,
-  ChevronsUpDown,
-  LogOut
+  LogOut,
+  User
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { LanguageSwitcher } from "../language-switcher";
 import { Skeleton } from "../ui/skeleton";
 import { TenantSwitcher } from "./tenant-switcher";
 import { useTranslation } from "react-i18next";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+  DropdownMenuTrigger} from "../ui/dropdown-menu";
 
 type NavItem = {
   path: string;
@@ -103,12 +103,50 @@ export function BackofficeLayout() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Top Navigation Bar */}
-      <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-10">
+      <header className="h-16 bg-card px-6 flex items-center justify-between sticky top-0 z-10 shadow-[0_6px_20px_rgba(15,23,42,0.08)]">
         <div className="flex items-center gap-6">
-          <h2 style={{ fontSize: 'var(--text-20)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+          <h2 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
             {t('brand')}
           </h2>
           <TenantSwitcher />
+        </div>
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher className="w-[96px]" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
+                <Avatar className="h-9 w-9">
+                  <AvatarFallback>
+                    {user?.name?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? <User className="h-4 w-4" />}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel className="space-y-1">
+                <p className="truncate text-sm font-medium">{user?.name ?? user?.email ?? t('brand')}</p>
+                <p className="truncate text-xs font-normal text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate('/profile');
+                }}
+              >
+                <User className="h-4 w-4" />
+                {t('profile')}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  await signOut();
+                  navigate('/');
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                {t('logout')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
@@ -124,12 +162,11 @@ export function BackofficeLayout() {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-[--radius] transition-colors ${
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
                     isActive
                       ? 'bg-sidebar-primary text-sidebar-primary-foreground'
                       : 'text-sidebar-foreground hover:bg-sidebar-accent'
                   }`}
-                  style={{ fontSize: 'var(--text-14)' }}
                 >
                   <Icon className="w-5 h-5" />
                   {item.label}
@@ -137,43 +174,6 @@ export function BackofficeLayout() {
               );
             })}
           </nav>
-
-          <div className="border-t border-sidebar-border p-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-auto w-full justify-between px-3 py-3 text-sidebar-foreground hover:bg-sidebar-accent"
-                >
-                  <div className="min-w-0 text-left">
-                    <p className="truncate text-sm font-medium">{user?.email ?? t('brand')}</p>
-                    <p className="truncate text-xs text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
-                  </div>
-                  <ChevronsUpDown className="h-4 w-4 shrink-0" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="top" className="w-56">
-                <DropdownMenuLabel className="space-y-1">
-                  <p className="truncate text-sm font-medium">{user?.email ?? t('brand')}</p>
-                  <p className="truncate text-xs font-normal text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <div className="px-2 py-2">
-                  <LanguageSwitcher />
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={async () => {
-                    await signOut();
-                    navigate('/');
-                  }}
-                >
-                  <LogOut className="h-4 w-4" />
-                  {t('logout')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </aside>
 
         {/* Main Content */}

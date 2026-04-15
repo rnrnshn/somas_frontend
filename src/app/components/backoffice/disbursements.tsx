@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Card, CardContent } from '../ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { useDisbursementBatchesQuery } from '@/features/transactions/hooks/use-transaction-queries'
 import { adaptBatch } from '@/features/transactions/adapters/transactions'
@@ -14,13 +14,13 @@ export function Disbursements() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>Disbursements</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
+        <h1 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>Disbursements</h1>
+        <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>
           Manage bulk payments and execution batches
         </p>
       </div>
 
-      {batchesQuery.error ? <p style={{ fontSize: 'var(--text-14)', color: 'var(--error)', marginBottom: '16px' }}>{batchesQuery.error instanceof Error ? batchesQuery.error.message : 'Disbursement batches could not be loaded.'}</p> : null}
+      {batchesQuery.error ? <p style={{  color: 'var(--error)', marginBottom: '16px' }}>{batchesQuery.error instanceof Error ? batchesQuery.error.message : 'Disbursement batches could not be loaded.'}</p> : null}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <MetricCard label="Execution batches" value={String(batches.length)} />
@@ -28,11 +28,10 @@ export function Disbursements() {
         <MetricCard label="Scheduled amount" value={`MZN ${totalAmount.toLocaleString('pt-MZ')}`} />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Execution batches</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+      <div className="space-y-3">
+        <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>Execution batches</h3>
+        <Card>
+          <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -49,7 +48,7 @@ export function Disbursements() {
               {batches.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="py-12 text-center">
-                    <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {batchesQuery.isPending ? 'Loading disbursement batches...' : 'No disbursement batches found'}
                     </p>
                   </TableCell>
@@ -75,11 +74,12 @@ export function Disbursements() {
             onPageChange={batchesPagination.setPage}
           />
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }
 
 function MetricCard({ label, value }: { label: string; value: string }) {
-  return <Card><CardContent className="p-6"><p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>{label}</p><p style={{ fontSize: 'var(--text-28)', fontWeight: 'var(--font-weight-semi-bold)', marginTop: '8px' }}>{value}</p></CardContent></Card>
+  return <Card><CardContent className="p-6"><p style={{  color: 'var(--muted-foreground)' }}>{label}</p><p style={{  fontWeight: 'var(--font-weight-semi-bold)', marginTop: '8px' }}>{value}</p></CardContent></Card>
 }

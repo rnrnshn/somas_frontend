@@ -8,8 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/app/components/ui/dialog'
+  DialogTitle} from '@/app/components/ui/dialog'
 
 type Props = {
   open: boolean
@@ -28,20 +27,19 @@ export function CampaignConfirmDialog({
   totalSummary,
   executionDate,
   onOpenChange,
-  onConfirm,
-}: Props) {
+  onConfirm}: Props) {
   const { t } = useTranslation()
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle style={{ fontSize: 'var(--text-20)' }}>
+          <DialogTitle>
             {isEditMode
               ? t('createCampaignPage.confirmCampaignUpdate')
               : t('createCampaignPage.confirmCampaignCreation')}
           </DialogTitle>
-          <DialogDescription style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <DialogDescription style={{  color: 'var(--muted-foreground)' }}>
             {isEditMode
               ? t('createCampaignPage.confirmUpdateQuestion')
               : t('createCampaignPage.confirmCreateQuestion')}
@@ -51,7 +49,7 @@ export function CampaignConfirmDialog({
         <div className="py-4">
           <Alert>
             <FileText className="h-4 w-4" />
-            <AlertDescription style={{ fontSize: 'var(--text-13)' }}>
+            <AlertDescription>
               <p style={{ fontWeight: 'var(--font-weight-medium)' }}>{totalSummary}</p>
               <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>
                 {isEditMode

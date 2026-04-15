@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Pagination,
   PaginationContent,
@@ -53,6 +54,7 @@ export function DataTablePagination({
   totalPages,
   onPageChange,
 }: DataTablePaginationProps) {
+  const { t } = useTranslation()
   if (totalItems === 0) return null
 
   const startItem = (page - 1) * pageSize + 1
@@ -61,7 +63,7 @@ export function DataTablePagination({
   return (
     <div className="flex items-center justify-between gap-4 border-t border-border px-6 py-4">
       <p className="text-sm text-muted-foreground">
-        Showing {startItem}-{endItem} of {totalItems}
+        {t('tablePagination.showing', { start: startItem, end: endItem, total: totalItems })}
       </p>
       <Pagination className="mx-0 w-auto justify-end">
         <PaginationContent>
@@ -73,11 +75,12 @@ export function DataTablePagination({
                 if (page > 1) onPageChange(page - 1)
               }}
               className={page <= 1 ? 'pointer-events-none opacity-50' : undefined}
+              label={t('tablePagination.previous')}
             />
           </PaginationItem>
           <PaginationItem>
             <span className="px-3 text-sm text-muted-foreground">
-              Page {page} of {totalPages}
+              {t('tablePagination.pageOf', { page, total: totalPages })}
             </span>
           </PaginationItem>
           <PaginationItem>
@@ -88,6 +91,7 @@ export function DataTablePagination({
                 if (page < totalPages) onPageChange(page + 1)
               }}
               className={page >= totalPages ? 'pointer-events-none opacity-50' : undefined}
+              label={t('tablePagination.next')}
             />
           </PaginationItem>
         </PaginationContent>

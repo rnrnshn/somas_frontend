@@ -50,8 +50,8 @@ export function BackofficeSystemEvents() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 style={{ fontSize: 'var(--text-32)' }}>System Events</h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }} className="mt-2">
+        <h1>System Events</h1>
+        <p style={{  color: 'var(--muted-foreground)' }} className="mt-2">
           Real-time system event log for developers and debugging
         </p>
       </div>
@@ -63,16 +63,16 @@ export function BackofficeSystemEvents() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <Badge variant="outline">{event.type}</Badge>
-                  <span style={{ fontSize: 'var(--text-12)', fontFamily: 'monospace', color: 'var(--muted-foreground)' }}>
+                  <span style={{  fontFamily: 'monospace', color: 'var(--muted-foreground)' }}>
                     {event.id}
                   </span>
                 </div>
-                <span style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                <span style={{  color: 'var(--muted-foreground)' }}>
                   {event.createdAt}
                 </span>
               </div>
-              <div className="p-4 bg-muted rounded-[--radius]">
-                <pre style={{ fontSize: 'var(--text-12)', fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              <div className="p-4 bg-muted rounded-[var(--radius)]">
+                <pre style={{  fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                   {JSON.stringify(event.payload, null, 2)}
                 </pre>
               </div>

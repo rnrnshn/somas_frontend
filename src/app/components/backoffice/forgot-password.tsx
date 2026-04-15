@@ -39,11 +39,11 @@ export function ForgotPassword() {
       <div className="min-h-screen flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-[var(--radius-card)] bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Building2 className="w-8 h-8 text-primary" />
             </div>
             <h2 className="mb-2">{t('auth.passwordReset')}</h2>
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
               {t('auth.checkEmailInstructions')}
             </p>
           </div>
@@ -62,7 +62,7 @@ export function ForgotPassword() {
                   {t('auth.resetMessage', { email })}
                 </AlertDescription>
               </Alert>
-              <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+              <p style={{  color: 'var(--muted-foreground)' }}>
                 {t('auth.resetExpiry')}
               </p>
             </CardContent>
@@ -85,11 +85,11 @@ export function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-[var(--radius-card)] bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-primary" />
           </div>
           <h2 className="mb-2">{t('auth.resetPassword')}</h2>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <p style={{  color: 'var(--muted-foreground)' }}>
             {t('auth.resetPasswordSubtitle')}
           </p>
         </div>
@@ -113,7 +113,7 @@ export function ForgotPassword() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@somas.gov"
+                  placeholder={"admin@somas.gov"}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}

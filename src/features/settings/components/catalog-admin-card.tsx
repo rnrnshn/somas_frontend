@@ -40,11 +40,11 @@ export function CatalogAdminCard({
       <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         {feedback ? <p className="text-sm text-muted-foreground">{feedback}</p> : null}
-        <div className="space-y-2 rounded-[--radius] border border-border p-4">
+        <div className="space-y-2 rounded-[var(--radius)] border border-border p-4">
           <p className="text-sm font-medium text-foreground">Current entries</p>
           <div className="space-y-2">
             {items.map((item) => (
-              <div className="flex items-center justify-between gap-4 rounded-[--radius] border border-border px-3 py-2" key={item.id}>
+              <div className="flex items-center justify-between gap-4 rounded-[var(--radius)] border border-border px-3 py-2" key={item.id}>
                 <div>
                   <p className="font-medium text-foreground">{item.name}</p>
                   {item.description ? <p className="text-xs text-muted-foreground">{item.description}</p> : null}

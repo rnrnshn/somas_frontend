@@ -75,8 +75,7 @@ export function ResetPassword() {
     try {
       await resetPasswordMutation.mutateAsync({
         token: resetToken,
-        password: newPassword,
-      });
+        password: newPassword});
       toast.success('Password reset successfully.');
       setIsSuccess(true);
     } catch (requestError) {
@@ -90,11 +89,11 @@ export function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-[var(--radius-card)] bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Building2 className="w-8 h-8 text-primary" />
             </div>
             <h2 className="mb-2">Password Reset</h2>
-            <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+            <p style={{  color: 'var(--muted-foreground)' }}>
               Your password has been updated
             </p>
           </div>
@@ -133,11 +132,11 @@ export function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-[var(--radius-card)] bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-primary" />
           </div>
           <h2 className="mb-2">Reset Password</h2>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <p style={{  color: 'var(--muted-foreground)' }}>
             Create a new secure password
           </p>
         </div>
@@ -163,7 +162,7 @@ export function ResetPassword() {
                 <Input
                   id="newPassword"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={"••••••••"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   disabled={isLoading}
@@ -172,12 +171,12 @@ export function ResetPassword() {
                 {newPassword && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <span style={{  color: 'var(--muted-foreground)' }}>
                         Password strength:
                       </span>
                       <span 
                         style={{ 
-                          fontSize: 'var(--text-12)', 
+                           
                           fontWeight: 'var(--font-weight-medium)',
                           color: getStrengthColor(passwordStrength),
                           textTransform: 'capitalize'
@@ -207,7 +206,7 @@ export function ResetPassword() {
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={"••••••••"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={isLoading}
@@ -218,14 +217,14 @@ export function ResetPassword() {
                     {passwordsMatch ? (
                       <>
                         <CheckCircle2 className="h-4 w-4" style={{ color: 'var(--success)' }} />
-                        <span style={{ fontSize: 'var(--text-12)', color: 'var(--success)' }}>
+                        <span style={{  color: 'var(--success)' }}>
                           Passwords match
                         </span>
                       </>
                     ) : (
                       <>
                         <XCircle className="h-4 w-4" style={{ color: 'var(--destructive)' }} />
-                        <span style={{ fontSize: 'var(--text-12)', color: 'var(--destructive)' }}>
+                        <span style={{  color: 'var(--destructive)' }}>
                           Passwords do not match
                         </span>
                       </>
@@ -235,13 +234,13 @@ export function ResetPassword() {
               </div>
 
               <div 
-                className="p-3 rounded-[--radius]" 
+                className="p-3 rounded-[var(--radius)]" 
                 style={{ backgroundColor: 'var(--muted)' }}
               >
-                <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                <p style={{  color: 'var(--muted-foreground)' }}>
                   Password requirements:
                 </p>
-                <ul style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '8px' }} className="space-y-1">
+                <ul style={{  color: 'var(--muted-foreground)', marginTop: '8px' }} className="space-y-1">
                   <li>• At least 8 characters long</li>
                   <li>• Mix of uppercase and lowercase letters</li>
                   <li>• Include numbers and special characters</li>

@@ -105,7 +105,7 @@ export function Settings() {
 
   const permissions = [
     { module: 'Campaigns', view: true, create: true, edit: true, delete: true },
-    { module: 'Savings Programs', view: true, create: true, edit: true, delete: false },
+    // { module: 'Savings Programs', view: true, create: true, edit: true, delete: false },
     { module: 'Beneficiaries', view: true, create: true, edit: true, delete: false },
     { module: 'Transactions', view: true, create: false, edit: false, delete: false },
     { module: 'Reports', view: true, create: true, edit: false, delete: false },
@@ -210,13 +210,6 @@ export function Settings() {
       campaign: 'Flood Relief 2024',
       status: 'Active'
     },
-    {
-      id: 'TPL-003',
-      name: 'Savings Milestone',
-      message: 'Congratulations! You reached MZN ${milestone} in savings.',
-      campaign: 'Savings Program',
-      status: 'Draft'
-    },
   ];
 
   const getStatusBadge = (status: string) => {
@@ -238,10 +231,10 @@ export function Settings() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 style={{ fontSize: 'var(--text-32)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+        <h1 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
           {t('settingsPage.title')}
         </h1>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)', marginTop: '8px' }}>
+        <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>
           {t('settingsPage.subtitle')}
         </p>
       </div>
@@ -262,16 +255,15 @@ export function Settings() {
 
         {/* USERS TAB */}
         <TabsContent value="users">
-          <Card>
-            <CardHeader>
+          <Card className="mb-6">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  
                   <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                       {t('settingsPage.systemUsers')}
                     </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('settingsPage.manageUsers')}
                     </p>
                   </div>
@@ -292,7 +284,10 @@ export function Settings() {
                   </Button>
                 </div>
               </div>
-            </CardHeader>
+            </CardContent>
+          </Card>
+
+          <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
@@ -310,14 +305,14 @@ export function Settings() {
                   {usersPagination.paginatedItems.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)',  fontFamily: 'var(--font-mono)' }}>
                           {user.id}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {user.name}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {user.email}
                       </TableCell>
                       <TableCell>
@@ -326,7 +321,7 @@ export function Settings() {
                       <TableCell>
                         {getStatusBadge(user.status)}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {user.lastLogin}
                       </TableCell>
                       <TableCell>
@@ -359,27 +354,26 @@ export function Settings() {
 
         {/* ROLES TAB */}
         <TabsContent value="roles">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      {t('settingsPage.roleManagement')}
-                    </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      {t('settingsPage.manageRoles')}
-                    </p>
-                  </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <div>
+                  <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
+                    {t('settingsPage.roleManagement')}
+                  </h3>
+                  <p style={{  color: 'var(--foreground)', opacity: 0.7 }}>
+                    {t('settingsPage.manageRoles')}
+                  </p>
                 </div>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                   {t('settingsPage.createRole')}
-                </Button>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                 {t('settingsPage.createRole')}
+              </Button>
+            </div>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -395,20 +389,20 @@ export function Settings() {
                   {rolesPagination.paginatedItems.map((role) => (
                     <TableRow key={role.id}>
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)',  fontFamily: 'var(--font-mono)' }}>
                           {role.id}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {role.name}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {role.description}
                       </TableCell>
-                      <TableCell className="text-right" style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <TableCell className="text-right" style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {role.usersCount}
                       </TableCell>
-                      <TableCell className="text-right" style={{ fontSize: 'var(--text-13)' }}>
+                      <TableCell className="text-right">
                         {role.permissionsCount}
                       </TableCell>
                       <TableCell>
@@ -433,39 +427,39 @@ export function Settings() {
                 onPageChange={rolesPagination.setPage}
               />
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* PERMISSIONS TAB */}
         <TabsContent value="permissions">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      {t('settingsPage.permissionMatrix')}
-                    </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      {t('settingsPage.configurePermissions')}
-                    </p>
-                  </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <div>
+                  <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
+                    {t('settingsPage.permissionMatrix')}
+                  </h3>
+                  <p style={{  color: 'var(--foreground)', opacity: 0.7 }}>
+                    {t('settingsPage.configurePermissions')}
+                  </p>
                 </div>
-                <Select defaultValue="administrator">
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="administrator">Administrator</SelectItem>
-                    <SelectItem value="field-manager">Field Manager</SelectItem>
-                    <SelectItem value="finance-officer">Finance Officer</SelectItem>
-                    <SelectItem value="enumerator">Enumerator</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+              <Select defaultValue="administrator">
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="administrator">Administrator</SelectItem>
+                  <SelectItem value="field-manager">Field Manager</SelectItem>
+                  <SelectItem value="finance-officer">Finance Officer</SelectItem>
+                  <SelectItem value="enumerator">Enumerator</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -479,7 +473,7 @@ export function Settings() {
                 <TableBody>
                   {permissionsPagination.paginatedItems.map((perm, index) => (
                     <TableRow key={index}>
-                      <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {perm.module}
                       </TableCell>
                       <TableCell className="text-center">
@@ -535,44 +529,44 @@ export function Settings() {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* AUDIT LOGS TAB */}
         <TabsContent value="audit">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      {t('settingsPage.auditLogsTitle')}
-                    </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      {t('settingsPage.trackAudit')}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <Select defaultValue="all-users">
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all-users">{t('settingsPage.allUsers')}</SelectItem>
-                      <SelectItem value="maria">Maria Santos</SelectItem>
-                      <SelectItem value="john">John Smith</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    {t('transactionsPage.export')}
-                  </Button>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FileText className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <div>
+                  <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
+                    {t('settingsPage.auditLogsTitle')}
+                  </h3>
+                  <p style={{  color: 'var(--foreground)', opacity: 0.7 }}>
+                    {t('settingsPage.trackAudit')}
+                  </p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+              <div className="flex gap-3">
+                <Select defaultValue="all-users">
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all-users">{t('settingsPage.allUsers')}</SelectItem>
+                    <SelectItem value="maria">Maria Santos</SelectItem>
+                    <SelectItem value="john">John Smith</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline">
+                  <Download className="w-4 h-4 mr-2" />
+                  {t('transactionsPage.export')}
+                </Button>
+              </div>
+            </div>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -588,25 +582,25 @@ export function Settings() {
                   {auditLogsPagination.paginatedItems.map((log) => (
                     <TableRow key={log.id}>
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)',  fontFamily: 'var(--font-mono)' }}>
                           {log.id}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {log.user}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)' }}>
+                      <TableCell>
                         {log.action}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {log.entity}
                       </TableCell>
                       <TableCell>
-                        <span style={{ fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{  fontFamily: 'var(--font-mono)' }}>
                           {log.entityId}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {log.timestamp}
                       </TableCell>
                     </TableRow>
@@ -621,26 +615,26 @@ export function Settings() {
                 onPageChange={auditLogsPagination.setPage}
               />
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* SESSIONS TAB */}
         <TabsContent value="sessions">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <Monitor className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                <div>
-                  <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      {t('settingsPage.activeSessions')}
-                  </h3>
-                  <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      {t('settingsPage.manageSessions')}
-                  </p>
-                </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Monitor className="w-5 h-5" style={{ color: "var(--primary)" }} />
+              <div>
+                <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
+                    {t('settingsPage.activeSessions')}
+                </h3>
+                <p style={{  color: 'var(--foreground)', opacity: 0.7 }}>
+                    {t('settingsPage.manageSessions')}
+                </p>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+            </div>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -657,25 +651,25 @@ export function Settings() {
                   {sessionsPagination.paginatedItems.map((session) => (
                     <TableRow key={session.id}>
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)',  fontFamily: 'var(--font-mono)' }}>
                           {session.id}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {session.user}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {session.device}
                       </TableCell>
                       <TableCell>
-                        <span style={{ fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{  fontFamily: 'var(--font-mono)' }}>
                           {session.ipAddress}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {session.lastActivity}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {session.expiresAt}
                       </TableCell>
                       <TableCell>
@@ -698,32 +692,32 @@ export function Settings() {
                 onPageChange={sessionsPagination.setPage}
               />
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* SYSTEM EVENTS TAB */}
         <TabsContent value="events">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Activity className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      {t('settingsPage.systemEventsTitle')}
-                    </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      {t('settingsPage.monitorEvents')}
-                    </p>
-                  </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Activity className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <div>
+                  <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
+                    {t('settingsPage.systemEventsTitle')}
+                  </h3>
+                  <p style={{  color: 'var(--foreground)', opacity: 0.7 }}>
+                    {t('settingsPage.monitorEvents')}
+                  </p>
                 </div>
-                <Button variant="outline">
-                  <Download className="w-4 h-4 mr-2" />
-                    {t('settingsPage.exportLogs')}
-                </Button>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+              <Button variant="outline">
+                <Download className="w-4 h-4 mr-2" />
+                  {t('settingsPage.exportLogs')}
+              </Button>
+            </div>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -737,21 +731,21 @@ export function Settings() {
                   {systemEventsPagination.paginatedItems.map((event) => (
                     <TableRow key={event.id}>
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)',  fontFamily: 'var(--font-mono)' }}>
                           {event.id}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" style={{ fontSize: 'var(--text-11)' }}>
+                        <Badge variant="outline">
                           {event.eventType}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <code style={{ fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)', color: 'var(--muted-foreground)' }}>
+                        <code style={{  fontFamily: 'var(--font-mono)', color: 'var(--muted-foreground)' }}>
                           {event.payload}
                         </code>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)' }}>
                         {event.timestamp}
                       </TableCell>
                     </TableRow>
@@ -766,32 +760,32 @@ export function Settings() {
                 onPageChange={systemEventsPagination.setPage}
               />
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* SMS TEMPLATES TAB */}
         <TabsContent value="sms">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <MessageSquare className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
-                      {t('settingsPage.smsTemplates')}
-                    </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
-                      {t('settingsPage.manageTemplates')}
-                    </p>
-                  </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <MessageSquare className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <div>
+                  <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>
+                    {t('settingsPage.smsTemplates')}
+                  </h3>
+                  <p style={{  color: 'var(--foreground)', opacity: 0.7 }}>
+                    {t('settingsPage.manageTemplates')}
+                  </p>
                 </div>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                   {t('settingsPage.createTemplate')}
-                </Button>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                 {t('settingsPage.createTemplate')}
+              </Button>
+            </div>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -807,19 +801,19 @@ export function Settings() {
                   {smsTemplatesPagination.paginatedItems.map((template) => (
                     <TableRow key={template.id}>
                       <TableCell>
-                        <span style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-12)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontWeight: 'var(--font-weight-medium)',  fontFamily: 'var(--font-mono)' }}>
                           {template.id}
                         </span>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                      <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                         {template.name}
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)', maxWidth: '300px' }}>
+                      <TableCell style={{  color: 'var(--muted-foreground)', maxWidth: '300px' }}>
                         <div className="truncate">
                           {template.message}
                         </div>
                       </TableCell>
-                      <TableCell style={{ fontSize: 'var(--text-13)' }}>
+                      <TableCell>
                         {template.campaign}
                       </TableCell>
                       <TableCell>
@@ -847,7 +841,8 @@ export function Settings() {
                 onPageChange={smsTemplatesPagination.setPage}
               />
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* TENANT SETTINGS TAB */}
@@ -858,10 +853,10 @@ export function Settings() {
                 <div className="flex items-center gap-3">
                   <SettingsIcon className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                       {t('settingsPage.tenantIdentity')}
                     </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('settingsPage.configureIdentity')}
                     </p>
                   </div>
@@ -870,20 +865,20 @@ export function Settings() {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <label style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.tenantName')}
                     </label>
                     <Input defaultValue="Department of Social Welfare - Region V" />
                   </div>
                   <div className="space-y-2">
-                    <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <label style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.shortCode')}
                     </label>
                     <Input defaultValue="DSWD-R5" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                  <label style={{  fontWeight: 'var(--font-weight-medium)' }}>
                     {t('settingsPage.tenantLogo')}
                   </label>
                   <div className="flex items-center gap-4">
@@ -898,7 +893,7 @@ export function Settings() {
                       {t('settingsPage.uploadLogo')}
                     </Button>
                   </div>
-                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <p style={{  color: 'var(--muted-foreground)' }}>
                     {t('settingsPage.logoRecommendation')}
                   </p>
                 </div>
@@ -910,10 +905,10 @@ export function Settings() {
                 <div className="flex items-center gap-3">
                   <Globe className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                       {t('settingsPage.regionalSettings')}
                     </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('settingsPage.configureRegional')}
                     </p>
                   </div>
@@ -922,7 +917,7 @@ export function Settings() {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <label style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.primaryProvince')}
                     </label>
                     <Select defaultValue="maputo-cidade">
@@ -945,7 +940,7 @@ export function Settings() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <label style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.timezone')}
                     </label>
                     <Select defaultValue="africa-maputo">
@@ -961,7 +956,7 @@ export function Settings() {
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <label style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.currency')}
                     </label>
                     <Select defaultValue="mzn">
@@ -974,7 +969,7 @@ export function Settings() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <label style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <label style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4" />
                         <span>{t('settingsPage.language')}</span>
@@ -993,10 +988,10 @@ export function Settings() {
                   </div>
                 </div>
                 <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
-                  <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)', marginBottom: '4px' }}>
+                  <p style={{  fontWeight: 'var(--font-weight-medium)', marginBottom: '4px' }}>
                      {t('settingsPage.selectedLanguage', { language: language === 'pt-MZ' ? 'Português (Moçambique)' : language === 'en' ? 'English' : 'Português (Portugal)' })}
                   </p>
-                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                  <p style={{  color: 'var(--muted-foreground)' }}>
                      {t('settingsPage.selectedLanguageHelp')}
                   </p>
                 </div>
@@ -1008,10 +1003,10 @@ export function Settings() {
                 <div className="flex items-center gap-3">
                   <SettingsIcon className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   <div>
-                    <h3 style={{ fontSize: 'var(--text-16)', fontWeight: 'var(--font-weight-semi-bold)' }}>
+                    <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
                       {t('settingsPage.notificationSettings')}
                     </h3>
-                    <p style={{ fontSize: 'var(--text-13)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('settingsPage.configureNotifications')}
                     </p>
                   </div>
@@ -1020,10 +1015,10 @@ export function Settings() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
                   <div>
-                    <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.emailNotifications')}
                     </p>
-                    <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('settingsPage.emailNotificationsHelp')}
                     </p>
                   </div>
@@ -1031,10 +1026,10 @@ export function Settings() {
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
                   <div>
-                    <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.smsAlerts')}
                     </p>
-                    <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('settingsPage.smsAlertsHelp')}
                     </p>
                   </div>
@@ -1042,10 +1037,10 @@ export function Settings() {
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius)' }}>
                   <div>
-                    <p style={{ fontSize: 'var(--text-13)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <p style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {t('settingsPage.transactionNotifications')}
                     </p>
-                    <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)' }}>
+                    <p style={{  color: 'var(--muted-foreground)' }}>
                       {t('settingsPage.transactionNotificationsHelp')}
                     </p>
                   </div>

@@ -19,7 +19,7 @@ export function CurrentUserCard() {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[--radius] border border-border p-4">
+    <div className="rounded-[var(--radius)] border border-border p-4">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-2 font-medium text-foreground">{value}</p>
     </div>

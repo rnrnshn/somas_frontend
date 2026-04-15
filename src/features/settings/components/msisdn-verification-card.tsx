@@ -22,7 +22,7 @@ export function AddMsisdnCard({ feedback, isPending = false, onSubmit }: { feedb
           {feedback ? <p className="text-sm text-muted-foreground">{feedback}</p> : null}
           <div>
             <Label>MSISDN</Label>
-            <div className="mt-2"><Input name="msisdn" placeholder="25884..." /></div>
+            <div className="mt-2"><Input name="msisdn" placeholder={"25884..."} /></div>
           </div>
           <Button disabled={isPending} type="submit">Send verification code</Button>
         </form>
@@ -50,7 +50,7 @@ export function ConfirmMsisdnCard({ feedback, isPending = false, onSubmit, onRes
           {feedback ? <p className="text-sm text-muted-foreground">{feedback}</p> : null}
           <div>
             <Label>Verification code</Label>
-            <div className="mt-2"><Input inputMode="numeric" name="token" placeholder="123456" /></div>
+            <div className="mt-2"><Input inputMode="numeric" name="token" placeholder={"123456"} /></div>
           </div>
           <div className="flex gap-3">
             <Button disabled={isPending} type="submit">Confirm number</Button>

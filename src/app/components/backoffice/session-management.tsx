@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import {
@@ -8,8 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "../ui/table";
+  TableRow} from "../ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,8 +17,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from "../ui/alert-dialog";
+  AlertDialogTitle} from "../ui/alert-dialog";
 import { Monitor, Smartphone, Tablet, AlertCircle } from "lucide-react";
 import { DataTablePagination, useTablePagination } from "../ui/table-pagination";
 
@@ -45,8 +43,7 @@ const MOCK_SESSIONS: Session[] = [
     ipAddress: "192.168.1.100",
     lastActivity: "2 minutes ago",
     expiresAt: "In 6 hours",
-    status: 'active',
-  },
+    status: 'active'},
   {
     id: "2",
     user: "john.doe@somas.gov",
@@ -56,8 +53,7 @@ const MOCK_SESSIONS: Session[] = [
     ipAddress: "192.168.1.101",
     lastActivity: "15 minutes ago",
     expiresAt: "In 5 hours 45 minutes",
-    status: 'active',
-  },
+    status: 'active'},
   {
     id: "3",
     user: "jane.smith@somas.gov",
@@ -67,8 +63,7 @@ const MOCK_SESSIONS: Session[] = [
     ipAddress: "192.168.1.102",
     lastActivity: "1 hour ago",
     expiresAt: "In 5 hours",
-    status: 'active',
-  },
+    status: 'active'},
   {
     id: "4",
     user: "mike.wilson@somas.gov",
@@ -78,8 +73,7 @@ const MOCK_SESSIONS: Session[] = [
     ipAddress: "192.168.1.103",
     lastActivity: "3 hours ago",
     expiresAt: "Expired",
-    status: 'expired',
-  },
+    status: 'expired'},
 ];
 
 const DeviceIcon = ({ type }: { type: 'desktop' | 'mobile' | 'tablet' }) => {
@@ -109,20 +103,21 @@ export function SessionManagement() {
     <div className="space-y-6">
       <div>
         <h3 className="mb-2">Session Management</h3>
-        <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+        <p style={{  color: 'var(--muted-foreground)' }}>
           Monitor and manage active user sessions across the platform
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Sessions</CardTitle>
-          <CardDescription>
+      <div className="space-y-2">
+        <div>
+          <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)', color: 'var(--foreground)' }}>Active Sessions</h3>
+          <p style={{  color: 'var(--foreground)', opacity: 0.7 }}>
             View and revoke user sessions for security and compliance
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-[--radius-card] border border-[--border]">
+          </p>
+        </div>
+        <Card>
+          <CardContent>
+          <div className="rounded-[var(--radius-card)] border border-[--border]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -139,27 +134,27 @@ export function SessionManagement() {
               <TableBody>
                 {sessionsPagination.paginatedItems.map((session) => (
                   <TableRow key={session.id}>
-                    <TableCell style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                    <TableCell style={{  fontWeight: 'var(--font-weight-medium)' }}>
                       {session.user}
                     </TableCell>
-                    <TableCell style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                    <TableCell style={{  color: 'var(--muted-foreground)' }}>
                       {session.tenant}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <DeviceIcon type={session.deviceType} />
-                        <span style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                        <span style={{  color: 'var(--muted-foreground)' }}>
                           {session.device}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                    <TableCell style={{  color: 'var(--muted-foreground)' }}>
                       {session.ipAddress}
                     </TableCell>
-                    <TableCell style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                    <TableCell style={{  color: 'var(--muted-foreground)' }}>
                       {session.lastActivity}
                     </TableCell>
-                    <TableCell style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                    <TableCell style={{  color: 'var(--muted-foreground)' }}>
                       {session.expiresAt}
                     </TableCell>
                     <TableCell>
@@ -190,7 +185,8 @@ export function SessionManagement() {
             />
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
 
       <AlertDialog open={!!sessionToRevoke} onOpenChange={() => setSessionToRevoke(null)}>
         <AlertDialogContent>
@@ -206,31 +202,31 @@ export function SessionManagement() {
           </AlertDialogHeader>
           {sessionToRevoke && (
             <div 
-              className="p-4 rounded-[--radius]" 
+              className="p-4 rounded-[var(--radius)]" 
               style={{ backgroundColor: 'var(--muted)' }}
             >
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                  <span style={{  color: 'var(--muted-foreground)' }}>
                     User:
                   </span>
-                  <span style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                  <span style={{  fontWeight: 'var(--font-weight-medium)' }}>
                     {sessionToRevoke.user}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                  <span style={{  color: 'var(--muted-foreground)' }}>
                     Device:
                   </span>
-                  <span style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                  <span style={{  fontWeight: 'var(--font-weight-medium)' }}>
                     {sessionToRevoke.device}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+                  <span style={{  color: 'var(--muted-foreground)' }}>
                     IP:
                   </span>
-                  <span style={{ fontSize: 'var(--text-14)', fontWeight: 'var(--font-weight-medium)' }}>
+                  <span style={{  fontWeight: 'var(--font-weight-medium)' }}>
                     {sessionToRevoke.ipAddress}
                   </span>
                 </div>

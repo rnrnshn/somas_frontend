@@ -45,8 +45,7 @@ export function BackofficeLogin() {
     try {
       const response = await loginMutation.mutateAsync({
         email,
-        password,
-      });
+        password});
       const normalizedUser = normalizeAuthUser(response.user);
       const normalizedRole = normalizedUser?.role;
 
@@ -93,11 +92,11 @@ export function BackofficeLogin() {
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-[--radius-card] bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-[var(--radius-card)] bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-primary" />
           </div>
           <h2 className="mb-2">{t('auth.backofficeTitle')}</h2>
-          <p style={{ fontSize: 'var(--text-14)', color: 'var(--muted-foreground)' }}>
+          <p style={{  color: 'var(--muted-foreground)' }}>
             {t('auth.backofficeSubtitle')}
           </p>
         </div>
@@ -123,7 +122,7 @@ export function BackofficeLogin() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@somas.gov"
+                  placeholder={"admin@somas.gov"}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={handleEmailBlur}
@@ -131,7 +130,7 @@ export function BackofficeLogin() {
                   required
                 />
                 {detectedTenant && (
-                  <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', marginTop: '4px' }}>
+                  <p style={{  color: 'var(--muted-foreground)', marginTop: '4px' }}>
                     {t('auth.tenant')}: {detectedTenant}
                   </p>
                 )}
@@ -142,7 +141,7 @@ export function BackofficeLogin() {
                   <Label htmlFor="password">{t('auth.password')}</Label>
                   <Link 
                     to="/backoffice/forgot-password" 
-                    style={{ fontSize: 'var(--text-12)', color: 'var(--primary)' }}
+                    style={{  color: 'var(--primary)' }}
                     className="hover:underline"
                   >
                     {t('auth.forgotPassword')}
@@ -151,7 +150,7 @@ export function BackofficeLogin() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={"••••••••"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading || accountStatus === 'locked' || accountStatus === 'disabled'}
@@ -174,7 +173,7 @@ export function BackofficeLogin() {
                   t('auth.signIn')
                 )}
               </Button>
-              <p style={{ fontSize: 'var(--text-12)', color: 'var(--muted-foreground)', textAlign: 'center' }}>
+              <p style={{  color: 'var(--muted-foreground)', textAlign: 'center' }}>
                 {t('auth.accessMonitored')}
               </p>
               <Button

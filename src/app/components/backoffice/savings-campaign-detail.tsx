@@ -6,8 +6,7 @@ import { useSavingsProgramQuery } from "@/features/savings-programs/hooks/use-sa
 import {
   adaptSavingsProgramDetail,
   buildParticipationData,
-  buildSavingsGrowth,
-} from "@/features/savings-programs/adapters/savings-programs";
+  buildSavingsGrowth} from "@/features/savings-programs/adapters/savings-programs";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -21,8 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+  DialogTitle} from "../ui/dialog";
 import {
   ArrowLeft,
   DollarSign,
@@ -112,12 +110,12 @@ export function SavingsCampaignDetail() {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 style={{ fontSize: "var(--text-32)", fontWeight: "var(--font-weight-semi-bold)" }}>
+              <h1 style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                 {campaign?.name ?? (savingsProgramQuery.isPending ? 'Loading savings campaign...' : 'Savings campaign unavailable')}
               </h1>
               {campaign ? getStatusBadge(campaign.status) : null}
             </div>
-            <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+            <p style={{  color: "var(--muted-foreground)" }}>
               {campaign ? `${campaign.id} • Linked to ${campaign.linkedCampaign} (${campaign.linkedCampaignId})` : 'Loading savings program details'}
             </p>
           </div>
@@ -137,7 +135,7 @@ export function SavingsCampaignDetail() {
       {errorMessage ? (
         <Card className="mb-6">
           <CardContent className="p-4">
-            <p style={{ fontSize: "var(--text-14)", color: "var(--error)" }}>{errorMessage}</p>
+            <p style={{  color: "var(--error)" }}>{errorMessage}</p>
           </CardContent>
         </Card>
       ) : null}
@@ -158,12 +156,12 @@ export function SavingsCampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                  <p style={{  color: "var(--muted-foreground)" }}>
                     Total Saved
                   </p>
                   <DollarSign className="w-5 h-5" style={{ color: "var(--success)" }} />
                 </div>
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                   {formatCurrency(campaign.totalSaved)}
                 </p>
               </CardContent>
@@ -172,15 +170,15 @@ export function SavingsCampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                  <p style={{  color: "var(--muted-foreground)" }}>
                     Participants
                   </p>
                   <Users className="w-5 h-5" style={{ color: "var(--primary)" }} />
                 </div>
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                   {campaign.participants.toLocaleString()}
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   of {campaign.totalBeneficiaries.toLocaleString()}
                 </p>
               </CardContent>
@@ -189,15 +187,15 @@ export function SavingsCampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                  <p style={{  color: "var(--muted-foreground)" }}>
                     Goal Progress
                   </p>
                   <Target className="w-5 h-5" style={{ color: "var(--primary)" }} />
                 </div>
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                   {goalProgress.toFixed(1)}%
                 </p>
-                <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                <p style={{  color: "var(--muted-foreground)", marginTop: "4px" }}>
                   Goal: {formatCurrency(campaign.savingsGoal)}
                 </p>
               </CardContent>
@@ -206,12 +204,12 @@ export function SavingsCampaignDetail() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                  <p style={{  color: "var(--muted-foreground)" }}>
                     Avg per Beneficiary
                   </p>
                   <TrendingUp className="w-5 h-5" style={{ color: "var(--primary)" }} />
                 </div>
-                <p style={{ fontSize: "var(--text-24)", fontWeight: "var(--font-weight-semi-bold)" }}>
+                <p style={{  fontWeight: "var(--font-weight-semi-bold)" }}>
                   {formatMetical(campaign.avgSavingsPerBeneficiary)}
                 </p>
               </CardContent>
@@ -221,15 +219,15 @@ export function SavingsCampaignDetail() {
           {/* Goal Progress */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Savings Goal Progress</CardTitle>
+              <CardTitle>Savings Goal Progress</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span style={{ fontSize: "var(--text-13)", color: "var(--muted-foreground)" }}>
+                  <span style={{  color: "var(--muted-foreground)" }}>
                     {formatCurrency(campaign.totalSaved)} of {formatCurrency(campaign.savingsGoal)}
                   </span>
-                  <span style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                  <span style={{  fontWeight: "var(--font-weight-medium)" }}>
                     {goalProgress.toFixed(1)}%
                   </span>
                 </div>
@@ -241,47 +239,47 @@ export function SavingsCampaignDetail() {
           {/* Campaign Details */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Campaign Details</CardTitle>
+              <CardTitle>Campaign Details</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
+                  <p style={{  color: "var(--muted-foreground)", marginBottom: "4px" }}>
                     Start Date
                   </p>
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     {formatDate(campaign.startDate)}
                   </p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
+                  <p style={{  color: "var(--muted-foreground)", marginBottom: "4px" }}>
                     End Date
                   </p>
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     {formatDate(campaign.endDate)}
                   </p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
+                  <p style={{  color: "var(--muted-foreground)", marginBottom: "4px" }}>
                     Minimum Contribution
                   </p>
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     {formatMetical(campaign.minimumContribution)}
                   </p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
+                  <p style={{  color: "var(--muted-foreground)", marginBottom: "4px" }}>
                     Matching Bonus
                   </p>
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     {campaign.matchingBonus}%
                   </p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)", marginBottom: "4px" }}>
+                  <p style={{  color: "var(--muted-foreground)", marginBottom: "4px" }}>
                     Participation Rate
                   </p>
-                  <p style={{ fontSize: "var(--text-14)", fontWeight: "var(--font-weight-medium)" }}>
+                  <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                     {participationRate.toFixed(1)}%
                   </p>
                 </div>
@@ -292,22 +290,21 @@ export function SavingsCampaignDetail() {
 
         {/* PARTICIPANTS TAB */}
         <TabsContent value="participants" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle style={{ fontSize: "var(--text-16)" }}>Savings Participants</CardTitle>
-                <div className="relative w-64">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
-                  <Input
-                    placeholder="Search participants..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>Savings Participants</h3>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
+                <Input
+                  placeholder={"Search participants..."}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+            </div>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -322,7 +319,7 @@ export function SavingsCampaignDetail() {
                   {participants.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-12">
-                        <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                        <p style={{  color: "var(--muted-foreground)" }}>
                           Savings participant rows are not wired yet for this screen.
                         </p>
                       </TableCell>
@@ -331,23 +328,23 @@ export function SavingsCampaignDetail() {
                     <TableRow key={participant.id}>
                       <TableCell>
                         <div>
-                          <p style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                          <p style={{  fontWeight: "var(--font-weight-medium)" }}>
                             {participant.name}
                           </p>
-                          <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                          <p style={{  color: "var(--muted-foreground)" }}>
                             {participant.id}
                           </p>
                         </div>
                       </TableCell>
-                      <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                      <TableCell style={{  fontWeight: "var(--font-weight-medium)" }}>
                         {formatMetical(participant.totalSaved)}
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p style={{ fontSize: "var(--text-13)" }}>
+                          <p>
                             {formatDate(participant.lastContribution)}
                           </p>
-                          <p style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                          <p style={{  color: "var(--muted-foreground)" }}>
                             {formatMetical(participant.contributionAmount)}
                           </p>
                         </div>
@@ -355,10 +352,10 @@ export function SavingsCampaignDetail() {
                       <TableCell>
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <span style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                            <span style={{  color: "var(--muted-foreground)" }}>
                               {formatMetical(participant.personalGoal)}
                             </span>
-                            <span style={{ fontSize: "var(--text-12)", fontWeight: "var(--font-weight-medium)" }}>
+                            <span style={{  fontWeight: "var(--font-weight-medium)" }}>
                               {participant.goalProgress}%
                             </span>
                           </div>
@@ -380,16 +377,16 @@ export function SavingsCampaignDetail() {
                 onPageChange={participantsPagination.setPage}
               />
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* SAVINGS HISTORY TAB */}
         <TabsContent value="history" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Savings Transactions</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
+          <div className="space-y-3">
+            <h3 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>Savings Transactions</h3>
+            <Card>
+              <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -404,23 +401,23 @@ export function SavingsCampaignDetail() {
                   {transactions.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-12">
-                        <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                        <p style={{  color: "var(--muted-foreground)" }}>
                           Savings transaction rows are not wired yet for this screen.
                         </p>
                       </TableCell>
                     </TableRow>
                   ) : transactionsPagination.paginatedItems.map((txn) => (
                     <TableRow key={txn.id}>
-                      <TableCell style={{ fontSize: "var(--text-12)", fontFamily: "var(--font-mono)" }}>
+                      <TableCell style={{  fontFamily: "var(--font-mono)" }}>
                         {txn.id}
                       </TableCell>
-                      <TableCell style={{ fontSize: "var(--text-13)" }}>
+                      <TableCell>
                         {txn.beneficiary}
                       </TableCell>
-                      <TableCell style={{ fontSize: "var(--text-13)", fontWeight: "var(--font-weight-medium)" }}>
+                      <TableCell style={{  fontWeight: "var(--font-weight-medium)" }}>
                         {formatMetical(txn.amount)}
                       </TableCell>
-                      <TableCell style={{ fontSize: "var(--text-12)", color: "var(--muted-foreground)" }}>
+                      <TableCell style={{  color: "var(--muted-foreground)" }}>
                         {txn.date}
                       </TableCell>
                       <TableCell>
@@ -438,7 +435,8 @@ export function SavingsCampaignDetail() {
                 onPageChange={transactionsPagination.setPage}
               />
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* ANALYTICS TAB */}
@@ -446,14 +444,14 @@ export function SavingsCampaignDetail() {
           {/* Savings Growth Chart */}
           <Card>
             <CardHeader>
-              <CardTitle style={{ fontSize: "var(--text-16)" }}>Savings Growth Over Time</CardTitle>
+              <CardTitle>Savings Growth Over Time</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={savingsGrowth}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="month" style={{ fontSize: "var(--text-12)" }} />
-                  <YAxis style={{ fontSize: "var(--text-12)" }} />
+                  <XAxis dataKey="month" />
+                  <YAxis />
                   <Tooltip />
                   <Line
                     type="monotone"
@@ -471,12 +469,12 @@ export function SavingsCampaignDetail() {
             {/* Savings by Region */}
             <Card>
               <CardHeader>
-                <CardTitle style={{ fontSize: "var(--text-16)" }}>Savings by Region</CardTitle>
+                <CardTitle>Savings by Region</CardTitle>
               </CardHeader>
               <CardContent>
                 {savingsByRegion.length === 0 ? (
                   <div className="flex h-[300px] items-center justify-center">
-                    <p style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+                    <p style={{  color: "var(--muted-foreground)" }}>
                       Region analytics are not wired yet for this screen.
                     </p>
                   </div>
@@ -484,8 +482,8 @@ export function SavingsCampaignDetail() {
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={savingsByRegion}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="region" style={{ fontSize: "var(--text-12)" }} />
-                      <YAxis style={{ fontSize: "var(--text-12)" }} />
+                      <XAxis dataKey="region" />
+                      <YAxis />
                       <Tooltip />
                       <Bar dataKey="amount" fill="var(--primary)" name="Amount (MZN)" />
                     </BarChart>
@@ -497,7 +495,7 @@ export function SavingsCampaignDetail() {
             {/* Participation Rate */}
             <Card>
               <CardHeader>
-                <CardTitle style={{ fontSize: "var(--text-16)" }}>Participation Rate</CardTitle>
+                <CardTitle>Participation Rate</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -529,10 +527,10 @@ export function SavingsCampaignDetail() {
       <Dialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle style={{ fontSize: "var(--text-20)" }}>
+            <DialogTitle>
               Suspend Savings Campaign
             </DialogTitle>
-            <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+            <DialogDescription style={{  color: "var(--muted-foreground)" }}>
               Are you sure you want to suspend this savings campaign? All savings activities will be paused.
             </DialogDescription>
           </DialogHeader>
@@ -551,10 +549,10 @@ export function SavingsCampaignDetail() {
       <Dialog open={showCloseDialog} onOpenChange={setShowCloseDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle style={{ fontSize: "var(--text-20)" }}>
+            <DialogTitle>
               Close Savings Campaign
             </DialogTitle>
-            <DialogDescription style={{ fontSize: "var(--text-14)", color: "var(--muted-foreground)" }}>
+            <DialogDescription style={{  color: "var(--muted-foreground)" }}>
               Are you sure you want to close this savings campaign? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
