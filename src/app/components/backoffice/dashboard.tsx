@@ -76,7 +76,7 @@ export function BackofficeDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
-  const [dateRange, setDateRange] = useState("today");
+  const [dateRange, setDateRange] = useState("month");
   const [region, setRegion] = useState("all");
   const [campaign, setCampaign] = useState("all");
   const { t } = useTranslation();
@@ -89,6 +89,7 @@ export function BackofficeDashboard() {
     campaignId: campaign === "all" ? undefined : Number(campaign)};
 
   const dashboard = useBackofficeDashboardQueries(filters);
+  const selectedPeriodLabel = getSelectedPeriodLabel(dateRange, t);
   const kpiMetrics = dashboard.overview.data?.kpis ?? {
     totalTransactions: 0,
     totalDisbursed: 0,
@@ -306,7 +307,7 @@ export function BackofficeDashboard() {
                       color: "var(--muted-foreground)",
                       marginTop: "8px"}}
                   >
-                    {t("dashboardPage.last30Days")}
+                    {selectedPeriodLabel}
                   </p>
                 </CardContent>
               </Card>
@@ -337,7 +338,7 @@ export function BackofficeDashboard() {
                       color: "var(--muted-foreground)",
                       marginTop: "8px"}}
                   >
-                    {t("dashboardPage.selectedPeriod")}
+                    {selectedPeriodLabel}
                   </p>
                 </CardContent>
               </Card>
@@ -461,7 +462,7 @@ export function BackofficeDashboard() {
                       color: "var(--muted-foreground)",
                       marginTop: "8px"}}
                   >
-                    Selected period
+                    {selectedPeriodLabel}
                   </p>
                 </CardContent>
               </Card>
@@ -1267,6 +1268,23 @@ function mapDateRange(value: string): DashboardFilters["period"] {
     case "quarter":
       return "last_90_days";
     default:
-      return "today";
+      return "last_30_days";
+  }
+}
+
+function getSelectedPeriodLabel(
+  value: string,
+  t: (key: string) => string,
+) {
+  switch (value) {
+    case "today":
+      return t("dashboardPage.today");
+    case "week":
+      return t("dashboardPage.thisWeek");
+    case "quarter":
+      return t("dashboardPage.thisQuarter");
+    case "month":
+    default:
+      return t("dashboardPage.last30Days");
   }
 }
