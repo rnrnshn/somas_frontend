@@ -41,7 +41,7 @@ function setStoredUser(user: AuthUser | null) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => getAccessToken())
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser())
-  const [isBootstrapping, setIsBootstrapping] = useState(Boolean(token))
+  const [isBootstrapping, setIsBootstrapping] = useState(() => Boolean(getAccessToken() && !getStoredUser()))
 
   useEffect(() => {
     if (!token) {
@@ -51,8 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false
+    const hasStoredUser = Boolean(user)
 
-    setIsBootstrapping(true)
+    setIsBootstrapping(!hasStoredUser)
 
     void getCurrentUser()
       .then((nextUser) => {
@@ -83,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [token])
+  }, [token, user])
 
   const value = useMemo<AuthContextValue>(
     () => ({
