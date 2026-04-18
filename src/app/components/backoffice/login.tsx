@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate, Link } from "@/lib/router";
+import { Navigate, useNavigate, Link, useLocation } from "@/lib/router";
 import { HttpError } from "@/lib/api/http-error";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useBackofficeLoginMutation } from "@/features/auth/hooks/use-login-mutation";
@@ -17,6 +17,7 @@ type AccountStatus = 'active' | 'locked' | 'disabled' | null;
 
 export function BackofficeLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, signIn, user } = useAuth();
   const loginMutation = useBackofficeLoginMutation();
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ export function BackofficeLogin() {
   const [detectedTenant, setDetectedTenant] = useState<string | null>(null);
   const isLoading = loginMutation.isPending;
   const { t } = useTranslation();
+  const showGatewayButton = location.pathname !== '/'
 
   const handleEmailBlur = () => {
     // Simulate tenant detection after email is entered
@@ -176,15 +178,17 @@ export function BackofficeLogin() {
               <p style={{  color: 'var(--muted-foreground)', textAlign: 'center' }}>
                 {t('auth.accessMonitored')}
               </p>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => navigate('/')}
-                disabled={isLoading}
-              >
-                {t('backToGateway')}
-              </Button>
+              {showGatewayButton ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => navigate('/')}
+                  disabled={isLoading}
+                >
+                  {t('backToGateway')}
+                </Button>
+              ) : null}
             </CardFooter>
           </form>
         </Card>
