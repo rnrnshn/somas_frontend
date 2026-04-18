@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   useDisbursementBatchesQuery,
   useFailedTransactionsQuery,
@@ -30,7 +30,7 @@ import { toast } from "sonner";
 export function BackofficeTransactions() {
   const { user } = useAuth();
   const isAnalyticsOnly = normalizeRole(user?.role) === 'analytics';
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTabState, setActiveTabState] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -46,11 +46,12 @@ export function BackofficeTransactions() {
   const [isCreatedToOpen, setIsCreatedToOpen] = useState(false);
   const [isExecutedFromOpen, setIsExecutedFromOpen] = useState(false);
   const [isExecutedToOpen, setIsExecutedToOpen] = useState(false);
-  const [selectedFailedTransactionIds, setSelectedFailedTransactionIds] = useState<number[]>([]);
+  const [selectedFailedTransactionIdsState, setSelectedFailedTransactionIdsState] = useState<number[]>([]);
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
   const [showTransactionDetail, setShowTransactionDetail] = useState(false);
   const { t } = useTranslation();
   const catalogs = useCampaignCatalogs();
+  const activeTab = isAnalyticsOnly ? 'analytics' : activeTabState;
 
   const filters: TransactionListFilters = {
     page: 1,
@@ -120,6 +121,14 @@ export function BackofficeTransactions() {
       return matchesCampaign;
     })
   ), [failedTransactionsQuery.data?.data, campaignFilter]);
+  const failedTransactionIds = useMemo(
+    () => new Set(failedTransactionsList.map((item) => item.numericId)),
+    [failedTransactionsList]
+  );
+  const selectedFailedTransactionIds = useMemo(
+    () => selectedFailedTransactionIdsState.filter((id) => failedTransactionIds.has(id)),
+    [failedTransactionIds, selectedFailedTransactionIdsState]
+  );
   const selectedTransaction = selectedTransactionQuery.data ? adaptTransaction(selectedTransactionQuery.data) : transactions.find((txn) => txn.numericId === selectedTransactionId) ?? null;
   const transactionsPagination = useTablePagination(transactions, undefined, [
     activeTab,
@@ -147,23 +156,6 @@ export function BackofficeTransactions() {
     executedFrom,
     executedTo,
   ]);
-
-  useEffect(() => {
-    if (isAnalyticsOnly && activeTab !== 'analytics') {
-      setActiveTab('analytics');
-    }
-  }, [activeTab, isAnalyticsOnly]);
-
-  useEffect(() => {
-    const failedIds = new Set(failedTransactionsList.map((item) => item.numericId));
-    setSelectedFailedTransactionIds((current) => {
-      const next = current.filter((id) => failedIds.has(id));
-      if (next.length === current.length && next.every((id, index) => id === current[index])) {
-        return current;
-      }
-      return next;
-    });
-  }, [failedTransactionsList]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant?: "default" | "secondary" | "outline" | "success" | "warning" | "destructive" }> = {
@@ -206,8 +198,18 @@ export function BackofficeTransactions() {
     setShowTransactionDetail(true);
   };
 
+  const setActiveTab = (nextTab: string) => {
+    if (!isAnalyticsOnly) {
+      setActiveTabState(nextTab);
+    }
+  };
+
+  const updateSelectedFailedTransactionIds = (updater: (current: number[]) => number[]) => {
+    setSelectedFailedTransactionIdsState((current) => updater(current.filter((id) => failedTransactionIds.has(id))));
+  };
+
   const toggleFailedTransaction = (transactionId: number, checked: boolean) => {
-    setSelectedFailedTransactionIds((current) => {
+    updateSelectedFailedTransactionIds((current) => {
       if (checked) return Array.from(new Set([...current, transactionId]));
       return current.filter((id) => id !== transactionId);
     });
@@ -229,7 +231,7 @@ export function BackofficeTransactions() {
       } else {
         toast.error('No transactions were scheduled for retry.');
       }
-      setSelectedFailedTransactionIds([]);
+      setSelectedFailedTransactionIdsState([]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Retry request failed.');
     }
@@ -745,10 +747,10 @@ export function BackofficeTransactions() {
                         onChange={(event) => {
                           const pageIds = failedTransactionsPagination.paginatedItems.map((item) => item.numericId);
                           if (event.target.checked) {
-                            setSelectedFailedTransactionIds((current) => Array.from(new Set([...current, ...pageIds])));
+                            updateSelectedFailedTransactionIds((current) => Array.from(new Set([...current, ...pageIds])));
                             return;
                           }
-                          setSelectedFailedTransactionIds((current) => current.filter((id) => !pageIds.includes(id)));
+                          updateSelectedFailedTransactionIds((current) => current.filter((id) => !pageIds.includes(id)));
                         }}
                       />
                     </TableHead>

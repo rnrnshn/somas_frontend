@@ -23,16 +23,13 @@ function Calendar({
   const currentYear = new Date().getFullYear();
   const fromYear = props.fromYear ?? currentYear;
   const toYear = props.toYear ?? currentYear + 5;
-  const [month, setMonth] = React.useState<Date>(props.month ?? new Date());
-
-  React.useEffect(() => {
-    if (props.month) {
-      setMonth(props.month);
-    }
-  }, [props.month]);
+  const [uncontrolledMonth, setUncontrolledMonth] = React.useState<Date>(props.month ?? new Date());
+  const month = props.month ?? uncontrolledMonth;
 
   const handleMonthChange = (nextMonth: Date) => {
-    setMonth(nextMonth);
+    if (props.month === undefined) {
+      setUncontrolledMonth(nextMonth);
+    }
     props.onMonthChange?.(nextMonth);
   };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Pagination,
@@ -17,26 +17,37 @@ export function useTablePagination<T>(
 ) {
   const [page, setPage] = useState(1)
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize))
+  const resetDepsRef = useRef(resetDeps)
+  const resetVersionRef = useRef(0)
 
-  useEffect(() => {
-    setPage(1)
-  }, resetDeps)
+  if (!areShallowEqual(resetDepsRef.current, resetDeps)) {
+    resetDepsRef.current = resetDeps
+    resetVersionRef.current += 1
+  }
 
-  useEffect(() => {
-    setPage((currentPage) => Math.min(currentPage, totalPages))
-  }, [totalPages])
+  const effectivePage = Math.min(resetVersionRef.current === 0 ? page : 1, totalPages)
+  const clampedPage = Math.min(effectivePage, totalPages)
 
-  const startIndex = (page - 1) * pageSize
+  const startIndex = (clampedPage - 1) * pageSize
   const endIndex = startIndex + pageSize
 
   return {
-    page,
+    page: clampedPage,
     pageSize,
-    setPage,
+    setPage: (nextPage: number) => {
+      resetVersionRef.current = 0
+      setPage(nextPage)
+    },
     totalItems: items.length,
     totalPages,
     paginatedItems: items.slice(startIndex, endIndex),
   }
+}
+
+function areShallowEqual(previous: readonly unknown[], next: readonly unknown[]) {
+  if (previous.length !== next.length) return false
+
+  return previous.every((value, index) => Object.is(value, next[index]))
 }
 
 type DataTablePaginationProps = {

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "@/lib/router";
+import { useState } from "react";
+import { Navigate, useParams, useNavigate } from "@/lib/router";
 import { useBeneficiaryDetailQueries } from "@/features/beneficiaries/hooks/use-beneficiary-queries";
 import { useUpdateBeneficiaryMutation } from "@/features/beneficiaries/hooks/use-beneficiary-mutations";
 import { useCampaignCatalogs, useDistrictCatalog } from "@/features/catalogs/hooks/use-catalog-queries";
@@ -20,41 +20,63 @@ export function BeneficiaryForm() {
   const isEdit = Number.isFinite(beneficiaryId);
   const queries = useBeneficiaryDetailQueries(beneficiaryId);
   const catalogs = useCampaignCatalogs();
+
+  if (!isEdit) {
+    return <Navigate to="/backoffice/beneficiaries" />
+  }
+
+  if (queries.profile.isPending && !queries.profile.data) {
+    return (
+      <div className="p-8">
+        <div className="mb-6">
+          <h1 style={{ fontWeight: 'var(--font-weight-semi-bold)' }}>Edit Beneficiary</h1>
+          <p style={{ color: 'var(--muted-foreground)', marginTop: '8px' }}>Loading beneficiary...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!queries.profile.data) {
+    return null
+  }
+
+  return (
+    <BeneficiaryEditForm
+      beneficiaryId={beneficiaryId}
+      navigate={navigate}
+      profile={queries.profile.data}
+      provinces={catalogs.provinces.data ?? []}
+    />
+  )
+}
+
+function BeneficiaryEditForm({
+  beneficiaryId,
+  navigate,
+  profile,
+  provinces,
+}: {
+  beneficiaryId: number
+  navigate: ReturnType<typeof useNavigate>
+  profile: NonNullable<ReturnType<typeof useBeneficiaryDetailQueries>['profile']['data']>
+  provinces: Array<{ id: number; name: string }>
+}) {
   const updateMutation = useUpdateBeneficiaryMutation(beneficiaryId);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-    provinceId: "",
-    districtId: "",
-    community: "",
-    notes: ""});
+  const [formData, setFormData] = useState(() => ({
+    fullName: profile.name,
+    phone: profile.msisdn,
+    email: profile.email ?? '',
+    provinceId: getCatalogId(profile.province, profile.provinceId),
+    districtId: getCatalogId(profile.district, profile.districtId),
+    community: profile.community ?? '',
+    notes: profile.notes ?? '',
+  }));
 
   const selectedProvinceId = Number(formData.provinceId);
   const districts = useDistrictCatalog(
     Number.isFinite(selectedProvinceId) && selectedProvinceId > 0 ? selectedProvinceId : undefined
   );
-
-  useEffect(() => {
-    if (!isEdit) {
-      toast.info('Standalone beneficiary creation is not available here. Add beneficiaries from a campaign instead.');
-      navigate('/backoffice/beneficiaries');
-      return;
-    }
-
-    const profile = queries.profile.data;
-    if (!profile) return;
-    setFormData({
-      fullName: profile.name,
-      phone: profile.msisdn,
-      email: profile.email ?? '',
-      provinceId: getCatalogId(profile.province, profile.provinceId),
-      districtId: getCatalogId(profile.district, profile.districtId),
-      community: profile.community ?? '',
-      notes: profile.notes ?? ''});
-  }, [isEdit, navigate, queries.profile.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,14 +117,11 @@ export function BeneficiaryForm() {
           Back to Beneficiaries
         </Button>
         <h1 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
-          {isEdit ? "Edit Beneficiary" : "Create New Beneficiary"}
+          Edit Beneficiary
         </h1>
         <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>
-          {isEdit ? "Update beneficiary information" : "Add a new beneficiary to the system"}
+          Update beneficiary information
         </p>
-        {isEdit && queries.profile.isPending ? (
-          <p style={{  color: 'var(--muted-foreground)', marginTop: '8px' }}>Loading beneficiary...</p>
-        ) : null}
       </div>
 
       {/* Form */}
@@ -185,9 +204,9 @@ export function BeneficiaryForm() {
                     <SelectValue placeholder={"Select province"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {(catalogs.provinces.data ?? []).map((province) => (
-                      <SelectItem key={province.id} value={String(province.id)}>{province.name}</SelectItem>
-                    ))}
+                      {provinces.map((province) => (
+                        <SelectItem key={province.id} value={String(province.id)}>{province.name}</SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -252,7 +271,7 @@ export function BeneficiaryForm() {
             Cancel
           </Button>
           <Button disabled={updateMutation.isPending} type="submit">
-            {isEdit ? "Save Changes" : "Create Beneficiary"}
+            Save Changes
           </Button>
         </div>
       </form>

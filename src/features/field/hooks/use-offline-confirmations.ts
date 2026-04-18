@@ -1,18 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { readOfflineConfirmations } from '@/features/field/lib/offline-queue'
 
 export function useOfflineConfirmations() {
-  const [items, setItems] = useState(() => readOfflineConfirmations())
+  return useSyncExternalStore(subscribeToOfflineConfirmations, readOfflineConfirmations, () => [])
+}
 
-  useEffect(() => {
-    const update = () => setItems(readOfflineConfirmations())
-    window.addEventListener('storage', update)
-    window.addEventListener('somas-field-queue-updated', update)
-    return () => {
-      window.removeEventListener('storage', update)
-      window.removeEventListener('somas-field-queue-updated', update)
-    }
-  }, [])
+function subscribeToOfflineConfirmations(onStoreChange: () => void) {
+  window.addEventListener('storage', onStoreChange)
+  window.addEventListener('somas-field-queue-updated', onStoreChange)
 
-  return items
+  return () => {
+    window.removeEventListener('storage', onStoreChange)
+    window.removeEventListener('somas-field-queue-updated', onStoreChange)
+  }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -12,17 +12,7 @@ export function FieldStatus() {
   const { t } = useTranslation();
   const items = useOfflineConfirmations();
   const syncMutation = useSyncFieldConfirmationsMutation();
-  const [isOnline, setIsOnline] = useState(() => navigator.onLine);
-
-  useEffect(() => {
-    const syncStatus = () => setIsOnline(navigator.onLine);
-    window.addEventListener('online', syncStatus);
-    window.addEventListener('offline', syncStatus);
-    return () => {
-      window.removeEventListener('online', syncStatus);
-      window.removeEventListener('offline', syncStatus);
-    };
-  }, []);
+  const isOnline = useOnlineStatus();
 
   return (
     <div className="p-6">
@@ -163,4 +153,22 @@ export function FieldStatus() {
       </Card>
     </div>
   );
+}
+
+function useOnlineStatus() {
+  return useSyncExternalStore(subscribeToOnlineStatus, getOnlineSnapshot, () => true)
+}
+
+function subscribeToOnlineStatus(onStoreChange: () => void) {
+  window.addEventListener('online', onStoreChange)
+  window.addEventListener('offline', onStoreChange)
+
+  return () => {
+    window.removeEventListener('online', onStoreChange)
+    window.removeEventListener('offline', onStoreChange)
+  }
+}
+
+function getOnlineSnapshot() {
+  return navigator.onLine
 }
