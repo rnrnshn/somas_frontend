@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { logout } from '@/features/auth/api/auth-api'
 import { AUTH_ME_QUERY_KEY, useCurrentUserQuery } from '@/features/auth/hooks/use-current-user-query'
@@ -22,16 +22,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
   const [token, setToken] = useState<string | null>(() => getAccessToken())
   const currentUserQuery = useCurrentUserQuery(token)
-
-  if (
+  const hasExpiredToken = Boolean(
     token
     && currentUserQuery.error instanceof HttpError
     && (currentUserQuery.error.status === 401 || currentUserQuery.error.status === 498)
-  ) {
+  )
+
+  useEffect(() => {
+    if (!hasExpiredToken) return
+
     clearAccessToken()
     setToken(null)
     queryClient.removeQueries({ queryKey: AUTH_ME_QUERY_KEY })
-  }
+  }, [hasExpiredToken, queryClient])
 
   const user = token ? currentUserQuery.data ?? null : null
   const isBootstrapping = Boolean(token) && currentUserQuery.isPending
