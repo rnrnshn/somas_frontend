@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { getCurrentUser, logout } from '@/features/auth/api/auth-api'
+import { useQueryClient } from '@tanstack/react-query'
+import { logout } from '@/features/auth/api/auth-api'
+import { AUTH_ME_QUERY_KEY, useCurrentUserQuery } from '@/features/auth/hooks/use-current-user-query'
 import type { AuthUser } from '@/features/auth/types/auth'
 import { HttpError } from '@/lib/api/http-error'
 import { normalizeAuthUser } from '@/lib/auth/roles'
@@ -14,77 +16,28 @@ type AuthContextValue = {
   signOut: () => Promise<void>
 }
 
-const AUTH_USER_KEY = 'somas.auth_user'
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-function getStoredUser(): AuthUser | null {
-  const raw = window.localStorage.getItem(AUTH_USER_KEY)
-  if (!raw) return null
-
-  try {
-    return normalizeAuthUser(JSON.parse(raw) as AuthUser)
-  } catch {
-    window.localStorage.removeItem(AUTH_USER_KEY)
-    return null
-  }
-}
-
-function setStoredUser(user: AuthUser | null) {
-  if (!user) {
-    window.localStorage.removeItem(AUTH_USER_KEY)
-    return
-  }
-
-  window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizeAuthUser(user)))
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient()
   const [token, setToken] = useState<string | null>(() => getAccessToken())
-  const [user, setUser] = useState<AuthUser | null>(() => getStoredUser())
-  const [isBootstrapping, setIsBootstrapping] = useState(() => Boolean(getAccessToken() && !getStoredUser()))
+  const currentUserQuery = useCurrentUserQuery(token)
+  const hasExpiredToken = Boolean(
+    token
+    && currentUserQuery.error instanceof HttpError
+    && (currentUserQuery.error.status === 401 || currentUserQuery.error.status === 498)
+  )
 
   useEffect(() => {
-    if (!token) {
-      setUser(null)
-      setIsBootstrapping(false)
-      return
-    }
+    if (!hasExpiredToken) return
 
-    let cancelled = false
-    const hasStoredUser = Boolean(user)
+    clearAccessToken()
+    setToken(null)
+    queryClient.removeQueries({ queryKey: AUTH_ME_QUERY_KEY })
+  }, [hasExpiredToken, queryClient])
 
-    setIsBootstrapping(!hasStoredUser)
-
-    void getCurrentUser()
-      .then((nextUser) => {
-        if (cancelled) return
-        const normalizedUser = normalizeAuthUser(nextUser)
-        setUser(normalizedUser)
-        setStoredUser(normalizedUser)
-      })
-      .catch((error: unknown) => {
-        if (cancelled) return
-
-        if (error instanceof HttpError && (error.status === 401 || error.status === 498)) {
-          clearAccessToken()
-          setStoredUser(null)
-          setToken(null)
-          setUser(null)
-          return
-        }
-
-        setUser(getStoredUser())
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsBootstrapping(false)
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [token, user])
+  const user = token ? currentUserQuery.data ?? null : null
+  const isBootstrapping = Boolean(token) && currentUserQuery.isPending
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -95,10 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn: (nextToken, nextUser) => {
         const normalizedUser = normalizeAuthUser(nextUser)
         setAccessToken(nextToken)
-        setStoredUser(normalizedUser)
         setToken(nextToken)
-        setUser(normalizedUser)
-        setIsBootstrapping(false)
+        queryClient.setQueryData(AUTH_ME_QUERY_KEY, normalizedUser ?? null)
+        if (!normalizedUser) {
+          void queryClient.invalidateQueries({ queryKey: AUTH_ME_QUERY_KEY })
+        }
       },
       signOut: async () => {
         try {
@@ -108,14 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch {
         } finally {
           clearAccessToken()
-          setStoredUser(null)
+          queryClient.removeQueries({ queryKey: AUTH_ME_QUERY_KEY })
           setToken(null)
-          setUser(null)
-          setIsBootstrapping(false)
         }
       },
     }),
-    [isBootstrapping, token, user]
+    [isBootstrapping, queryClient, token, user]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

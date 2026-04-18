@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Button } from '@/app/components/ui/button'
 import {
   Dialog,
@@ -43,25 +43,33 @@ const EMPTY_FORM: AddCampaignBeneficiaryPayload = {
 }
 
 export function CampaignAddBeneficiaryDialog({ open, isPending, onOpenChange, onSubmit }: Props) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {open ? (
+        <CampaignAddBeneficiaryDialogForm
+          isPending={isPending}
+          onOpenChange={onOpenChange}
+          onSubmit={onSubmit}
+        />
+      ) : null}
+    </Dialog>
+  )
+}
+
+function CampaignAddBeneficiaryDialogForm({ isPending, onOpenChange, onSubmit }: Omit<Props, 'open'>) {
   const { t } = useTranslation()
   const [form, setForm] = useState<AddCampaignBeneficiaryPayload>(EMPTY_FORM)
 
-  useEffect(() => {
-    if (open) return
-    setForm(EMPTY_FORM)
-  }, [open])
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{t('campaignDetailPage.addBeneficiary')}</DialogTitle>
-        </DialogHeader>
+    <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+      <DialogHeader>
+        <DialogTitle>{t('campaignDetailPage.addBeneficiary')}</DialogTitle>
+      </DialogHeader>
 
-        <div className="grid gap-4 py-2 sm:grid-cols-2">
-          <Field label={t('createCampaignPage.name')}>
-            <Input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
-          </Field>
+      <div className="grid gap-4 py-2 sm:grid-cols-2">
+        <Field label={t('createCampaignPage.name')}>
+          <Input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+        </Field>
 
           <Field label="MSISDN">
             <Input value={form.msisdn} onChange={(event) => setForm({ ...form, msisdn: event.target.value })} />
@@ -152,26 +160,25 @@ export function CampaignAddBeneficiaryDialog({ open, isPending, onOpenChange, on
           </Field>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
-            {t('createCampaignPage.cancel')}
-          </Button>
-          <Button
-            onClick={() =>
-              void onSubmit({
-                ...form,
-                name: form.name.trim(),
-                msisdn: form.msisdn.trim(),
-                dateOfBirth: normalizeDateOfBirth(form.dateOfBirth),
-              })
-            }
-            disabled={isPending}
-          >
-            {t('campaignDetailPage.addBeneficiary')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <DialogFooter>
+        <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
+          {t('createCampaignPage.cancel')}
+        </Button>
+        <Button
+          onClick={() =>
+            void onSubmit({
+              ...form,
+              name: form.name.trim(),
+              msisdn: form.msisdn.trim(),
+              dateOfBirth: normalizeDateOfBirth(form.dateOfBirth),
+            })
+          }
+          disabled={isPending}
+        >
+          {t('campaignDetailPage.addBeneficiary')}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   )
 }
 

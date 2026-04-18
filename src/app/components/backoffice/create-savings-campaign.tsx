@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "@/lib/router";
 import { useCampaignsQuery } from "@/features/campaigns/hooks/use-campaign-queries";
 import {
@@ -49,34 +49,75 @@ export function CreateSavingsCampaign() {
   const isEditMode = Number.isFinite(savingsProgramId);
   const campaignsQuery = useCampaignsQuery({ page: 1, pageSize: 100 });
   const savingsProgramQuery = useSavingsProgramQuery(savingsProgramId);
+  const initialFormData = buildInitialSavingsCampaignFormData(savingsProgramQuery.data);
+
+  if (isEditMode && savingsProgramQuery.isPending && !savingsProgramQuery.data) {
+    return null;
+  }
+
+  return (
+    <SavingsCampaignEditor
+      key={isEditMode ? `edit-${savingsProgramId}` : 'create'}
+      campaigns={campaignsQuery.data?.data ?? []}
+      isEditMode={isEditMode}
+      initialFormData={initialFormData}
+      navigate={navigate}
+      savingsProgramError={savingsProgramQuery.error}
+      savingsProgramId={savingsProgramId}
+    />
+  )
+}
+
+function buildInitialSavingsCampaignFormData(
+  savingsProgram: ReturnType<typeof useSavingsProgramQuery>['data']
+): SavingsCampaignFormData {
+  if (!savingsProgram) {
+    return {
+      name: "",
+      linkedCampaign: "",
+      startDate: "",
+      endDate: "",
+      savingsGoal: "",
+      minimumContribution: "",
+      matchingBonus: "",
+      enableMatchingBonus: false,
+      description: "",
+    }
+  }
+
+  return {
+    name: savingsProgram.name,
+    linkedCampaign: String(savingsProgram.campaignId),
+    startDate: savingsProgram.startDate,
+    endDate: savingsProgram.endDate,
+    savingsGoal: String(savingsProgram.savingsGoal),
+    minimumContribution: String(savingsProgram.minimumContribution),
+    matchingBonus: String(savingsProgram.matchingBonusPercentage ?? ''),
+    enableMatchingBonus: savingsProgram.matchingBonusEnabled,
+    description: savingsProgram.description ?? '',
+  }
+}
+
+function SavingsCampaignEditor({
+  campaigns,
+  initialFormData,
+  isEditMode,
+  navigate,
+  savingsProgramError,
+  savingsProgramId,
+}: {
+  campaigns: Array<{ id: number; name: string }>
+  initialFormData: SavingsCampaignFormData
+  isEditMode: boolean
+  navigate: ReturnType<typeof useNavigate>
+  savingsProgramError: unknown
+  savingsProgramId: number
+}) {
   const createMutation = useCreateSavingsProgramMutation();
   const updateMutation = useUpdateSavingsProgramMutation(savingsProgramId);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<SavingsCampaignFormData>({
-    name: "",
-    linkedCampaign: "",
-    startDate: "",
-    endDate: "",
-    savingsGoal: "",
-    minimumContribution: "",
-    matchingBonus: "",
-    enableMatchingBonus: false,
-    description: ""});
-
-  useEffect(() => {
-    if (!savingsProgramQuery.data) return;
-    setFormData({
-      name: savingsProgramQuery.data.name,
-      linkedCampaign: String(savingsProgramQuery.data.campaignId),
-      startDate: savingsProgramQuery.data.startDate,
-      endDate: savingsProgramQuery.data.endDate,
-      savingsGoal: String(savingsProgramQuery.data.savingsGoal),
-      minimumContribution: String(savingsProgramQuery.data.minimumContribution),
-      matchingBonus: String(savingsProgramQuery.data.matchingBonusPercentage ?? ''),
-      enableMatchingBonus: savingsProgramQuery.data.matchingBonusEnabled,
-      description: savingsProgramQuery.data.description ?? ''});
-  }, [savingsProgramQuery.data]);
+  const [formData, setFormData] = useState<SavingsCampaignFormData>(initialFormData);
 
   const validateForm = () => {
     if (!formData.name.trim()) return 'Enter a savings campaign name.';
@@ -206,7 +247,7 @@ export function CreateSavingsCampaign() {
                   <SelectValue placeholder={"Select a campaign"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {(campaignsQuery.data?.data ?? []).map((campaign) => (
+                  {campaigns.map((campaign) => (
                     <SelectItem key={campaign.id} value={String(campaign.id)}>{campaign.name}</SelectItem>
                   ))}
                 </SelectContent>

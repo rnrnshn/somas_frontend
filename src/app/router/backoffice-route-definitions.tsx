@@ -1,4 +1,5 @@
 import { lazyPage } from '@/app/router/lazy-page'
+import { BackofficeCampaigns } from '@/app/components/backoffice/campaigns'
 
 export const backofficeLayoutComponent = lazyPage(() =>
   import('@/app/components/backoffice/layout').then((module) => ({ default: module.BackofficeLayout }))
@@ -6,7 +7,7 @@ export const backofficeLayoutComponent = lazyPage(() =>
 
 export const backofficeRouteDefinitions = [
   { path: 'dashboard', component: lazyPage(() => import('@/app/components/backoffice/dashboard').then((module) => ({ default: module.BackofficeDashboard }))) },
-  { path: 'campaigns', component: lazyPage(() => import('@/app/components/backoffice/campaigns').then((module) => ({ default: module.BackofficeCampaigns }))) },
+  { path: 'campaigns', component: BackofficeCampaigns },
   { path: 'campaigns/create', component: lazyPage(() => import('@/app/components/backoffice/create-campaign').then((module) => ({ default: module.CreateCampaign }))) },
   { path: 'campaigns/$id/edit', component: lazyPage(() => import('@/app/components/backoffice/create-campaign').then((module) => ({ default: module.CreateCampaign }))) },
   { path: 'campaigns/$id', component: lazyPage(() => import('@/app/components/backoffice/campaign-detail').then((module) => ({ default: module.CampaignDetail }))) },

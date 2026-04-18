@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import type {
   CampaignBeneficiaryUploadPreview,
   CampaignBeneficiaryUploadPreviewRow,
@@ -32,18 +32,14 @@ const EMPTY_FORM: CampaignFormData = {
 }
 
 type Params = {
-  isEditMode: boolean
-  campaignData: any
-  existingBeneficiaries: any[] | undefined
+  initialFormData: CampaignFormData
   validateUpload: (file: File) => Promise<CampaignBeneficiaryUploadPreview>
   validateRows: (rows: CampaignBeneficiaryRow[]) => Promise<CampaignBeneficiaryUploadPreview>
   fileValidationErrorMessage: string
 }
 
 export function useCreateCampaignForm({
-  isEditMode,
-  campaignData,
-  existingBeneficiaries,
+  initialFormData,
   validateUpload,
   validateRows,
   fileValidationErrorMessage,
@@ -54,71 +50,7 @@ export function useCreateCampaignForm({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [uploadParseErrors, setUploadParseErrors] = useState<string[]>([])
   const [editingBeneficiaryId, setEditingBeneficiaryId] = useState<string | null>(null)
-  const [formData, setFormData] = useState<CampaignFormData>(EMPTY_FORM)
-
-  useEffect(() => {
-    if (!campaignData) return
-
-    setFormData((current) => ({
-      ...current,
-      name: campaignData.name ?? current.name,
-      program: campaignData.programRelation?.id ? String(campaignData.programRelation.id) : current.program,
-      region: campaignData.regionRelation?.id ? String(campaignData.regionRelation.id) : current.region,
-      province:
-        campaignData.provinceRelation?.id || campaignData.province?.id
-          ? String(campaignData.provinceRelation?.id ?? campaignData.province?.id)
-          : current.province,
-      district:
-        campaignData.districtRelation?.id || campaignData.district?.id
-          ? String(campaignData.districtRelation?.id ?? campaignData.district?.id)
-          : current.district,
-      startDate: campaignData.startDate ?? current.startDate,
-      endDate: campaignData.endDate ?? current.endDate,
-      description: campaignData.description ?? '',
-      enableSavings: campaignData.isSavingCampaignEnabled,
-      paymentChannel: campaignData.paymentChannel?.id
-        ? String(campaignData.paymentChannel.id)
-        : current.paymentChannel,
-      disbursementType: campaignData.disbursementType?.id
-        ? String(campaignData.disbursementType.id)
-        : current.disbursementType,
-      executionDate: campaignData.executionDate ?? '',
-    }))
-  }, [campaignData])
-
-  useEffect(() => {
-    if (!isEditMode || uploadedFile || !campaignData || !existingBeneficiaries) return
-
-    const rows = existingBeneficiaries.map((item) => ({
-      id: String(item.id),
-      index: item.id,
-      name: item.beneficiary?.name ?? 'Beneficiary',
-      msisdn: item.beneficiary?.msisdn ?? '—',
-      disbursementAmount: item.disbursementAmount,
-      testimony: null,
-      gender: null,
-      dateOfBirth: null,
-      email: null,
-      location: null,
-      province: null,
-      district: null,
-      community: null,
-      documentIdType: null,
-      documentIdNumber: null,
-      mobileMoneyProvider: null,
-      mobileMoneyAccountName: null,
-      mobileMoneyAccountNumber: null,
-      notes: null,
-      status: 'valid' as const,
-      errors: [],
-    }))
-
-    if (rows.length === 0) return
-
-    setFormData((current) =>
-      current.beneficiaries.length > 0 ? current : { ...current, beneficiaries: rows }
-    )
-  }, [campaignData, existingBeneficiaries, isEditMode, uploadedFile])
+  const [formData, setFormData] = useState<CampaignFormData>(initialFormData)
 
   const applyValidationPreview = (preview: CampaignBeneficiaryUploadPreview) => {
     setUploadParseErrors(
@@ -203,5 +135,56 @@ export function useCreateCampaignForm({
     handleFileUpload,
     handleEditBeneficiary,
     handleRemoveBeneficiary,
+  }
+}
+
+export function buildInitialCampaignFormData(campaignData: any, existingBeneficiaries: any[] | undefined) {
+  if (!campaignData) {
+    return EMPTY_FORM
+  }
+
+  return {
+    ...EMPTY_FORM,
+    name: campaignData.name ?? '',
+    program: campaignData.programRelation?.id ? String(campaignData.programRelation.id) : '',
+    region: campaignData.regionRelation?.id ? String(campaignData.regionRelation.id) : '',
+    province:
+      campaignData.provinceRelation?.id || campaignData.province?.id
+        ? String(campaignData.provinceRelation?.id ?? campaignData.province?.id)
+        : '',
+    district:
+      campaignData.districtRelation?.id || campaignData.district?.id
+        ? String(campaignData.districtRelation?.id ?? campaignData.district?.id)
+        : '',
+    startDate: campaignData.startDate ?? '',
+    endDate: campaignData.endDate ?? '',
+    description: campaignData.description ?? '',
+    enableSavings: campaignData.isSavingCampaignEnabled,
+    beneficiaries: (existingBeneficiaries ?? []).map((item) => ({
+      id: String(item.id),
+      index: item.id,
+      name: item.beneficiary?.name ?? 'Beneficiary',
+      msisdn: item.beneficiary?.msisdn ?? '—',
+      disbursementAmount: item.disbursementAmount,
+      testimony: null,
+      gender: null,
+      dateOfBirth: null,
+      email: null,
+      location: null,
+      province: null,
+      district: null,
+      community: null,
+      documentIdType: null,
+      documentIdNumber: null,
+      mobileMoneyProvider: null,
+      mobileMoneyAccountName: null,
+      mobileMoneyAccountNumber: null,
+      notes: null,
+      status: 'valid' as const,
+      errors: [],
+    })),
+    paymentChannel: campaignData.paymentChannel?.id ? String(campaignData.paymentChannel.id) : '',
+    disbursementType: campaignData.disbursementType?.id ? String(campaignData.disbursementType.id) : '',
+    executionDate: campaignData.executionDate ?? '',
   }
 }

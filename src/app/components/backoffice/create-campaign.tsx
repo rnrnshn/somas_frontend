@@ -23,7 +23,7 @@ import {
   useValidateCampaignBeneficiaryRowsMutation,
   useValidateCampaignBeneficiariesUploadMutation,
 } from '@/features/campaigns/hooks/use-campaign-mutations'
-import { useCreateCampaignForm } from '@/features/campaigns/hooks/use-create-campaign-form'
+import { buildInitialCampaignFormData, useCreateCampaignForm } from '@/features/campaigns/hooks/use-create-campaign-form'
 import { formatMetical } from '@/lib/format/currency'
 import { useNavigate, useParams } from '@/lib/router'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
@@ -47,11 +47,57 @@ export function CreateCampaign() {
   const validateUploadMutation = useValidateCampaignBeneficiariesUploadMutation()
   const validateRowsMutation = useValidateCampaignBeneficiaryRowsMutation()
   const { t } = useTranslation()
+  const initialFormData = buildInitialCampaignFormData(
+    campaignQuery.data,
+    existingCampaignBeneficiariesQuery.data?.data
+  )
 
+  if (isEditMode && (campaignQuery.isPending || catalogs.isPending) && !campaignQuery.data) {
+    return <CreateCampaignSkeleton />
+  }
+
+  return (
+    <CreateCampaignEditor
+      key={isEditMode ? `edit-${campaignId}` : 'create'}
+      campaignError={campaignQuery.error}
+      catalogs={catalogs}
+      createCampaignMutation={createCampaignMutation}
+      initialFormData={initialFormData}
+      isEditMode={isEditMode}
+      navigate={navigate}
+      t={t}
+      updateCampaignMutation={updateCampaignMutation}
+      validateRowsMutation={validateRowsMutation}
+      validateUploadMutation={validateUploadMutation}
+    />
+  )
+}
+
+function CreateCampaignEditor({
+  campaignError,
+  catalogs,
+  createCampaignMutation,
+  initialFormData,
+  isEditMode,
+  navigate,
+  t,
+  updateCampaignMutation,
+  validateRowsMutation,
+  validateUploadMutation,
+}: {
+  campaignError: unknown
+  catalogs: ReturnType<typeof useCampaignCatalogs>
+  createCampaignMutation: ReturnType<typeof useCreateCampaignMutation>
+  initialFormData: Parameters<typeof useCreateCampaignForm>[0]['initialFormData']
+  isEditMode: boolean
+  navigate: ReturnType<typeof useNavigate>
+  t: ReturnType<typeof useTranslation>['t']
+  updateCampaignMutation: ReturnType<typeof useUpdateCampaignMutation>
+  validateRowsMutation: ReturnType<typeof useValidateCampaignBeneficiaryRowsMutation>
+  validateUploadMutation: ReturnType<typeof useValidateCampaignBeneficiariesUploadMutation>
+}) {
   const form = useCreateCampaignForm({
-    isEditMode,
-    campaignData: campaignQuery.data,
-    existingBeneficiaries: existingCampaignBeneficiariesQuery.data?.data,
+    initialFormData,
     validateUpload: (file) => validateUploadMutation.mutateAsync(file),
     validateRows: (rows) => validateRowsMutation.mutateAsync(rows),
     fileValidationErrorMessage: t('createCampaignPage.fileValidationError'),
@@ -70,10 +116,6 @@ export function CreateCampaign() {
 
   const isRowValidationPending = validateRowsMutation.isPending || validateUploadMutation.isPending
   const isSavePending = createCampaignMutation.isPending || updateCampaignMutation.isPending
-
-  if (isEditMode && (campaignQuery.isPending || catalogs.isPending) && !campaignQuery.data) {
-    return <CreateCampaignSkeleton />
-  }
 
   return (
     <div className="mx-auto max-w-5xl p-8">
@@ -98,7 +140,7 @@ export function CreateCampaign() {
           districtsLoading={districtsLoading}
           submitError={form.submitError}
           catalogsError={catalogs.error}
-          campaignError={campaignQuery.error}
+          campaignError={campaignError}
         />
       ) : null}
 

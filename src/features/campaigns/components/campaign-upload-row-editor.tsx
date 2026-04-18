@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { CampaignBeneficiaryUploadPreviewRow } from '@/features/campaigns/types/campaign'
 import { normalizeDateOfBirth } from '@/features/campaigns/components/create-campaign-shared'
 import { Button } from '@/app/components/ui/button'
@@ -18,21 +18,33 @@ type Props = {
 }
 
 export function CampaignUploadRowEditor({ open, row, isPending = false, onOpenChange, onSave }: Props) {
-  const { t } = useTranslation()
-  const [draft, setDraft] = useState<CampaignBeneficiaryUploadPreviewRow | null>(row)
-
-  useEffect(() => {
-    setDraft(row ? { ...row, dateOfBirth: normalizeDateOfBirth(row.dateOfBirth) } : null)
-  }, [row])
-
-  if (!draft) return null
+  if (!open || !row) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{t('createCampaignPage.editBeneficiary')}</DialogTitle>
-        </DialogHeader>
+      <CampaignUploadRowEditorForm
+        key={row.id}
+        row={row}
+        isPending={isPending}
+        onOpenChange={onOpenChange}
+        onSave={onSave}
+      />
+    </Dialog>
+  )
+}
+
+function CampaignUploadRowEditorForm({ row, isPending = false, onOpenChange, onSave }: Omit<Props, 'open'>) {
+  const { t } = useTranslation()
+  const [draft, setDraft] = useState<CampaignBeneficiaryUploadPreviewRow>({
+    ...row!,
+    dateOfBirth: normalizeDateOfBirth(row!.dateOfBirth),
+  })
+
+  return (
+    <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+      <DialogHeader>
+        <DialogTitle>{t('createCampaignPage.editBeneficiary')}</DialogTitle>
+      </DialogHeader>
 
         <div className="grid gap-4 py-2 sm:grid-cols-2">
           <Field label={t('createCampaignPage.name')}>
@@ -124,24 +136,23 @@ export function CampaignUploadRowEditor({ open, row, isPending = false, onOpenCh
           </Field>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
-            {t('createCampaignPage.cancel')}
-          </Button>
-          <Button
-            onClick={() =>
-              void onSave({
-                ...draft,
-                dateOfBirth: normalizeDateOfBirth(draft.dateOfBirth),
-              })
-            }
-            disabled={isPending}
-          >
-            {t('createCampaignPage.saveRow')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <DialogFooter>
+        <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
+          {t('createCampaignPage.cancel')}
+        </Button>
+        <Button
+          onClick={() =>
+            void onSave({
+              ...draft,
+              dateOfBirth: normalizeDateOfBirth(draft.dateOfBirth),
+            })
+          }
+          disabled={isPending}
+        >
+          {t('createCampaignPage.saveRow')}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   )
 }
 
