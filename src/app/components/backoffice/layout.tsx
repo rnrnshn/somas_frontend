@@ -1,16 +1,21 @@
 import { Suspense } from "react";
 import { Navigate, Outlet, useNavigate, useLocation } from "@/lib/router";
 import { useAuth } from "@/lib/auth/auth-context";
-import { canAccessBackofficePath, getDefaultRouteForRole, isBackofficeRole, normalizeRole } from "@/lib/auth/roles";
-import { 
-  LayoutDashboard, 
-  Megaphone, 
-  Users, 
-  Receipt, 
+import {
+  canAccessBackofficePath,
+  getDefaultRouteForRole,
+  isBackofficeRole,
+  normalizeRole,
+} from "@/lib/auth/roles";
+import {
+  LayoutDashboard,
+  Megaphone,
+  Users,
+  Receipt,
   BarChart3,
   Settings,
   LogOut,
-  User
+  User,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { LanguageSwitcher } from "../language-switcher";
@@ -24,7 +29,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger} from "../ui/dropdown-menu";
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 type NavItem = {
   path: string;
@@ -40,47 +46,72 @@ export function BackofficeLayout() {
   const normalizedRole = normalizeRole(user?.role);
 
   const navItems: NavItem[] = [
-    { path: '/backoffice/dashboard', label: t('dashboard'), icon: LayoutDashboard },
-    { path: '/backoffice/campaigns', label: t('campaigns'), icon: Megaphone },
-    { path: '/backoffice/beneficiaries', label: t('beneficiaries'), icon: Users },
-    { path: '/backoffice/users', label: t('inquirers'), icon: Users },
-    { path: '/backoffice/transactions', label: t('transactions'), icon: Receipt },
-    { path: '/backoffice/metrics', label: t('insights'), icon: BarChart3 },
-    { path: '/backoffice/settings', label: t('settings'), icon: Settings }
+    {
+      path: "/backoffice/dashboard",
+      label: t("dashboard"),
+      icon: LayoutDashboard,
+    },
+    { path: "/backoffice/campaigns", label: t("campaigns"), icon: Megaphone },
+    {
+      path: "/backoffice/beneficiaries",
+      label: t("beneficiaries"),
+      icon: Users,
+    },
+    { path: "/backoffice/users", label: t("inquirers"), icon: Users },
+    {
+      path: "/backoffice/transactions",
+      label: t("transactions"),
+      icon: Receipt,
+    },
+    { path: "/backoffice/metrics", label: t("insights"), icon: BarChart3 },
+    { path: "/backoffice/settings", label: t("settings"), icon: Settings },
   ].filter((item) => canAccessBackofficePath(user?.role, item.path));
 
   const isPathActive = (path: string) => {
     // Special handling for certain paths
-    if (path === '/backoffice/metrics') {
-      return location.pathname === path || 
-             location.pathname.startsWith('/backoffice/reports') ||
-             location.pathname.startsWith('/backoffice/metrics');
+    if (path === "/backoffice/metrics") {
+      return (
+        location.pathname === path ||
+        location.pathname.startsWith("/backoffice/reports") ||
+        location.pathname.startsWith("/backoffice/metrics")
+      );
     }
-    if (path === '/backoffice/transactions') {
-      return location.pathname === path || 
-             location.pathname.startsWith('/backoffice/transactions') ||
-             location.pathname.startsWith('/backoffice/disbursements');
+    if (path === "/backoffice/transactions") {
+      return (
+        location.pathname === path ||
+        location.pathname.startsWith("/backoffice/transactions") ||
+        location.pathname.startsWith("/backoffice/disbursements")
+      );
     }
-    if (path === '/backoffice/beneficiaries') {
-      return location.pathname === path || 
-             location.pathname.startsWith('/backoffice/beneficiaries') ||
-             location.pathname.startsWith('/backoffice/field-verification');
+    if (path === "/backoffice/beneficiaries") {
+      return (
+        location.pathname === path ||
+        location.pathname.startsWith("/backoffice/beneficiaries") ||
+        location.pathname.startsWith("/backoffice/field-verification")
+      );
     }
-    if (path === '/backoffice/users') {
-      return location.pathname === path || location.pathname.startsWith('/backoffice/users/');
+    if (path === "/backoffice/users") {
+      return (
+        location.pathname === path ||
+        location.pathname.startsWith("/backoffice/users/")
+      );
     }
-    if (path === '/backoffice/settings') {
-      return location.pathname === path || 
-             location.pathname.startsWith('/backoffice/settings') ||
-             location.pathname.startsWith('/backoffice/roles') ||
-             location.pathname.startsWith('/backoffice/permissions') ||
-             location.pathname.startsWith('/backoffice/audit') ||
-             location.pathname.startsWith('/backoffice/sessions') ||
-             location.pathname.startsWith('/backoffice/system-events') ||
-             location.pathname.startsWith('/backoffice/sms-templates');
+    if (path === "/backoffice/settings") {
+      return (
+        location.pathname === path ||
+        location.pathname.startsWith("/backoffice/settings") ||
+        location.pathname.startsWith("/backoffice/roles") ||
+        location.pathname.startsWith("/backoffice/permissions") ||
+        location.pathname.startsWith("/backoffice/audit") ||
+        location.pathname.startsWith("/backoffice/sessions") ||
+        location.pathname.startsWith("/backoffice/system-events") ||
+        location.pathname.startsWith("/backoffice/sms-templates")
+      );
     }
-    
-    return location.pathname === path || location.pathname.startsWith(path + '/');
+
+    return (
+      location.pathname === path || location.pathname.startsWith(path + "/")
+    );
   };
 
   if (isBootstrapping) {
@@ -104,8 +135,8 @@ export function BackofficeLayout() {
       {/* Top Navigation Bar */}
       <header className="h-16 bg-card px-6 flex items-center justify-between sticky top-0 z-10 shadow-[0_6px_20px_rgba(15,23,42,0.08)]">
         <div className="flex items-center gap-6">
-          <h2 style={{  fontWeight: 'var(--font-weight-semi-bold)' }}>
-            {t('brand')}
+          <h2 style={{ fontWeight: "var(--font-weight-semi-bold)" }}>
+            {t("brand")}
           </h2>
           <TenantSwitcher />
         </div>
@@ -116,33 +147,40 @@ export function BackofficeLayout() {
               <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
                 <Avatar className="h-9 w-9">
                   <AvatarFallback>
-                    {user?.name?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? <User className="h-4 w-4" />}
+                    {user?.name?.[0]?.toUpperCase() ??
+                      user?.email?.[0]?.toUpperCase() ?? (
+                        <User className="h-4 w-4" />
+                      )}
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="space-y-1">
-                <p className="truncate text-sm font-medium">{user?.name ?? user?.email ?? t('brand')}</p>
-                <p className="truncate text-xs font-normal text-muted-foreground">{t(`roles.${normalizedRole ?? 'fallback'}`)}</p>
+                <p className="truncate text-sm font-medium">
+                  {user?.name ?? user?.email ?? t("brand")}
+                </p>
+                <p className="truncate text-xs font-normal text-muted-foreground">
+                  {t(`roles.${normalizedRole ?? "fallback"}`)}
+                </p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  navigate('/profile');
+                  navigate("/profile");
                 }}
               >
                 <User className="h-4 w-4" />
-                {t('profile')}
+                {t("profile")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={async () => {
                   await signOut();
-                  navigate('/');
+                  navigate("/");
                 }}
               >
                 <LogOut className="h-4 w-4" />
-                {t('logout')}
+                {t("logout")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -163,8 +201,8 @@ export function BackofficeLayout() {
                   onClick={() => navigate(item.path)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
                     isActive
-                      ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                      : 'text-sidebar-foreground hover:bg-sidebar-accent'
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -200,5 +238,5 @@ function BackofficeRouteSkeleton() {
       </div>
       <Skeleton className="h-80" />
     </div>
-  )
+  );
 }

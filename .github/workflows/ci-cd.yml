@@ -1,0 +1,44 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Create .env before build
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Use Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - name: Install & Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare folders on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.PROD_SERVER_IP }} \
+            'mkdir -p ${{ secrets.PROJECT_FOLDER }}/frontend'
+
+      - name: Sync static build to VPS
+        run: |
+          rsync -avz --delete \
+            dist/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.PROD_SERVER_IP }}:${{ secrets.PROJECT_FOLDER }}/frontend/
