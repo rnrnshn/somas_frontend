@@ -4,7 +4,7 @@ SOMAS – Social Mass Payments & Savings Platform
 
 SOMAS is a compliance-driven, multi-tenant financial infrastructure system used for large-scale social transfers.
 
-The design must be:
+The designs must be:
 	•	Simple
 	•	Elegant
 	•	Institutional
